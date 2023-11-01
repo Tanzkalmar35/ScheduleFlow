@@ -2,7 +2,7 @@ mod cli;
 mod calender_endpoint;
 
 fn main() {
-    let matches = cli::cli().get_matches();
+    let matches = cli::cli().get_matches(); // register the command
 
     match matches.subcommand() {
         Some(("add", sub_matches)) => {

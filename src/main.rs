@@ -1,10 +1,11 @@
 use clap::ArgMatches;
+mod calendar;
 
-mod cli;
-mod calender_endpoint;
+#[path = "util/cli_util.rs"]
+mod cli_util;
 
 fn main() {
-    let matches = cli::cli().get_matches(); // register the command
+    let matches = cli_util::cli().get_matches();
 
     match matches.subcommand() {
         Some(("add", sub_matches)) => {

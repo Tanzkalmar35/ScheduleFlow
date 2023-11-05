@@ -19,7 +19,7 @@
   </p>
 </p>
 
-![Contributors](https://img.shields.io/github/contributors/Tanzkalmar35/ScheduleFlow?color=dark-green) ![Forks](https://img.shields.io/github/forks/Tanzkalmar35/ScheduleFlow?style=social) ![Issues](https://img.shields.io/github/issues/Tanzkalmar35/ScheduleFlow) ![License](https://img.shields.io/github/license/Tanzkalmar35/ScheduleFlow) 
+![Contributors](https://img.shields.io/github/contributors/Tanzkalmar35/ScheduleFlow?color=dark-green) ![Forks](https://img.shields.io/github/forks/Tanzkalmar35/ScheduleFlow?style=social) ![Issues](https://img.shields.io/github/issues/Tanzkalmar35/ScheduleFlow)
 
 ## Table Of Contents
 

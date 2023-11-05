@@ -33,7 +33,7 @@ pub fn cli() -> Command {
                     Arg::new("to")
                         .long("to")
                         .short('t')
-                        .help("The tiem the event ends")
+                        .help("The time the event ends")
                         .required(true)
                 )
                 .arg(

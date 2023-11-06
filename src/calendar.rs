@@ -1,4 +1,14 @@
-#[path = "calendar/date_format.rs"]
-mod date_format;
-mod init;
-mod key;
+use icalendar::CalendarDateTime;
+
+struct Event {
+    title: String,
+    starting_time: Option<CalendarDateTime>,
+    ending_time: Option<CalendarDateTime>,
+    date: Option<CalendarDateTime>
+}
+
+impl Event {
+    fn new(title: String, starting_time: CalendarDateTime, ending_time: CalendarDateTime, date: CalendarDateTime) {
+
+    }
+}

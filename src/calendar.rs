@@ -8,7 +8,8 @@ struct Event {
 }
 
 impl Event {
+    /// Creates a new event
     fn new(title: String, starting_time: CalendarDateTime, ending_time: CalendarDateTime, date: CalendarDateTime) {
-
+    
     }
 }

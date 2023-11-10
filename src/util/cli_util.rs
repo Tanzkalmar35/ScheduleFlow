@@ -1,5 +1,6 @@
 use clap::{Arg, Command};
 
+/// Creates the command line commands.
 pub fn cli() -> Command {
     Command::new("scheduleflow")
         .about("A cli calendar tool")

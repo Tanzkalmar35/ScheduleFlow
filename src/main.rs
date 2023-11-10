@@ -1,5 +1,5 @@
-use clap::ArgMatches;
 mod calendar;
+use crate::calendar::add_event;
 
 #[path = "util/cli_util.rs"]
 mod cli_util;
@@ -19,16 +19,8 @@ fn main() {
             println!(
                 "You want to show your calendar? DENIED"
             );
-            show_event(_sub_matches);
+            //show_event();
         }
         _ => unreachable!(),
     }
-}
-
-fn add_event(args: &ArgMatches) {
-
-}
-
-fn show_event(args: &ArgMatches) {
-
 }

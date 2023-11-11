@@ -1,25 +1,31 @@
 mod calendar;
-use crate::calendar::add_event;
 
-#[path = "util/cli_util.rs"]
-mod cli_util;
+use icalendar::Calendar;
+use crate::calendar::{create_event, open_calendar_tui};
+
+#[path = "util/command_util.rs"]
+mod command_util;
+mod tui;
 
 fn main() {
-    let matches = cli_util::cli().get_matches();
+    // We need to store the calendar in a file and get it out of it instead of
+    // creating a new one every time the application starts.
+    let calendar = Calendar::new();
+
+    let matches = command_util::cmd().get_matches();
 
     match matches.subcommand() {
         Some(("add", sub_matches)) => {
-            println!(
-                "Following value for 'name' of 'add' was provided: {}",
-                sub_matches.get_one::<String>("name").expect("required")
-            );
-            add_event(sub_matches);
+            create_event(sub_matches)
+                .expect("Error creating a new event; sub_matches = " + sub_matches);
         },
-        Some(("show", _sub_matches)) => {
-            println!(
-                "You want to show your calendar? DENIED"
-            );
-            //show_event();
+        Some(("show", sub_matches)) => {
+            //open_calendar_tui(calendar)
+            //    .expect("Error opening the calendar in tui interface; calendar = " + &calendar);
+        },
+        Some(("open", sub_matches)) => {
+            open_calendar_tui(calendar)
+                .expect("Error opening the calendar in tui interface; calendar = " + &calendar);
         }
         _ => unreachable!(),
     }

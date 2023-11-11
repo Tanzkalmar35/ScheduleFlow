@@ -1,7 +1,7 @@
 use clap::{Arg, Command};
 
 /// Creates the command line commands.
-pub fn cli() -> Command {
+pub fn cmd() -> Command {
     Command::new("scheduleflow")
         .about("A cli calendar tool")
         .subcommand_required(true)
@@ -46,7 +46,7 @@ pub fn cli() -> Command {
         )
         .subcommand(
             Command::new("show")
-                .about("Shows the calendar of a specified date period")
+                .about("Opens a tui session for the calendar of either a specific date or a specific time span")
                 .arg(
                     Arg::new("date")
                         .long("date")
@@ -68,5 +68,9 @@ pub fn cli() -> Command {
                         .help("The ending date of the printed calendar")
                         .required_unless_present("date")
                 )
+        )
+        .subcommand(
+            Command::new("open")
+                .about("Opens a tui session with the whole calendar.")
         )
 }

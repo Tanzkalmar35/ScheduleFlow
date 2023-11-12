@@ -17,7 +17,7 @@ fn main() {
     match matches.subcommand() {
         Some(("add", sub_matches)) => {
             create_event(sub_matches)
-                .expect("Error creating a new event; sub_matches = " + sub_matches);
+                .expect("Error creating a new event");
         },
         Some(("show", sub_matches)) => {
             //open_calendar_tui(calendar)
@@ -25,7 +25,7 @@ fn main() {
         },
         Some(("open", sub_matches)) => {
             open_calendar_tui(calendar)
-                .expect("Error opening the calendar in tui interface; calendar = " + &calendar);
+                .expect("Error opening the calendar in tui interface");
         }
         _ => unreachable!(),
     }

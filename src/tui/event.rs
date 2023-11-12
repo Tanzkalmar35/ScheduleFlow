@@ -4,6 +4,8 @@ use std::time::{Duration, Instant};
 use crossterm::event;
 use crossterm::event::{KeyEvent, MouseEvent, Event as CrosstermEvent};
 
+use anyhow::Result;
+
 #[derive(Debug, Copy, Clone)]
 pub enum Event {
     /// Terminal tick.
@@ -75,7 +77,7 @@ impl EventHandler {
     ///
     /// This function will always block the current thread if
     /// there is no data available and it's possible for more data to be sent.
-    pub fn next(&self) -> Result<Event, Err> {
+    pub fn next(&self) -> Result<Event> {
         Ok(self.receiver.recv()?)
     }
 }

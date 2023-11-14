@@ -19,11 +19,11 @@ fn main() {
             create_event(sub_matches)
                 .expect("Error creating a new event");
         },
-        Some(("show", sub_matches)) => {
+        Some(("show", _sub_matches)) => {
             //open_calendar_tui(calendar)
             //    .expect("Error opening the calendar in tui interface; calendar = " + &calendar);
         },
-        Some(("open", sub_matches)) => {
+        Some(("open", _sub_matches)) => {
             open_calendar_tui(calendar)
                 .expect("Error opening the calendar in tui interface");
         }

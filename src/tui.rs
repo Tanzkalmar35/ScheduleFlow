@@ -8,7 +8,6 @@ use crossterm::{
 use anyhow::Result;
 
 use crate::tui::event::EventHandler;
-use crate::tui::tui_app::TuiApp;
 
 pub(crate) mod tui_app;
 pub(crate) mod event;
@@ -74,8 +73,8 @@ impl Tui {
     ///
     /// [`Draw`]: tui::Terminal::draw
     /// [`rendering`]: crate::ui:render
-    pub fn draw(&mut self, app: &mut TuiApp) -> Result<()> {
-        self.terminal.draw(|frame| ui::render(app, frame))?;
+    pub fn draw(&mut self) -> Result<()> {
+        self.terminal.draw(|frame| ui::render(frame))?;
         Ok(())
     }
 }

@@ -2,9 +2,8 @@ use ratatui::Frame;
 use ratatui::prelude::Alignment;
 use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, Borders, BorderType, Paragraph};
-use crate::tui::tui_app::TuiApp;
 
-pub fn render(app: &mut TuiApp, frame: &mut Frame) {
+pub fn render(frame: &mut Frame) {
     frame.render_widget(
         Paragraph::new(format!(
             "

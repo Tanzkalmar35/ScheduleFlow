@@ -10,6 +10,7 @@ impl TuiApp {
     }
 
     /// Handles the tick event of the terminal.
+    #[allow(unused)]
     pub fn tick(&self) {}
 
     /// Set the running to false to quit the application immediately

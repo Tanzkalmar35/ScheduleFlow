@@ -32,7 +32,7 @@ pub struct EventHandler {
 
 impl EventHandler {
     pub fn new(tick_rate: u64) -> Self {
-        /// Constructs a new instance of EventHandler.
+        // Constructs a new instance of EventHandler.
         let tick_rate = Duration::from_millis(tick_rate);
         let (sender, receiver) = mpsc::channel();
         let handler = {
@@ -42,7 +42,7 @@ impl EventHandler {
                 loop {
                     let timeout = tick_rate.checked_sub(last_tick.elapsed()).unwrap_or(tick_rate);
                     if event::poll(timeout).expect("no events available") {
-                        /// If an event is available, we process it
+                        // If an event is available, we process it
                         match event::read().expect("unable to read event") {
                             CrosstermEvent::Key(e) => {
                                 if e.kind == event::KeyEventKind::Press {
@@ -57,8 +57,8 @@ impl EventHandler {
                         }
                             .expect("failed to send terminal event")
                     }
-                    /// Update the last_tick value based on the time elapsed since the previous tick
-                    /// and send an Event::Tick on the channel.
+                    // Update the last_tick value based on the time elapsed since the previous tick
+                    // and send an Event::Tick on the channel.
                     if last_tick.elapsed() >= tick_rate {
                         sender.send(Event::Tick).expect("failed to send tick event");
                         last_tick = Instant::now();

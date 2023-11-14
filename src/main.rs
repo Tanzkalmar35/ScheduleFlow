@@ -27,6 +27,6 @@ fn main() {
             open_calendar_tui(calendar)
                 .expect("Error opening the calendar in tui interface");
         }
-        _ => unreachable!(),
+        _ => unimplemented!(),
     }
 }

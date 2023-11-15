@@ -6,13 +6,11 @@ use ratatui::widgets::{Block, Borders, BorderType, Paragraph};
 pub fn render(frame: &mut Frame) {
     frame.render_widget(
         Paragraph::new(format!(
-            "
-                Press `Esc`, `Ctrl-C` or `q` to stop running.\n\
-            "
+            "\nPress `Esc`, `Ctrl-C` or `q` to stop running.\n"
         ))
             .block(
                 Block::default()
-                    .title("Calendar app")
+                    .title(" Calendar app ")
                     .title_alignment(Alignment::Center)
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded),

@@ -34,7 +34,7 @@ pub fn create_event(cmd_arg: &ArgMatches) -> Result<calendar_event> {
 /// Opens a tui window with the calendar.
 pub fn open_calendar_tui(_calendar: Calendar) -> Result<()> {
     let mut app = TuiApp::new();
-    let backend = CrosstermBackend::new(std::io::stderr());
+    let backend = CrosstermBackend::new(std::io::stderr()); //TODO: Use TermWizBackend
     let terminal = Terminal::new(backend)?;
     let events = EventHandler::new(250);
     let mut tui = Tui::new(terminal, events);

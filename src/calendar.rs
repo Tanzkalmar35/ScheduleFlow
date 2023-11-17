@@ -1,9 +1,9 @@
 use clap::ArgMatches;
 use icalendar::{Event as calendar_event, Component, Calendar};
-use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 
 use anyhow::Result;
+use ratatui::backend::CrosstermBackend;
 
 use crate::tui::tui_app::TuiApp;
 use crate::tui::event::{Event, EventHandler};

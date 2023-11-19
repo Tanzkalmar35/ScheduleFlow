@@ -1,11 +1,10 @@
 use std::{io, panic};
 
+use anyhow::Result;
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
 };
-
-use anyhow::Result;
 
 use crate::tui::event::EventHandler;
 

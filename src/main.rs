@@ -28,6 +28,6 @@ fn main() {
             open_calendar_tui(calendar)
                 .expect("Error opening the calendar in tui interface");
         }
-        _ => unimplemented!(),
+        _ => unimplemented!("This command is not implemented yet"),
     }
 }

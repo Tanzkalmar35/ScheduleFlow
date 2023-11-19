@@ -1,10 +1,10 @@
 use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
-use crossterm::event;
-use crossterm::event::{KeyEvent, MouseEvent, Event as CrosstermEvent};
 
 use anyhow::Result;
+use crossterm::event;
+use crossterm::event::{Event as CrosstermEvent, KeyEvent, MouseEvent};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Event {
@@ -50,10 +50,10 @@ impl EventHandler {
                                 } else {
                                     Ok(()) // ignore KeyEventKind::Release on windows
                                 }
-                            },
+                            }
                             CrosstermEvent::Mouse(e) => sender.send(Event::Mouse(e)),
                             CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
-                            _ => unimplemented!()
+                            _ => Ok(()),
                         }
                             .expect("failed to send terminal event")
                     }
@@ -69,7 +69,7 @@ impl EventHandler {
         Self {
             sender,
             receiver,
-            handler
+            handler,
         }
     }
 

@@ -120,4 +120,3 @@ fn render_calendar_month(frame: &mut Frame, parent_layout: &Layouts, month: time
         parent_layout[idx],
     )
 }
-

@@ -23,7 +23,7 @@ pub fn render(frame: &mut Frame) {
             .title(" ScheduleFlow ")
             .title_alignment(Alignment::Center)
             .style(Style::new()
-                .fg(Color::Yellow)), // TODO: Make the color adjustable
+                .fg(Con)), // TODO: Make the color adjustable
         main_layout[0],
     );
 

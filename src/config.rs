@@ -29,13 +29,13 @@ impl ConfigBuilder {
     pub fn user(mut self, user: impl Into<User>) -> Self {
         self.user.insert(user.into());
         self
-    }   
+    }
 
     pub fn build(&self) -> Result<Config> {
         Ok(
             Config {
-                config = self.config,
-                user = self.user
+                color: self.color,
+                user: self.user,
             }
         )
     }

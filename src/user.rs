@@ -1,7 +1,14 @@
-struct User {}
+#[derive(Debug, Default)]
+pub struct User {
+    name: String,
+    config: Config,
+}
 
 impl User {
     pub fn new() -> Self {
-        User {}
+        User {
+            name: String::new(),
+            config: Config::new(),
+        }
     }
 }

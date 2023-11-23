@@ -1,3 +1,6 @@
+#[path = "user.rs"]
+mod user;
+
 /// Holds all available colors to choose from
 enum Colors {
     Yellow,
@@ -6,13 +9,13 @@ enum Colors {
 #[derive(Debug)]
 pub struct Config {
     color: Colors,
-    user: User, // TODO: Create a user
+    user: User,
 }
 
 #[derive(Default, Clone)]
 pub struct ConfigBuilder {
     color: Option<Colors>,
-    user: Option<User>, // TODO: Create a user
+    user: Option<User>,
 }
 
 /// The builder to complete the builder pattern for the application configuration

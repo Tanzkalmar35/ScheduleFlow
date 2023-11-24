@@ -1,3 +1,5 @@
+// TODO: add the config ref
+
 #[derive(Debug, Default)]
 pub struct User {
     name: String,

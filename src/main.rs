@@ -12,7 +12,9 @@ mod tui;
 fn main() {
     // We need to store the calendar in a file and get it out of it instead of
     // creating a new one every time the application starts.
-    let calendar = Calendar::new();
+    let calendar = Calendar::new(); // TODO: Store the calendar somewhere
+
+    let user = User::new(); // TODO: Store the user somewhere
 
     let user = config::User::new();
 

@@ -4,6 +4,7 @@ use icalendar::{Calendar, Component, Event as calendar_event};
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 
+use crate::config::User;
 use crate::tui::event::{Event, EventHandler};
 use crate::tui::Tui;
 use crate::tui::tui_app::TuiApp;
@@ -31,7 +32,7 @@ pub fn create_event(cmd_arg: &ArgMatches) -> Result<calendar_event> {
 }
 
 /// Opens a tui window with the calendar.
-pub fn open_calendar_tui(_calendar: Calendar) -> Result<()> {
+pub fn open_calendar_tui(_calendar: Calendar, user: &User) -> Result<()> {
     let mut app = TuiApp::new();
     let backend = CrosstermBackend::new(std::io::stderr());
     let terminal = Terminal::new(backend)?;
@@ -40,7 +41,7 @@ pub fn open_calendar_tui(_calendar: Calendar) -> Result<()> {
     tui.enter()?;
 
     while !app.should_quit {
-        tui.draw()?;
+        tui.draw(user)?;
         match tui.events.next()? {
             Event::Tick => {}
             Event::Key(key_event) => {

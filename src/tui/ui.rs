@@ -5,9 +5,11 @@ use ratatui::widgets::{Block, Borders};
 use ratatui::widgets::calendar::{CalendarEventStore, Monthly};
 use time::Date;
 
+use crate::config::User;
+
 type Layouts = std::rc::Rc<[ratatui::prelude::Rect]>;
 
-pub fn render(frame: &mut Frame) {
+pub fn render(frame: &mut Frame, user: &User) {
     let main_layout: Layouts = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -23,7 +25,7 @@ pub fn render(frame: &mut Frame) {
             .title(" ScheduleFlow ")
             .title_alignment(Alignment::Center)
             .style(Style::new()
-                .fg(Color::Yellow)), // TODO: Make the color adjustable
+                .fg(user.config.color)), // TODO: Make the color adjustable
         main_layout[0],
     );
 

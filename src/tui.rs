@@ -6,6 +6,7 @@ use crossterm::{
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
 };
 
+use crate::config::User;
 use crate::tui::event::EventHandler;
 
 pub(crate) mod tui_app;
@@ -72,8 +73,8 @@ impl Tui {
     ///
     /// [`Draw`]: tui::Terminal::draw
     /// [`rendering`]: crate::ui:render
-    pub fn draw(&mut self) -> Result<()> {
-        self.terminal.draw(|frame| ui::render(frame))?;
+    pub fn draw(&mut self, user: &User) -> Result<()> {
+        self.terminal.draw(|frame| ui::render(frame, user))?;
         Ok(())
     }
 }

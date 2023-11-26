@@ -73,4 +73,23 @@ pub fn cmd() -> Command {
             Command::new("open")
                 .about("Opens a tui session with the whole calendar.")
         )
+        .subcommand(
+            Command::new("config")
+                .about("Configures the application")
+                .arg_required_else_help(true)
+                .arg(
+                    Arg::new("color")
+                        .long("color")
+                        .short('c')
+                        .help("The color of the application")
+                )
+
+                .arg(
+                    Arg::new("user")
+                        .long("user")
+                        .short('u')
+                        .help("The name of the user")
+                        .required(true)
+                )
+        )
 }

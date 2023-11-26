@@ -1,5 +1,5 @@
-#[path = "user.rs"]
-mod user;
+use anyhow::Result;
+use icalendar::Calendar;
 
 /// Holds all available colors to choose from
 enum Colors {
@@ -7,15 +7,13 @@ enum Colors {
 }
 
 #[derive(Debug)]
-pub struct Config {
+struct Config {
     color: Colors,
-    user: User,
 }
 
-#[derive(Default, Clone)]
-pub struct ConfigBuilder {
+#[derive(Debug)]
+struct ConfigBuilder {
     color: Option<Colors>,
-    user: Option<User>,
 }
 
 /// The builder to complete the builder pattern for the application configuration
@@ -25,21 +23,31 @@ impl ConfigBuilder {
     }
 
     pub fn color(mut self, color: impl Into<Colors>) -> Self {
-        self.color.insert(color.into());
-        self
-    }
-
-    pub fn user(mut self, user: impl Into<User>) -> Self {
-        self.user.insert(user.into());
+        self.color = Some(color.into());
         self
     }
 
     pub fn build(&self) -> Result<Config> {
         Ok(
             Config {
-                color: self.color,
-                user: self.user,
+                color: self.color.expect("")
             }
         )
+    }
+}
+
+pub struct User {
+    name: String,
+    config: Config,
+    calendar: Calendar,
+}
+
+impl User {
+    pub fn new() -> Self {
+        User {
+            name: String::new(),
+            config: ConfigBuilder::new().build().unwrap(),
+            calendar: Calendar::new(),
+        }
     }
 }

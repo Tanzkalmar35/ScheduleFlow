@@ -1,26 +1,19 @@
-use surrealdb::dbs::Session;
 use surrealdb::engine::local::Mem;
-use surrealdb::kvs::Datastore;
 use surrealdb::Surreal;
 
+use anyhow::Result;
+
+type Database = Surreal<surrealdb::engine::local::Db>;
+
 struct SurrealDb {
-    datastore: Datastore,
-    session: Session,
+    datastore: Database,
 }
 
 impl SurrealDb {}
 
 #[derive(Default)]
 struct SurrealDbBuilder {
-    datastore: Option<Datastore>,
-    session: Option<Session>,
-}
-
-#[derive(Debug)]
-struct Person<'a> {
-    title: &'a str,
-    name: String,
-    marketing: bool,
+    database: Option<Database>,
 }
 
 impl SurrealDbBuilder {
@@ -28,14 +21,16 @@ impl SurrealDbBuilder {
         SurrealDbBuilder::default()
     }
 
-    async fn build() -> SurrealDb {
+    async fn build() -> Result<SurrealDb> {
         let db = Surreal::new::<Mem>(()).await?;
         db.use_ns("test").use_db("test").await?;
+        
+        Ok(
+            SurrealDb {
+                datastore: db,
+            }
+          )
 
-        SurrealDb {
-            datastore: db.datastore,
-            session: db.session,
-        }
 
         //let created = db
         //    .create("person")

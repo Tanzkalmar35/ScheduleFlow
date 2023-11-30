@@ -1,4 +1,3 @@
-use anyhow::Result;
 use clap::ArgMatches;
 use icalendar::Calendar;
 use ratatui::style::Color;
@@ -8,28 +7,18 @@ pub struct Config {
     pub color: Color,
 }
 
-#[derive(Debug, Default)]
-struct ConfigBuilder {
-    color: Option<Color>,
-}
-
-/// The builder to complete the builder pattern for the application configuration
-impl ConfigBuilder {
+#[allow(dead_code)]
+impl Config {
     pub fn new() -> Self {
-        ConfigBuilder::default()
+        Self {
+           color: Color::Yellow 
+        }
     }
 
-    pub fn color(mut self, color: Color) -> Self {
-        self.color = Some(color);
-        self
-    }
-
-    pub fn build(&self) -> Result<Config> {
-        Ok(
-            Config {
-                color: self.color.expect("No color specified. Please build the application config first.")
-            }
-        )
+    pub fn color(color: Color) -> Self {
+        Self {
+            color
+        }
     }
 }
 
@@ -45,7 +34,7 @@ impl User {
     pub fn new(cmd: &ArgMatches) -> Self {
         let name = String::from(cmd.get_one::<String>("user").unwrap());
         let color = String::from(cmd.get_one::<String>("color").unwrap());
-        let config = ConfigBuilder::new().color(conv_str_to_color(color)).build().unwrap();
+        let config = Config::color(conv_str_to_color(color));
         let calendar = Calendar::new();
 
         User {

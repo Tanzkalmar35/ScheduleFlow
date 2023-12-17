@@ -21,13 +21,6 @@ impl SurrealDbBuilder {
     }
 
     async fn build() -> Result<SurrealDb> {
-        let db = Surreal::new::<Mem>(()).await?;
-        db.use_ns("test").use_db("test").await?;
-
-        Ok(
-            SurrealDb {
-                datastore: db,
-            }
-        )
+        todo!()
     }
 }

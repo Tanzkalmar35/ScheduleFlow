@@ -10,7 +10,8 @@ mod command_util;
 mod calendar;
 mod config;
 mod tui;
-mod database;
+mod db;
+mod schema;
 
 #[tokio::main]
 async fn main() {

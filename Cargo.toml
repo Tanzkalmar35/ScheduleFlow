@@ -7,12 +7,12 @@ edition = "2021"
 anyhow = "1.0.75"
 clap = { version = "4.4.7" }
 crossterm = "0.27.0"
-icalendar = "0.15.8"
+icalendar = "0.16.0"
 serde = { version = "1.0.193", features = ["derive"] }
-surrealdb = { version = "1.0.0", features = ["kv-mem"] }
+diesel = { version = "2.1.4", features = ["postgres"] }
 time = "0.3.30"
-tokio = { version = "1.34.0", features = ["macros", "rt-multi-thread"] }
+dotenv = "0.15.0"
 
 [dependencies.ratatui]
-version = "0.24.0"
+version = "0.25.0"
 features = ["widget-calendar"]

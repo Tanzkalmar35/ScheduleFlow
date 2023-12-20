@@ -30,7 +30,7 @@ pub fn render(frame: &mut Frame, user: &User) {
     );
 
     let cal_cols = create_tui_cols(&main_layout, 1);
-
+    
     render_calendar(frame, &cal_cols);
 }
 

@@ -1,6 +1,10 @@
 use std::env;
+
 use diesel::{Connection, PgConnection};
 use dotenv::dotenv;
+
+#[path = "ops/calendar_ops.rs"]
+mod calendar_ops;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();

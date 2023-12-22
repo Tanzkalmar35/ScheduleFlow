@@ -12,6 +12,7 @@ serde = { version = "1.0.193", features = ["derive"] }
 diesel = { version = "2.1.4", features = ["postgres"] }
 time = "0.3.30"
 dotenv = "0.15.0"
+tokio = "1.35.1"
 
 [dependencies.ratatui]
 version = "0.25.0"

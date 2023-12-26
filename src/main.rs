@@ -11,7 +11,6 @@ mod calendar;
 mod config;
 mod tui;
 mod db;
-mod schema;
 
 #[tokio::main]
 async fn main() {

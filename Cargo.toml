@@ -12,7 +12,7 @@ serde = { version = "1.0.193", features = ["derive"] }
 time = "0.3.30"
 dotenv = "0.15.0"
 tokio = "1.35.1"
-skytable = "0.8.2"
+skytable = "0.8"
 
 [dependencies.ratatui]
 version = "0.25.0"

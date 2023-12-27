@@ -1,15 +1,27 @@
 use std::env;
 
-use skytable::{Config, Connection, query};
+use dotenv::dotenv;
+use skytable::{Config, Connection, Query, query};
 
 pub fn connect() -> anyhow::Result<Connection> {
-    let user = env::var("SKYTABLE_DB_USER").expect("skytable user env variable must be set.")
-        .parse::<&str>()?;
-    let password = env::var("SKYTABLE_DB_PASS").expect("skytable password env variable must be set.")
-        .parse::<&str>()?;
+    dotenv().ok();
+    let user = env::var("SKYTABLE_DB_USER").expect("skytable user env variable must be set.");
+    let password = env::var("SKYTABLE_DB_PASS").expect("skytable password env variable must be set.");
+    let connection = Config::new_default(user.as_str(), password.as_str()).connect().unwrap();
+    println!("{:?}", connection);
     Ok(
-        Config::new_default(user, password.as_str()).connect()?
+        connection
     )
+}
+
+pub fn setup(mut conn: &mut Connection) {
+    let mut query = query!("create space example");
+    // Create space
+    conn.query_parse::<()>(&query).unwrap();
+
+    query = query!("create model example.users(userId: uint64, username: string, password: string)");
+    // Create model
+    conn.query_parse::<()>(&query).unwrap();
 }
 
 /// Insert a new row into the database.
@@ -19,7 +31,12 @@ pub fn connect() -> anyhow::Result<Connection> {
 /// conn - The connection to the database.
 /// model - The model to insert the row into.
 /// values - The values to insert into the row.
-pub fn insert(mut conn: Connection, model: String, values: Vec<String>) {
-    let query = query!("insert into scheduleflow.{}({})", model, values);
-    conn.query_parse::<()>(&query).unwrap();
+pub fn insert(mut conn: &mut Connection, query: Query) {
+    //let query = query!("insert into scheduleflow.{}({})", model, values);
+    println!("{:?}", conn.query(&query).expect("Error inserting into the db"));
+}
+
+pub fn get(mut conn: &mut Connection, query: Query) {
+    //let query = query!("select password from scheduleflow.users where username = ?", username);
+    println!("{:?}", conn.query_parse::<()>(&query).expect("Error reading from the db"));
 }

@@ -2,7 +2,7 @@ use skytable::query;
 
 use types::User;
 
-use crate::db::access::{connect, insert};
+use crate::db::access::{connect, insert, setup};
 
 #[path = "types.rs"]
 mod types;
@@ -14,7 +14,7 @@ pub fn create_user(username: String, password: String) -> User {
         password,
     };
     let mut conn = connect().unwrap();
-    //setup(&mut conn);
+    setup(&mut conn);
     insert(&mut conn, query!("insert into example.users(?, ?, ?)", 5u64, &user.username, &user.password));
     user
 }

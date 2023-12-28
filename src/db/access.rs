@@ -15,13 +15,13 @@ pub fn connect() -> anyhow::Result<Connection> {
 }
 
 pub fn setup(mut conn: &mut Connection) {
-    let mut query = query!("create space example");
+    let mut query = query!("CREATE SPACE IF NOT EXISTS example");
     // Create space
-    conn.query_parse::<()>(&query).unwrap();
+    println!("{:?}", conn.query(&query).unwrap());
 
-    query = query!("create model example.users(userId: uint64, username: string, password: string)");
+    query = query!("CREATE MODEL IF NOT EXISTS example.users(userId: uint64, username: string, password: string)");
     // Create model
-    conn.query_parse::<()>(&query).unwrap();
+    println!("{:?}", conn.query(&query).unwrap());
 }
 
 /// Insert a new row into the database.
@@ -38,5 +38,5 @@ pub fn insert(mut conn: &mut Connection, query: Query) {
 
 pub fn get(mut conn: &mut Connection, query: Query) {
     //let query = query!("select password from scheduleflow.users where username = ?", username);
-    println!("{:?}", conn.query_parse::<()>(&query).expect("Error reading from the db"));
+    println!("{:?}", conn.query(&query).expect("Error reading from the db"));
 }

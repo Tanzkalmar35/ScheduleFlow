@@ -11,7 +11,7 @@ icalendar = "0.16.0"
 serde = { version = "1.0.193", features = ["derive"] }
 time = "0.3.30"
 dotenv = "0.15.0"
-tokio = "1.35.1"
+tokio = { version = "1.35.1", features = ["rt", "rt-multi-thread", "macros"] }
 
 [dependencies.ratatui]
 version = "0.25.0"

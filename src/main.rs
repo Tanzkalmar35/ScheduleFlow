@@ -4,14 +4,13 @@ use icalendar::Calendar;
 use crate::calendar::{create_event, open_calendar_tui};
 use crate::config::User;
 
-#[path = "util/command_util.rs"]
-mod command_util;
+#[path = "cmd/cmd.rs"]
+mod cmd;
 
 mod calendar;
 mod config;
 mod tui;
 mod db;
-mod schema;
 
 #[tokio::main]
 async fn main() {
@@ -21,7 +20,7 @@ async fn main() {
     let calendar = Calendar::new();
     let user = User::new(&ArgMatches::default());
 
-    let matches = command_util::cmd().get_matches();
+    let matches = cmd::cmd().get_matches();
 
     match matches.subcommand() {
         Some(("add", sub_matches)) => {

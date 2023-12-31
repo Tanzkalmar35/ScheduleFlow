@@ -65,7 +65,7 @@ pub trait Table {
     }
 
     /// The table specific implementation for adding a new entry.
-    fn add(driver: PgDriver);
+    fn store(&self, driver: PgDriver);
 
     /// The table specific implementation for retrieving an entry.
     fn retrieve();

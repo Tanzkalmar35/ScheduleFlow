@@ -13,6 +13,7 @@ time = "0.3.30"
 dotenv = "0.15.0"
 tokio = { version = "1.35.1", features = ["rt", "rt-multi-thread", "macros"] }
 postgres = "0.19.7"
+struct-field-names-as-array = "0.3.0"
 
 [dependencies.ratatui]
 version = "0.25.0"

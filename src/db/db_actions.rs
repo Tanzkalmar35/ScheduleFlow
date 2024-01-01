@@ -43,7 +43,7 @@ pub trait Table {
     /// * `table` - The table to query.
     /// * `cols` - The columns to query.
     /// * `condition` - The condition to query. Optional.
-    fn query(mut driver: PgDriver, table: String, cols: Vec<String>, condition: Option<String>) {
+    fn read(mut driver: PgDriver, table: String, cols: Vec<String>, condition: Option<String>) {
         match condition {
             None => {
                 driver.exec(&format!("SELECT {:?} FROM {}", cols, table))

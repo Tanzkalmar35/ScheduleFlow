@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use postgres::Client;
 
 /// The database driver for PostgreSQL.
@@ -13,7 +14,12 @@ pub struct PgDriver {
 
 impl PgDriver {
     /// Sets up the database driver.
-    pub fn setup(user: String, pass: String, name: String, address: String) -> anyhow::Result<Self> {
+    pub fn setup() -> anyhow::Result<Self> {
+        dotenv().ok();
+        let name = std::env::var("PSQL_NAME").expect("PSQL_NAME must be set.");
+        let user = std::env::var("PSQL_USER").expect("PSQL_USER must be set.");
+        let pass = std::env::var("PSQL_PASS").expect("PSQL_PASS must be set.");
+        let address = std::env::var("PSQL_IP").expect("PSQL_IP must be set.");
         let url = format!("postgres://{}:{}@{}/{}", user, pass, address, name);
         Ok(
             Self {

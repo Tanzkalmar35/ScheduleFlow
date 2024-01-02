@@ -52,3 +52,16 @@ impl Table for User {
         todo!()
     }
 }
+
+#[test]
+pub fn test_user_insertion() {
+    let user = User::new(
+        String::from("Max"),
+        String::from("Mustermann"),
+        String::from("Musterstr. 1"),
+        String::from("Mustercity"),
+    );
+    let mut driver = PgDriver::setup().unwrap();
+    driver.connect().unwrap();
+    user.store(driver);
+}

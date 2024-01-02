@@ -44,4 +44,10 @@ impl PgDriver {
         self.client.as_mut().unwrap().execute(query, &[])?;
         Ok(())
     }
+
+    /// Queries the database.
+    pub fn query(&mut self, query: &str) -> anyhow::Result<Vec<postgres::Row>> {
+        let rows = self.client.as_mut().unwrap().query(query, &[])?;
+        Ok(rows)
+    }
 }

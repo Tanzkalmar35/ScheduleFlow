@@ -4,7 +4,7 @@ use crate::db::db_actions::Table;
 use crate::db::pg_driver::PgDriver;
 
 #[derive(FieldNamesAsArray)]
-struct User {
+pub struct User {
     lastname: String,
     firstname: String,
     address: String,
@@ -32,7 +32,7 @@ impl Table for User {
     fn store(&self, driver: PgDriver) {
         let cols = Vec::from(User::FIELD_NAMES_AS_ARRAY);
         let vals = self.vals();
-        User::insert(
+        Self::insert(
             driver,
             "users",
             cols,
@@ -40,8 +40,21 @@ impl Table for User {
         );
     }
 
-    fn retrieve() {
-        todo!()
+    fn retrieve(driver: PgDriver) -> Vec<User> {
+        let cols = vec![String::from("*"), String::from("lastname")];
+        let condition = None;
+        Self::read(
+            driver,
+            "users",
+            cols,
+            condition,
+        );
+        vec![User::new(
+            String::from("Max"),
+            String::from("Mustermann"),
+            String::from("Musterstr. 1"),
+            String::from("Mustercity"),
+        )]
     }
 
     fn edit() {
@@ -64,4 +77,11 @@ pub fn test_user_insertion() {
     let mut driver = PgDriver::setup().unwrap();
     driver.connect().unwrap();
     user.store(driver);
+}
+
+#[test]
+pub fn test_user_retrieval() {
+    let mut driver = PgDriver::setup().unwrap();
+    driver.connect().unwrap();
+    User::retrieve(driver);
 }

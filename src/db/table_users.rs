@@ -85,3 +85,13 @@ pub fn test_user_retrieval() {
     driver.connect().unwrap();
     User::retrieve(driver);
 }
+
+#[test]
+pub fn test_user_update() {
+    todo!()
+}
+
+#[test]
+pub fn test_user_deletion() {
+    todo!()
+}

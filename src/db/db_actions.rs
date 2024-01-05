@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use struct_field_names_as_array::FieldNamesAsArray;
+
 use crate::db::pg_driver::PgDriver;
 use crate::db::table_users::User;
 
@@ -44,24 +48,27 @@ pub trait Table {
     /// * `table` - The table to query.
     /// * `cols` - The columns to query.
     /// * `condition` - The condition to query. Optional.
-    fn read(mut driver: PgDriver, table: &str, cols: Vec<String>, condition: Option<String>) -> Vec<User> {
-        let col = cols.iter().map(|c| format!("{}", c)).collect::<Vec<_>>().join(", ");
-        match condition {
-            None => {
-                let x = &format!("SELECT {} FROM {}", col, table);
-                for row in driver.query(x).expect("Query failed.") {
-                    let id: i32 = row.get(0);
-                    let lastname: String = row.get(1);
-                    let firstname: String = row.get(2);
-                    println!("found user: {}, {}, {}", id, firstname, lastname)
-                }
-            }
-            Some(condition) => {
-                driver.exec(&format!("SELECT {:?} FROM {} WHERE {}", cols, table, condition))
-                    .expect("Query failed.");
-            }
+    fn read(mut driver: PgDriver, table: &str, mut cols: Vec<String>, condition: Option<String>) -> Vec<User> {
+        let mut res = vec![];
+        let fmt_cols = cols.iter().map(|c| format!("{:?}", c)).collect::<Vec<_>>().join(", ");
+
+        let rows = match condition {
+            Some(condition) => driver.query(&format!("SELECT {} FROM {} WHERE {}", fmt_cols, table, condition))?,
+            None => driver.query(&format!("SELECT {} FROM {}", fmt_cols, table))?
         };
-        todo!();
+
+        for row in rows {
+            let mut map = HashMap::new();
+            let mut cols = cols.clone();
+            if cols.eq("*") {
+                cols = Vec::from(User::FIELD_NAMES_AS_ARRAY.iter().map(|fld| return fld.to_string();));
+            }
+            for (i, col) in cols.iter().enumerate() {
+                map.insert(col.clone(), row.get(i));
+            }
+            res.push(map);
+        }
+        todo!("Make res a list of users")
     }
 
     fn update(&self) {

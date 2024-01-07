@@ -13,7 +13,7 @@ pub struct User {
 
 impl User {
     /// Creates a new user.
-    fn new(lastname: String, firstname: String, address: String, city: String) -> Self {
+    pub(crate) fn new(lastname: String, firstname: String, address: String, city: String) -> Self {
         Self {
             lastname,
             firstname,
@@ -41,14 +41,15 @@ impl Table for User {
     }
 
     fn retrieve(driver: PgDriver) -> Vec<User> {
-        let cols = vec![String::from("*"), String::from("lastname")];
+        let cols = vec![String::from("*")];
         let condition = None;
-        Self::read(
+        let res = Self::read(
             driver,
             "users",
             cols,
             condition,
         );
+        println!("{:?}", res);
         vec![User::new(
             String::from("Max"),
             String::from("Mustermann"),

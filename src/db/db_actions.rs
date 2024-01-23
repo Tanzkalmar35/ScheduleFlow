@@ -22,8 +22,8 @@ use crate::db::table_users::User;
 /// }
 ///
 /// fn main() {
-///    // Now you can access all base and user specific implementations
-///    User::insert([args]);
+///    // Now you can access all base- and user specific implementations
+///    User::insert(args);
 /// }
 pub trait Table {
     /// Inserts a new entry into a given table table.

@@ -75,6 +75,7 @@ pub trait Table {
         res
     }
 
+    /// Updates an entry
     fn update(&self) {
         todo!()
     }

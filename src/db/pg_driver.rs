@@ -40,9 +40,14 @@ impl PgDriver {
     }
 
     /// Executes a query on the database.
-    pub fn exec(&mut self, query: &str) -> anyhow::Result<()> {
-        self.client.as_mut().unwrap().execute(query, &[])?;
-        Ok(())
+    pub fn exec(&mut self, query: &str) -> anyhow::Result<Vec<postgres::Row>> {
+        match self.client.as_mut() {
+            Some(client) => {
+                let rows = client.query(query, &[])?;
+                Ok(rows)
+            }
+            None => Err(anyhow::anyhow!("Database client is not connected.")),
+        }
     }
 
     /// Queries the database.

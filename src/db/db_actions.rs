@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use crate::db::pg_driver::PgDriver;
 use crate::db::table_users::User;
 
+pub type Row = HashMap<String, String>;
+
 /// This module holds the base implementation for the CRUD operations
 ///
 /// Example usage:
@@ -31,13 +33,13 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn insert(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> i32 {
+    fn insert(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
         let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
         let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
         println!("cols: {}, vals: {}", cols, vals);
         let rows = driver.exec(&format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals))
             .expect("Insertion failed.");
-        rows.get(0).unwrap().get("userid")
+        Ok(rows.get(0).unwrap().get("userid"))
     }
 
     /// Queries a given table.
@@ -47,7 +49,7 @@ pub trait Table {
     /// * `table` - The table to query.
     /// * `cols` - The columns to query.
     /// * `condition` - The condition to query. Optional.
-    fn read(mut driver: PgDriver, table: &str, mut cols: Vec<String>, condition: Option<String>) -> Vec<HashMap<String, String>> {
+    fn read(mut driver: PgDriver, table: &str, mut cols: Vec<String>, condition: Option<String>) -> Result<Vec<Row>, Box<dyn std::error::Error>> {
         let mut res = vec![];
 
         if cols.contains(&"*".to_string()) && cols.len() == 1 {
@@ -64,13 +66,13 @@ pub trait Table {
         };
 
         for row in &rows {
-            let mut map = HashMap::new();
+            let mut row_data = Row::new();
             for (i, col) in cols.iter().enumerate() {
-                map.insert(col.clone(), row.get(i));
+                row_data.insert(col.clone(), row.get(i));
             }
-            res.push(map);
+            res.push(row_data);
         }
-        res
+        Ok(res)
     }
 
     /// Updates a given entry.
@@ -80,7 +82,7 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn alter(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, condition: Option<&str>) {
+    fn alter(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, condition: Option<&str>) -> Result<(), dyn std::error::Error> {
         let update_stmt = cols.iter().zip(vals.iter()).map(|(c, v)|
             format!("\"{}\" = '{}'", c, v)).collect::<Vec<_>>().join(", ");
         match condition {
@@ -93,6 +95,7 @@ pub trait Table {
                     .expect("Update failed.")
             }
         };
+        Ok(())
     }
 
     /// Deletes an entry from a given table.
@@ -101,9 +104,10 @@ pub trait Table {
     /// * `driver` - The database driver.
     /// * `table` - The table to delete from.
     /// * `user_id` - The id of the user to delete.
-    fn delete(mut driver: PgDriver, table: &str, user_id: i32) {
+    fn delete(mut driver: PgDriver, table: &str, user_id: i32) -> Result<(), dyn std::error::Error> {
         driver.exec(&format!("DELETE FROM {} WHERE userid={}", table, user_id))
             .expect("Deletion failed.");
+        Ok(())
     }
 
     /// The table specific implementation for adding a new entry.

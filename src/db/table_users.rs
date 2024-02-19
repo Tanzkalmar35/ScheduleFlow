@@ -50,7 +50,10 @@ impl Table for User {
             cols,
             vals,
         );
-        self.id = Some(id);
+        match id {
+            Ok(id) => self.id = Some(id),
+            Err(e) => eprintln!("Error inserting user {}", e)
+        }
     }
 
     fn retrieve(driver: PgDriver) -> Vec<User> {
@@ -66,20 +69,34 @@ impl Table for User {
     }
 
     fn update(&self, driver: PgDriver) {
-        let cols = Vec::from(User::FIELD_NAMES);
-        let vals = self.vals();
-        let condition = format!("userid={}", self.id.unwrap());
-        Self::alter(
-            driver,
-            "users",
-            cols,
-            vals,
-            Some(&condition),
-        );
+        match self.id {
+            Some(id) => {
+                let cols = Vec::from(User::FIELD_NAMES);
+                let vals = self.vals();
+                let condition = format!("userid={}", id);
+                Self::alter(
+                    driver,
+                    "users",
+                    cols,
+                    vals,
+                    Some(&condition),
+                )
+            }
+            None => Err(Box::from("Cannot update user without id")),
+        }.expect("User update failed!");
     }
 
     fn remove(&self, driver: PgDriver) {
-        Self::delete(driver, "users", self.id.unwrap());
+        match self.id {
+            Some(id) => {
+                Self::delete(
+                    driver,
+                    "users",
+                    id,
+                )
+            }
+            None => Err(Box::from("Cannot delete user without id")),
+        }.expect("User deletion failed!");
     }
 }
 

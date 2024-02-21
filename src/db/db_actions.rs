@@ -82,7 +82,7 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn alter(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, condition: Option<&str>) -> Result<(), dyn std::error::Error> {
+    fn alter(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, condition: Option<&str>) -> Result<(), Box<dyn std::error::Error>> {
         let update_stmt = cols.iter().zip(vals.iter()).map(|(c, v)|
             format!("\"{}\" = '{}'", c, v)).collect::<Vec<_>>().join(", ");
         match condition {
@@ -104,7 +104,7 @@ pub trait Table {
     /// * `driver` - The database driver.
     /// * `table` - The table to delete from.
     /// * `user_id` - The id of the user to delete.
-    fn delete(mut driver: PgDriver, table: &str, user_id: i32) -> Result<(), dyn std::error::Error> {
+    fn delete(mut driver: PgDriver, table: &str, user_id: i32) -> Result<(), Box<dyn std::error::Error>> {
         driver.exec(&format!("DELETE FROM {} WHERE userid={}", table, user_id))
             .expect("Deletion failed.");
         Ok(())

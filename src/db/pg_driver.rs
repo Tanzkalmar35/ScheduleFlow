@@ -14,7 +14,7 @@ pub struct PgDriver {
 
 impl PgDriver {
     /// Sets up the database driver.
-    pub fn setup() -> anyhow::Result<Self> {
+    pub async fn setup() -> anyhow::Result<Self> {
         dotenv().ok();
         let name = std::env::var("PSQL_NAME").expect("PSQL_NAME must be set.");
         let user = std::env::var("PSQL_USER").expect("PSQL_USER must be set.");
@@ -34,7 +34,7 @@ impl PgDriver {
     }
 
     /// Initializes the database connection client.
-    pub fn connect(&mut self) -> anyhow::Result<&mut Self> {
+    pub async fn connect(&mut self) -> anyhow::Result<&mut Self> {
         self.client = Some(Client::connect(&self.url, postgres::NoTls)?);
         Ok(self)
     }

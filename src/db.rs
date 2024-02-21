@@ -1,3 +1,3 @@
-mod pg_driver;
-mod db_actions;
-mod table_users;
+pub mod pg_driver;
+pub mod db_actions;
+pub mod table_users;

@@ -1,3 +1,4 @@
+use crate::db;
 use crate::db::db_actions::Table;
 use crate::db::pg_driver::PgDriver;
 
@@ -29,15 +30,15 @@ impl User {
         }
     }
 
-    //fn new_with_id(id: i32, lastname: String, firstname: String, address: String, city: String) -> Self {
-    //    Self {
-    //        id: Some(id),
-    //        lastname,
-    //        firstname,
-    //        address,
-    //        city,
-    //    }
-    //}
+    fn new_with_id(id: i32, lastname: String, firstname: String, address: String, city: String) -> Self {
+        Self {
+            id: Some(id),
+            lastname,
+            firstname,
+            address,
+            city,
+        }
+    }
 }
 
 impl Table for User {
@@ -56,7 +57,7 @@ impl Table for User {
         }
     }
 
-    fn retrieve(driver: PgDriver) -> Vec<User> {
+    fn retrieve(driver: PgDriver) -> Vec<db::table_users::User> {
         let cols = vec![String::from("*")];
         let condition = None;
         let res = Self::read(

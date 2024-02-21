@@ -1,24 +1,21 @@
-use clap::ArgMatches;
-use icalendar::Calendar;
-
-use crate::calendar::{create_event, open_calendar_tui};
-use crate::config::User;
+use crate::calendar::create_event;
+use crate::db::db_actions::Table;
+use crate::db::pg_driver::PgDriver;
 
 #[path = "cmd/cmd.rs"]
 mod cmd;
 
+#[path = "db/table_users.rs"]
+mod table_users;
+
 mod calendar;
 mod config;
-mod tui;
 mod db;
 
 #[tokio::main]
 async fn main() {
     // We need to store the calendar in a file and get it out of it instead of
     // creating a new one every time the application starts.
-
-    let calendar = Calendar::new();
-    let user = User::new(&ArgMatches::default());
 
     let matches = cmd::cmd().get_matches();
 
@@ -27,16 +24,20 @@ async fn main() {
             create_event(sub_matches)
                 .expect("Error creating a new event");
         }
-        Some(("show", _sub_matches)) => {
-            //open_calendar_tui(calendar)
-            //    .expect("Error opening the calendar in tui interface; calendar = " + &calendar);
-        }
-        Some(("open", _sub_matches)) => {
-            open_calendar_tui(calendar, &user)
-                .expect("Error opening the calendar in tui interface");
+        Some(("user", sub_matches)) => {
+            let x = sub_matches.get_one::<String>("firstname").expect("firstname not existing");
+            let mut user = table_users::User::new(
+                String::from("SOME_LASTNAME"),
+                x.to_string(),
+                String::from("SOME_ADDRESS"),
+                String::from("SOME_CITY"),
+            );
+            let mut driver = PgDriver::setup().await.unwrap();
+            driver.connect().await.unwrap();
+            user.store(driver);
         }
         Some(("config", sub_matches)) => {
-            let user = User::new(sub_matches);
+            let user = config::User::new(sub_matches);
             println!("Successfully created new user {:?}", user);
         }
         _ => unimplemented!("This command is not implemented yet"),

@@ -1,5 +1,5 @@
 use dotenv::dotenv;
-use postgres::Client;
+use tokio_postgres::{Client, NoTls, Row};
 
 /// The database driver for PostgreSQL.
 pub struct PgDriver {
@@ -35,15 +35,17 @@ impl PgDriver {
 
     /// Initializes the database connection client.
     pub async fn connect(&mut self) -> anyhow::Result<&mut Self> {
-        self.client = Some(Client::connect(&self.url, postgres::NoTls)?);
+        let (client, _conn) =
+            tokio_postgres::connect(&self.url, NoTls).await?;
+        self.client = Some(client);
         Ok(self)
     }
 
     /// Executes a query on the database.
-    pub fn exec(&mut self, query: &str) -> anyhow::Result<Vec<postgres::Row>> {
+    pub async fn exec(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
         match self.client.as_mut() {
             Some(client) => {
-                let rows = client.query(query, &[])?;
+                let rows = client.query(query, &[]).await?;
                 Ok(rows)
             }
             None => Err(anyhow::anyhow!("Database client is not connected.")),
@@ -51,8 +53,8 @@ impl PgDriver {
     }
 
     /// Queries the database.
-    pub fn query(&mut self, query: &str) -> anyhow::Result<Vec<postgres::Row>> {
-        let rows = self.client.as_mut().unwrap().query(query, &[])?;
+    pub async fn query(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
+        let rows = self.client.as_mut().unwrap().query(query, &[]).await?;
         Ok(rows)
     }
 }

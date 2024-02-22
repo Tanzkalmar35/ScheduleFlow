@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use async_trait::async_trait;
+
 use crate::db::pg_driver::PgDriver;
 use crate::db::table_users::User;
 
@@ -25,6 +27,7 @@ pub type Row = HashMap<String, String>;
 ///    // Now you can access all base- and user specific implementations
 ///    User::insert(args);
 /// }
+#[async_trait]
 pub trait Table {
     /// Inserts a new entry into a given table.
     ///
@@ -33,11 +36,12 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn insert(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
+    async fn insert(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
         let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
         let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
         println!("cols: {}, vals: {}", cols, vals);
         let rows = driver.exec(&format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals))
+            .await
             .expect("Insertion failed.");
         Ok(rows.get(0).unwrap().get("userid"))
     }
@@ -49,7 +53,7 @@ pub trait Table {
     /// * `table` - The table to query.
     /// * `cols` - The columns to query.
     /// * `condition` - The condition to query. Optional.
-    fn read(mut driver: PgDriver, table: &str, mut cols: Vec<String>, condition: Option<String>) -> Result<Vec<Row>, Box<dyn std::error::Error>> {
+    async fn read(mut driver: PgDriver, table: &str, mut cols: Vec<String>, condition: Option<String>) -> Result<Vec<Row>, Box<dyn std::error::Error>> {
         let mut res = vec![];
 
         if cols.contains(&"*".to_string()) && cols.len() == 1 {
@@ -60,8 +64,10 @@ pub trait Table {
 
         let rows = match condition {
             Some(condition) => driver.query(&format!("SELECT {} FROM {} WHERE {}", fmt_cols, table, condition))
+                .await
                 .expect("Query with condition failed."),
             None => driver.query(&format!("SELECT {} FROM {}", fmt_cols, table))
+                .await
                 .expect("Query without condition failed.")
         };
 
@@ -82,16 +88,18 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn alter(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, condition: Option<&str>) -> Result<(), Box<dyn std::error::Error>> {
+    async fn alter(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, condition: Option<String>) -> Result<(), Box<dyn std::error::Error>> {
         let update_stmt = cols.iter().zip(vals.iter()).map(|(c, v)|
             format!("\"{}\" = '{}'", c, v)).collect::<Vec<_>>().join(", ");
         match condition {
             Some(condition) => {
                 driver.exec(&format!("UPDATE {} SET {} WHERE {}", table, update_stmt, condition))
+                    .await
                     .expect("Update failed.")
             }
             None => {
                 driver.exec(&format!("UPDATE {} SET {}", table, update_stmt))
+                    .await
                     .expect("Update failed.")
             }
         };
@@ -104,21 +112,22 @@ pub trait Table {
     /// * `driver` - The database driver.
     /// * `table` - The table to delete from.
     /// * `user_id` - The id of the user to delete.
-    fn delete(mut driver: PgDriver, table: &str, user_id: i32) -> Result<(), Box<dyn std::error::Error>> {
+    async fn delete(mut driver: PgDriver, table: &str, user_id: i32) -> Result<(), Box<dyn std::error::Error>> {
         driver.exec(&format!("DELETE FROM {} WHERE userid={}", table, user_id))
+            .await
             .expect("Deletion failed.");
         Ok(())
     }
 
     /// The table specific implementation for adding a new entry.
-    fn store(&mut self, driver: PgDriver);
+    async fn store<'a>(&'a mut self, driver: PgDriver);
 
     /// The table specific implementation for retrieving an entry.
     fn retrieve(driver: PgDriver) -> Vec<User>;
 
     /// The table specific implementation for editing an entry.
-    fn update(&self, driver: PgDriver);
+    async fn update(&self, driver: PgDriver) -> Result<(), Box<dyn std::error::Error>>;
 
     /// The table specific implementation for removing an entry.
-    fn remove(&self, driver: PgDriver);
+    async fn remove(&self, driver: PgDriver) -> Result<(), Box<dyn std::error::Error>>;
 }

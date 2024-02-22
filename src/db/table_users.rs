@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::db;
 use crate::db::db_actions::Table;
 use crate::db::pg_driver::PgDriver;
@@ -41,8 +43,9 @@ impl User {
     }
 }
 
+#[async_trait]
 impl Table for User {
-    fn store(&mut self, driver: PgDriver) {
+    async fn store<'a>(&'a mut self, driver: PgDriver) {
         let cols = Vec::from(User::FIELD_NAMES);
         let vals = self.vals();
         let id = Self::insert(
@@ -50,7 +53,7 @@ impl Table for User {
             "users",
             cols,
             vals,
-        );
+        ).await;
         match id {
             Ok(id) => self.id = Some(id),
             Err(e) => eprintln!("Error inserting user {}", e)
@@ -69,8 +72,8 @@ impl Table for User {
         todo!("Convert the result into a Vec<User>")
     }
 
-    fn update(&self, driver: PgDriver) {
-        match self.id {
+    async fn update(&self, driver: PgDriver) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(match self.id {
             Some(id) => {
                 let cols = Vec::from(User::FIELD_NAMES);
                 let vals = self.vals();
@@ -80,15 +83,15 @@ impl Table for User {
                     "users",
                     cols,
                     vals,
-                    Some(&condition),
+                    Some(condition),
                 )
             }
-            None => Err(Box::from("Cannot update user without id")),
-        }.expect("User update failed!");
+            None => return Err(Box::new(std::io::Error::new(std::io::ErrorKind::InvalidInput, "Cannot update user without id"))),
+        }.await.expect("User update failed!"))
     }
 
-    fn remove(&self, driver: PgDriver) {
-        match self.id {
+    async fn remove(&self, driver: PgDriver) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(match self.id {
             Some(id) => {
                 Self::delete(
                     driver,
@@ -96,8 +99,8 @@ impl Table for User {
                     id,
                 )
             }
-            None => Err(Box::from("Cannot delete user without id")),
-        }.expect("User deletion failed!");
+            None => return Err(Box::new(std::io::Error::new(std::io::ErrorKind::InvalidInput, "Cannot update user without id"))),
+        }.await.expect("User deletion failed!"))
     }
 }
 

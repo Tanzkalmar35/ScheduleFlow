@@ -32,9 +32,19 @@ async fn main() {
                 String::from("SOME_ADDRESS"),
                 String::from("SOME_CITY"),
             );
-            let mut driver = PgDriver::setup().await.unwrap();
-            driver.connect().await.unwrap();
-            user.store(driver);
+            match PgDriver::setup().await {
+                Ok(mut driver) => {
+                    if let Err(e) = driver.connect().await {
+                        eprintln!("Error connecting to the database: {}", e);
+                    } else {
+                        match user.store(driver).await {
+                            Ok(_) => println!("User stored successfully"),
+                            Err(e) => { eprintln!("Error storing user: {}", e); }
+                        }
+                    }
+                }
+                Err(e) => { eprintln!("Error setting up the driver: {}", e); }
+            }
         }
         Some(("config", sub_matches)) => {
             let user = config::User::new(sub_matches);

@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use async_trait::async_trait;
+use tokio::sync::Mutex;
 
 use crate::db::pg_driver::PgDriver;
 use crate::db::table_users::User;
@@ -36,13 +38,24 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    async fn insert(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
+    async fn insert(mut driver: Arc<Mutex<PgDriver>>, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
         let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
         let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
         println!("cols: {}, vals: {}", cols, vals);
-        let rows = driver.exec(&format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals))
-            .await
-            .expect("Insertion failed.");
+        let stmt = &format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals);
+        let mut rows = vec![];
+        println!("NOW GOING FOR THE INSERTION!");
+        match driver.lock().await.exec(stmt).await {
+            Ok(res) => {
+                eprintln!("Insertion succeeded!");
+                rows = res;
+            }
+            Err(e) => {
+                eprintln!("Insertion failed: error: {}", e)
+            }
+        };
+        println!("INSERTION PROCESS FINISHED (either good or bad...)");
+
         Ok(rows.get(0).unwrap().get("userid"))
     }
 
@@ -120,7 +133,7 @@ pub trait Table {
     }
 
     /// The table specific implementation for adding a new entry.
-    async fn store<'a>(&'a mut self, driver: PgDriver);
+    async fn store<'a>(&'a mut self, driver: Arc<Mutex<PgDriver>>) -> Result<(), Box<dyn std::error::Error>>;
 
     /// The table specific implementation for retrieving an entry.
     fn retrieve(driver: PgDriver) -> Vec<User>;

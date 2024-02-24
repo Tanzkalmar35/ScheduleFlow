@@ -1,3 +1,8 @@
+use std::error::Error;
+use std::sync::Arc;
+
+use tokio::sync::Mutex;
+
 use crate::calendar::create_event;
 use crate::db::db_actions::Table;
 use crate::db::pg_driver::PgDriver;
@@ -33,15 +38,28 @@ async fn main() {
                 String::from("SOME_CITY"),
             );
             match PgDriver::setup().await {
-                Ok(mut driver) => {
-                    if let Err(e) = driver.connect().await {
-                        eprintln!("Error connecting to the database: {}", e);
-                    } else {
-                        match user.store(driver).await {
-                            Ok(_) => println!("User stored successfully"),
-                            Err(e) => { eprintln!("Error storing user: {}", e); }
+                Ok(pg_driver) => {
+                    let driver = Arc::new(Mutex::new(pg_driver));
+                    match driver.lock().await.connect().await {
+                        // TODO: After this driver.lock() the driver is locked afterwards
+                        Err(e) => {
+                            eprintln!("Establishing connection failed: {}", e)
                         }
-                    }
+                        Ok(_) => {
+                            let driver_clone = Arc::clone(&driver);
+                            tokio::spawn(async move {
+                                driver_clone.lock().await.conn.as_ref();
+                            });
+                            match user.store(Arc::clone(&driver)).await {
+                                Ok(_) => {
+                                    eprintln!("Successfully stored user.")
+                                }
+                                Err(e) => {
+                                    eprintln!("Error storing user: {}", e)
+                                }
+                            }
+                        }
+                    };
                 }
                 Err(e) => { eprintln!("Error setting up the driver: {}", e); }
             }

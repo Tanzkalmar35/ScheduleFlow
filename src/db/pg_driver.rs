@@ -1,5 +1,6 @@
 use dotenv::dotenv;
-use tokio_postgres::{Client, NoTls, Row};
+use tokio_postgres::{Client, Connection, NoTls, Row, Socket};
+use tokio_postgres::tls::NoTlsStream;
 
 /// The database driver for PostgreSQL.
 pub struct PgDriver {
@@ -10,6 +11,7 @@ pub struct PgDriver {
     url: String,
     /// The postgres client.
     client: Option<Client>,
+    pub(crate) conn: Option<Connection<Socket, NoTlsStream>>,
 }
 
 impl PgDriver {
@@ -29,15 +31,17 @@ impl PgDriver {
                 address,
                 url,
                 client: None,
+                conn: None,
             }
         )
     }
 
     /// Initializes the database connection client.
     pub async fn connect(&mut self) -> anyhow::Result<&mut Self> {
-        let (client, _conn) =
+        let (client, conn) =
             tokio_postgres::connect(&self.url, NoTls).await?;
         self.client = Some(client);
+        self.conn = Some(conn);
         Ok(self)
     }
 

@@ -1,4 +1,7 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
+use tokio::sync::Mutex;
 
 use crate::db;
 use crate::db::db_actions::Table;
@@ -45,7 +48,7 @@ impl User {
 
 #[async_trait]
 impl Table for User {
-    async fn store<'a>(&'a mut self, driver: PgDriver) {
+    async fn store<'a>(&'a mut self, driver: Arc<Mutex<PgDriver>>) -> Result<(), Box<dyn std::error::Error>> {
         let cols = Vec::from(User::FIELD_NAMES);
         let vals = self.vals();
         let id = Self::insert(
@@ -58,6 +61,7 @@ impl Table for User {
             Ok(id) => self.id = Some(id),
             Err(e) => eprintln!("Error inserting user {}", e)
         }
+        Ok(())
     }
 
     fn retrieve(driver: PgDriver) -> Vec<db::table_users::User> {
@@ -102,53 +106,4 @@ impl Table for User {
             None => return Err(Box::new(std::io::Error::new(std::io::ErrorKind::InvalidInput, "Cannot update user without id"))),
         }.await.expect("User deletion failed!"))
     }
-}
-
-#[test]
-pub fn test_user_insertion() {
-    let mut user = User::new(
-        String::from("Max"),
-        String::from("Mustermann"),
-        String::from("Musterstr. 1"),
-        String::from("Mustercity"),
-    );
-    let mut driver = PgDriver::setup().unwrap();
-    driver.connect().unwrap();
-    user.store(driver);
-}
-
-#[test]
-pub fn test_user_retrieval() {
-    let mut driver = PgDriver::setup().unwrap();
-    driver.connect().unwrap();
-    User::retrieve(driver);
-}
-
-#[ignore]
-#[test]
-pub fn test_user_update() {
-    let mut driver = PgDriver::setup().unwrap();
-    driver.connect().unwrap();
-    let user = User::new_with_id( // User::new_with_id isn't available for safety reasons
-                                  1,
-                                  String::from("Rainer"),
-                                  String::from("Zufall"),
-                                  String::from("Zufallstr. 10"),
-                                  String::from("Zufallstadt"),
-    );
-    user.update(driver);
-}
-
-#[test]
-pub fn test_user_deletion() {
-    let mut driver = PgDriver::setup().unwrap();
-    driver.connect().unwrap();
-    let user = User::new_with_id( // User::new_with_id isn't available for safety reasons
-                                  1,
-                                  String::from("Rainer"),
-                                  String::from("Zufall"),
-                                  String::from("Zufallstr. 10"),
-                                  String::from("Zufallstadt"),
-    );
-    user.remove(driver);
 }

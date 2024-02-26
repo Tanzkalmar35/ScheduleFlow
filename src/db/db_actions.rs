@@ -44,10 +44,13 @@ pub trait Table {
         println!("cols: {}, vals: {}", cols, vals);
         let stmt = &format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals);
         let mut rows = vec![];
-        println!("NOW GOING FOR THE INSERTION!");
+        match driver.try_lock() {
+            Ok(_) => { println!("driver is not locked.") }
+            Err(_) => { println!("driver is locked."); }
+        }
         match driver.lock().await.exec(stmt).await {
             Ok(res) => {
-                eprintln!("Insertion succeeded!");
+                println!("Insertion succeeded!");
                 rows = res;
             }
             Err(e) => {

@@ -47,9 +47,12 @@ impl PgDriver {
 
     /// Executes a query on the database.
     pub async fn exec(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
+        println!("Starting execution!");
         match self.client.as_mut() {
             Some(client) => {
+                println!("Execution next on");
                 let rows = client.query(query, &[]).await?;
+                println!("Execution finished?!");
                 Ok(rows)
             }
             None => Err(anyhow::anyhow!("Database client is not connected.")),

@@ -40,26 +40,30 @@ async fn main() {
             match PgDriver::setup().await {
                 Ok(pg_driver) => {
                     let driver = Arc::new(Mutex::new(pg_driver));
-                    match driver.lock().await.connect().await {
-                        // TODO: After this driver.lock() the driver is locked afterwards
-                        Err(e) => {
-                            eprintln!("Establishing connection failed: {}", e)
-                        }
+                    let connection = match driver.lock().await.connect().await {
                         Ok(_) => {
-                            let driver_clone = Arc::clone(&driver);
-                            tokio::spawn(async move {
-                                driver_clone.lock().await.conn.as_ref();
-                            });
-                            match user.store(Arc::clone(&driver)).await {
-                                Ok(_) => {
-                                    eprintln!("Successfully stored user.")
-                                }
-                                Err(e) => {
-                                    eprintln!("Error storing user: {}", e)
-                                }
-                            }
+                            println!("Driver db connection succeeded.");
+                            true
+                        }
+                        Err(e) => {
+                            eprintln!("Driver db connection failed: {}", e);
+                            false
                         }
                     };
+                    if connection {
+                        let driver_clone = Arc::clone(&driver);
+                        tokio::spawn(async move {
+                            driver_clone.lock().await.conn.as_ref();
+                        });
+                        match user.store(Arc::clone(&driver)).await {
+                            Ok(_) => {
+                                eprintln!("Successfully stored user.")
+                            }
+                            Err(e) => {
+                                eprintln!("Error storing user: {}", e)
+                            }
+                        }
+                    }
                 }
                 Err(e) => { eprintln!("Error setting up the driver: {}", e); }
             }

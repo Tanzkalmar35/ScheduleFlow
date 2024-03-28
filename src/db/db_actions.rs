@@ -41,22 +41,35 @@ pub trait Table {
     async fn insert(mut driver: Arc<Mutex<PgDriver>>, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
         let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
         let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
-        println!("cols: {}, vals: {}", cols, vals);
         let stmt = &format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals);
         let mut rows = vec![];
-        match driver.try_lock() {
-            Ok(_) => { println!("driver is not locked.") }
-            Err(_) => { println!("driver is locked."); }
-        }
-        match driver.lock().await.exec(stmt).await {
-            Ok(res) => {
-                println!("Insertion succeeded!");
-                rows = res;
+        let lock_guard = match driver.try_lock() {
+            Ok(guard) => {
+                println!("driver is not locked.");
+                Some(guard)
             }
-            Err(e) => {
-                eprintln!("Insertion failed: error: {}", e)
+            Err(_) => {
+                println!("driver is locked.");
+                None
             }
         };
+
+        match lock_guard {
+            Some(mut guarded_driver) => {
+                match guarded_driver.exec(stmt).await {
+                    Ok(res) => {
+                        println!("Insertion succeeded!");
+                        rows = res;
+                    }
+                    Err(e) => {
+                        eprintln!("Insertion failed: error: {}", e)
+                    }
+                };
+            }
+            None => {
+                println!("Failed to acquire lock, skipping exec.");
+            }
+        }
         println!("INSERTION PROCESS FINISHED (either good or bad...)");
 
         Ok(rows.get(0).unwrap().get("userid"))

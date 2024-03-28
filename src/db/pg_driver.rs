@@ -50,7 +50,6 @@ impl PgDriver {
         println!("Starting execution!");
         match self.client.as_mut() {
             Some(client) => {
-                println!("Execution next on");
                 let rows = client.query(query, &[]).await?;
                 println!("Execution finished?!");
                 Ok(rows)

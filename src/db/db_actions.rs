@@ -41,7 +41,7 @@ pub trait Table {
     async fn insert(mut driver: Arc<Mutex<PgDriver>>, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
         let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
         let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
-        let stmt = &format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals);
+        let stmt = &format!("INSERT INTO {} ({}) VALUES ({})", table, cols, vals);
         let mut rows = vec![];
         let lock_guard = match driver.try_lock() {
             Ok(guard) => {

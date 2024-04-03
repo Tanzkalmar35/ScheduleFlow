@@ -1,6 +1,5 @@
 use dotenv::dotenv;
-use tokio_postgres::{Client, Connection, NoTls, Row, Socket};
-use tokio_postgres::tls::NoTlsStream;
+use postgres::{Client, NoTls, Row};
 
 /// The database driver for PostgreSQL.
 pub struct PgDriver {
@@ -11,12 +10,11 @@ pub struct PgDriver {
     url: String,
     /// The postgres client.
     client: Option<Client>,
-    pub(crate) conn: Option<Connection<Socket, NoTlsStream>>,
 }
 
 impl PgDriver {
     /// Sets up the database driver.
-    pub async fn setup() -> anyhow::Result<Self> {
+    pub fn setup() -> anyhow::Result<Self> {
         dotenv().ok();
         let name = std::env::var("PSQL_NAME").expect("PSQL_NAME must be set.");
         let user = std::env::var("PSQL_USER").expect("PSQL_USER must be set.");
@@ -31,36 +29,34 @@ impl PgDriver {
                 address,
                 url,
                 client: None,
-                conn: None,
             }
         )
     }
 
     /// Initializes the database connection client.
-    pub async fn connect(&mut self) -> anyhow::Result<&mut Self> {
-        let (client, conn) =
-            tokio_postgres::connect(&self.url, NoTls).await?;
+    pub fn connect(&mut self) -> anyhow::Result<&mut Self> {
+        let client =
+            Client::connect(&self.url, NoTls)?;
         self.client = Some(client);
-        self.conn = Some(conn);
         Ok(self)
     }
 
     /// Executes a query on the database.
-    pub async fn exec(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
+    pub fn exec(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
         println!("Starting execution!");
         match self.client.as_mut() {
             Some(client) => {
-                let rows = client.query(query, &[]).await?;
+                let rows = client.query(query, &[]);
                 println!("Execution finished?!");
-                Ok(rows)
+                Ok(rows?)
             }
             None => Err(anyhow::anyhow!("Database client is not connected.")),
         }
     }
 
     /// Queries the database.
-    pub async fn query(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
-        let rows = self.client.as_mut().unwrap().query(query, &[]).await?;
-        Ok(rows)
+    pub fn query(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
+        let rows = self.client.as_mut().unwrap().query(query, &[]);
+        Ok(rows?)
     }
 }

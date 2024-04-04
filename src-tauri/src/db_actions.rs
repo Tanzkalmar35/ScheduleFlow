@@ -36,19 +36,17 @@ pub trait Table {
     fn insert(mut driver: PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> Result<i32, Box<dyn std::error::Error>> {
         let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
         let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
-        let stmt = &format!("INSERT INTO {} ({}) VALUES ({})", table, cols, vals);
+        let stmt = &format!("INSERT INTO {} ({}) VALUES ({}) RETURNING id", table, cols, vals);
         let mut rows = vec![];
         match driver.exec(stmt) {
             Ok(res) => {
-                println!("Insertion succeeded!");
                 rows = res;
             }
             Err(e) => {
                 eprintln!("Insertion failed: error: {}", e)
             }
         };
-        println!("INSERTION PROCESS FINISHED (either good or bad...)");
-        Ok(rows.get(0).unwrap().get("userid"))
+        Ok(rows.get(0).unwrap().get("id"))
     }
 
     /// Queries a given table.

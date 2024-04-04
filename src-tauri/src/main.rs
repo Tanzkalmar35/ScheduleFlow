@@ -30,14 +30,14 @@ fn main() {
     let mut driver: PgDriver = PgDriver::setup().expect("Error setting up the driver.");
 
     match driver.connect() {
-        Some(_) => {
+        Ok(_) => {
             println!("Driver db connection succeeded.");
             match user.store(driver) {
                 Ok(_) => eprintln!("Successfully stored user."),
                 Err(e) => eprintln!("Error storing user: {}", e),
             };
         },
-        None => eprintln!("Driver db connection failed."),
+        Err(err) => eprintln!("Driver db connection failed: {}", err),
     }
 
     tauri::Builder::default()

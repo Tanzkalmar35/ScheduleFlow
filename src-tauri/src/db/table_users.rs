@@ -204,7 +204,7 @@ mod tests {
     #[test]
     fn test_store_user() {
         let mut res = false;
-        let mut start_time;
+        let start_time;
         let mut elapsed_time = Duration::from_millis(1);
 
         let mut user = User::new(
@@ -214,13 +214,7 @@ mod tests {
         );
 
         // Creating the driver
-        let mut driver = match PgDriver::setup() {
-            Ok(driver) => driver,
-            Err(e) => {
-                eprintln!("Failed to set up PgDriver: {}", e);
-                std::process::exit(1);
-            }
-        };
+        let mut driver = PgDriver::setup();
 
         // Attempting to establish a db connection
         match driver.connect() {
@@ -246,7 +240,7 @@ mod tests {
     #[test]
     fn test_update_user() {
         let mut res = false;
-        let mut start_time;
+        let start_time;
         let mut elapsed_time = Duration::from_millis(1);
 
         let mut user = User::new(
@@ -256,13 +250,7 @@ mod tests {
         );
 
         // Creating the driver
-        let mut driver = match PgDriver::setup() {
-            Ok(driver) => driver,
-            Err(e) => {
-                eprintln!("Failed to set up PgDriver: {}", e);
-                std::process::exit(1);
-            }
-        };
+        let mut driver = PgDriver::setup();
 
         // Attempting to establish a db connection
         match driver.connect() {
@@ -295,7 +283,7 @@ mod tests {
     #[test]
     fn test_remove_user() {
         let mut res = false;
-        let mut start_time;
+        let start_time;
         let mut elapsed_time = Duration::from_millis(1);
 
         let mut user = User::new(
@@ -305,13 +293,7 @@ mod tests {
         );
 
         // Creating the driver
-        let mut driver = match PgDriver::setup() {
-            Ok(driver) => driver,
-            Err(e) => {
-                eprintln!("Failed to set up PgDriver: {}", e);
-                std::process::exit(1);
-            }
-        };
+        let mut driver = PgDriver::setup();
 
         // Attempting to establish a db connection
         match driver.connect() {

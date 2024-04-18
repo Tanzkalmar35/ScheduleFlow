@@ -6,13 +6,13 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-#[path="table_users.rs"]
+#[path="db/table_users.rs"]
 mod table_users;
 
-#[path="db_actions.rs"]
+#[path="db/db_actions.rs"]
 mod db_actions;
 
-#[path="pg_driver.rs"]
+#[path= "db/pg_driver.rs"]
 mod pg_driver;
 
 fn main() {

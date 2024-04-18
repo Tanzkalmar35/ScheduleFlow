@@ -1,5 +1,4 @@
 use std::string::ToString;
-
 use uuid::Uuid;
 
 use crate::db_actions::Table;

@@ -19,6 +19,7 @@ anyhow = "1.0.81"
 dotenv = "0.15.0"
 uuid = { version = "1.8.0", features = ["v4"] }
 icalendar = "0.16.1"
+chrono = "0.4.37"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

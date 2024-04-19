@@ -55,13 +55,7 @@ impl Table for User {
     ///     );
     ///
     ///     // Creating the driver
-    ///     let mut driver = match PgDriver::setup() {
-    ///         Ok(driver) => driver,
-    ///         Err(e) => {
-    ///             eprintln!("Failed to set up PgDriver: {}", e);
-    ///             std::process::exit(1);
-    ///         }
-    ///     };
+    ///     let mut driver = PgDriver::setup();
     ///
     ///     // Attempting to establish a db connection
     ///     match driver.connect() {
@@ -103,13 +97,7 @@ impl Table for User {
     ///     );
     ///
     ///     // Creating the driver
-    ///     let mut driver = match PgDriver::setup() {
-    ///         Ok(driver) => driver,
-    ///         Err(e) => {
-    ///             eprintln!("Failed to set up PgDriver: {}", e);
-    ///             std::process::exit(1);
-    ///         }
-    ///     };
+    ///     let mut driver = PgDriver::setup();
     ///
     ///     // Attempting to establish a db connection
     ///     match driver.connect() {
@@ -160,13 +148,7 @@ impl Table for User {
     ///     );
     ///
     ///     // Creating the driver
-    ///     let mut driver = match PgDriver::setup() {
-    ///         Ok(driver) => driver,
-    ///         Err(e) => {
-    ///             eprintln!("Failed to set up PgDriver: {}", e);
-    ///             std::process::exit(1);
-    ///         }
-    ///     };
+    ///     let mut driver = PgDriver::setup();
     ///
     ///     // Attempting to establish a db connection
     ///     match driver.connect() {

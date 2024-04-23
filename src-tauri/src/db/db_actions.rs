@@ -36,7 +36,7 @@ pub trait Table {
     fn insert(driver: &mut PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> anyhow::Result<()> {
         let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
         let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
-        let stmt = &format!("INSERT INTO {} ({}) VALUES ({}) RETURNING userid", table, cols, vals);
+        let stmt = &format!("INSERT INTO {} ({}) VALUES ({})", table, cols, vals);
         return match driver.exec(stmt) {
             Ok(_) => {
                 Ok(())

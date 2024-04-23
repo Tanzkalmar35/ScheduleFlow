@@ -1,5 +1,6 @@
 use icalendar::{Calendar, Event, Todo};
 
+#[derive(Debug)]
 pub struct ICalendarUtil {
     pub(crate) calendar: Calendar
 }

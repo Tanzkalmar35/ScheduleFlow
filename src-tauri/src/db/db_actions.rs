@@ -58,7 +58,8 @@ pub trait Table {
         let mut res = vec![];
 
         if cols.contains(&"*".to_string()) && cols.len() == 1 {
-            cols = User::FIELD_NAMES.iter().map(|fld| fld.to_string()).collect::<Vec<_>>();
+            todo!();
+            cols = User::EDITABLE_FIELD_NAMES.iter().map(|fld| fld.to_string()).collect::<Vec<_>>();
         }
 
         let fmt_cols = cols.join(", ");
@@ -90,7 +91,7 @@ pub trait Table {
     fn alter(driver: &mut PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, id: String) -> anyhow::Result<()> {
         let update_stmt = cols.iter().zip(vals.iter()).map(|(c, v)|
             format!("\"{}\" = '{}'", c, v)).collect::<Vec<_>>().join(", ");
-        driver.exec(&format!("UPDATE {} SET {} WHERE userid = '{}'", table, update_stmt, id))
+        driver.exec(&format!("UPDATE {} SET {} WHERE id = '{}'", table, update_stmt, id))
             .expect("Update failed.");
         Ok(())
     }
@@ -102,7 +103,7 @@ pub trait Table {
     /// * `table` - The table to delete from.
     /// * `user_id` - The id of the user to delete.
     fn delete(driver: &mut PgDriver, table: &str, user_id: String) -> anyhow::Result<()> {
-        driver.exec(&format!("DELETE FROM {} WHERE userid='{}'", table, user_id))
+        driver.exec(&format!("DELETE FROM {} WHERE id='{}'", table, user_id))
             .expect("Deletion failed.");
         Ok(())
     }

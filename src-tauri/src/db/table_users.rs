@@ -13,12 +13,15 @@ pub struct User {
 }
 
 impl User {
-    /// Contains the usable field names of a user excluding the id.
-    pub(crate) const FIELD_NAMES: [&'static str; 4] = ["userid", "username", "password", "email"];
+    /// Contains all field names of a user including the id.
+    pub(crate) const FIELD_NAMES: [&'static str; 4] = ["id", "username", "password", "email"];
+
+    /// Contains the editable field names of a user - excluding the id.
+    pub(crate) const EDITABLE_FIELD_NAMES: [&'static str; 3] = ["username", "password", "email"];
 
     /// Provides the values of the user formatted as a vector of String.
     fn vals(&self) -> Vec<&str> {
-        vec![&self.id, &self.username, &self.password, &self.email]
+        vec![&self.username, &self.password, &self.email]
     }
 
     /// Creates a new user and prepares the raw values into values ready to be stored.
@@ -76,7 +79,11 @@ impl Table for User {
     /// Returns an error if the insertion process fails.
     fn store(&mut self, driver: &mut PgDriver) -> anyhow::Result<()> {
         let cols = Vec::from(User::FIELD_NAMES);
-        let vals = self.vals();
+        let mut vals = Vec::new();
+
+        vals.push(self.id.as_str().clone());
+        vals.extend(self.vals());
+
         Self::insert(
             driver,
             "users",
@@ -124,7 +131,7 @@ impl Table for User {
     ///
     /// Returns an error if the update process fails.
     fn update(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        let cols = Vec::from(User::FIELD_NAMES);
+        let cols = Vec::from(User::EDITABLE_FIELD_NAMES);
         let vals = self.vals();
         let user_id = format!("{}", self.id);
         Self::alter(

@@ -1,11 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use icalendar::Calendar;
 use crate::db_actions::Table;
-use crate::icalendar_util::ICalendarUtil;
-use crate::pg_driver::PgDriver;
-use crate::table_calendars::ICalendar;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]

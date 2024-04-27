@@ -1,7 +1,9 @@
 use icalendar::{Calendar, Event, Todo};
+use crate::table_calendars::ICalendar;
 
 #[derive(Debug)]
 pub struct ICalendarUtil {
+    table_calendar: ICalendar,
     pub(crate) calendar: Calendar
 }
 
@@ -9,8 +11,9 @@ pub struct ICalendarUtil {
 impl ICalendarUtil {
 
     /// Initializes a new icalendar::Calendar.
-    pub fn init() -> ICalendarUtil {
+    pub fn init(table_calendar: ICalendar) -> ICalendarUtil {
         Self {
+            table_calendar,
             calendar: Calendar::new().done()
         }
     }

@@ -1,33 +1,23 @@
 use std::string::ToString;
 use uuid::Uuid;
 
-use crate::db_actions::Table;
+use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
 #[derive(Debug)]
 pub struct User {
-    id: String,
+    uuid: Uuid,
     pub(crate) username: String,
     pub(crate) password: String,
     pub(crate) email: String,
 }
 
 impl User {
-    /// Contains all field names of a user including the id.
-    pub(crate) const FIELD_NAMES: [&'static str; 4] = ["id", "username", "password", "email"];
-
-    /// Contains the editable field names of a user - excluding the id.
-    pub(crate) const EDITABLE_FIELD_NAMES: [&'static str; 3] = ["username", "password", "email"];
-
-    /// Provides the values of the user formatted as a vector of String.
-    fn vals(&self) -> Vec<&str> {
-        vec![&self.username, &self.password, &self.email]
-    }
 
     /// Creates a new user and prepares the raw values into values ready to be stored.
     pub(crate) fn new(username: String, password: String, email: String) -> Self {
         Self {
-            id: Uuid::new_v4().to_string(),
+            uuid: Uuid::new_v4(),
             username,
             password,
             email,
@@ -35,9 +25,9 @@ impl User {
     }
 
     /// Creates a User object from values that already exist in the db.
-    pub(crate) fn from(id: String, username: String, password: String, email: String) -> Self {
+    pub(crate) fn from(uuid: Uuid, username: String, password: String, email: String) -> Self {
         Self {
-            id,
+            uuid,
             username,
             password,
             email,
@@ -45,7 +35,29 @@ impl User {
     }
 }
 
-impl Table for User {
+impl Table for &User {
+    fn get_name(&self) -> String {
+        String::from("users")
+    }
+
+    fn get_fmt_cols(&self) -> String {
+        String::from("uuid, username, password, email")
+    }
+
+    fn get_fmt_cols_no_id(&self) -> String {
+        String::from("username, password, email")
+    }
+
+    fn get_fmt_vals(&self) -> String {
+        format!("'{}', '{}', '{}', '{}'", &self.uuid, &self.username, &self.password, &self.email)
+    }
+
+    fn get_fmt_vals_no_id(&self) -> String {
+        format!("'{}', '{}', '{}'", &self.username, &self.password, &self.email)
+    }
+}
+
+impl DbActions for User {
     /// Stores the current user.
     ///
     /// # Example usage
@@ -77,18 +89,10 @@ impl Table for User {
     /// # Errors
     ///
     /// Returns an error if the insertion process fails.
-    fn store(&mut self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        let cols = Vec::from(User::FIELD_NAMES);
-        let mut vals = Vec::new();
-
-        vals.push(self.id.as_str().clone());
-        vals.extend(self.vals());
-
+    fn store(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
         Self::insert(
             driver,
-            "users",
-            cols,
-            vals,
+            self
         )
     }
 
@@ -131,15 +135,10 @@ impl Table for User {
     ///
     /// Returns an error if the update process fails.
     fn update(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        let cols = Vec::from(User::EDITABLE_FIELD_NAMES);
-        let vals = self.vals();
-        let user_id = format!("{}", self.id);
         Self::alter(
             driver,
-            "users",
-            cols,
-            vals,
-            user_id,
+            self,
+            self.uuid,
         )
     }
 
@@ -180,7 +179,7 @@ impl Table for User {
     ///
     /// Returns an Error if the deletion process fails.
     fn remove(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        Self::delete(driver, "users", self.id.clone())
+        Self::delete(driver, self, self.uuid)
     }
 }
 
@@ -210,6 +209,16 @@ mod tests {
                 println!("Driver db connection succeeded.");
                 // Storing the user
                 start_time = Instant::now();
+                match user.store(&mut driver) {
+                    Ok(_) => {
+                        elapsed_time = start_time.elapsed();
+                        println!("User {:?} successfully stored.", user);
+                        res = true
+                    }
+                    Err(e) => {
+                        eprintln!("User couldn't be stored: {}", e);
+                    }
+                }
                 if user.store(&mut driver).is_ok() {
                     elapsed_time = start_time.elapsed();
                     println!("User {:?} successfully stored.", user);

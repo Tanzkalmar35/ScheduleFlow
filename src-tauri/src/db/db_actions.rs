@@ -1,9 +1,25 @@
 use std::collections::HashMap;
+use uuid::Uuid;
 
 use crate::pg_driver::PgDriver;
 use crate::table_users::User;
 
 pub type Row = HashMap<String, String>;
+
+pub trait Table {
+    /// Returns the name of the table.
+    fn get_name(&self) -> String;
+    /// Returns a for a psql expression formatted String containing all columns of the table.
+    fn get_fmt_cols(&self) -> String;
+    /// Returns a for a psql expression formatted String containing all columns except for the id
+    /// field of the table.
+    fn get_fmt_cols_no_id(&self) -> String;
+    /// Returns a for a psql expression formatted String containing all values of the table.
+    fn get_fmt_vals(&self) -> String;
+    /// Returns a for a psql expression formatted String containing all values except for the id
+    /// field of the table.
+    fn get_fmt_vals_no_id(&self) -> String;
+}
 
 /// This module holds the base implementation for the CRUD operations
 ///
@@ -25,7 +41,8 @@ pub type Row = HashMap<String, String>;
 ///    // Now you can access all base- and user specific implementations
 ///    User::insert(args);
 /// }
-pub trait Table {
+pub trait DbActions {
+
     /// Inserts a new entry into a given table.
     ///
     /// # Arguments
@@ -33,10 +50,13 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn insert(driver: &mut PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>) -> anyhow::Result<()> {
-        let cols = cols.iter().map(|c| format!("\"{}\"", c)).collect::<Vec<_>>().join(", ");
-        let vals = vals.iter().map(|v| format!("'{}'", v)).collect::<Vec<_>>().join(", ");
-        let stmt = &format!("INSERT INTO {} ({}) VALUES ({})", table, cols, vals);
+    fn insert<E: Table>(driver: &mut PgDriver, entry: E) -> anyhow::Result<()> {
+        // Todo: Could potentially fail due to duplicate uuid, if so, regenerate uuid and try again
+        let stmt = &format!(
+            "INSERT INTO {} ({}) VALUES ({})",
+            entry.get_name(), entry.get_fmt_cols(),
+            entry.get_fmt_vals()
+        );
         return match driver.exec(stmt) {
             Ok(_) => {
                 Ok(())
@@ -58,8 +78,7 @@ pub trait Table {
         let mut res = vec![];
 
         if cols.contains(&"*".to_string()) && cols.len() == 1 {
-            todo!();
-            cols = User::EDITABLE_FIELD_NAMES.iter().map(|fld| fld.to_string()).collect::<Vec<_>>();
+            // cols = User::get_fmt_cols_no_id.iter().map(|fld| fld.to_string()).collect::<Vec<_>>();
         }
 
         let fmt_cols = cols.join(", ");
@@ -88,10 +107,16 @@ pub trait Table {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn alter(driver: &mut PgDriver, table: &str, cols: Vec<&str>, vals: Vec<&str>, id: String) -> anyhow::Result<()> {
+    fn alter<E: Table>(driver: &mut PgDriver, entry: E, uuid: Uuid) -> anyhow::Result<()> {
+        let col_binding = entry.get_fmt_cols_no_id();
+        let val_binding = entry.get_fmt_vals_no_id();
+        let cols = col_binding.split(", ").collect::<Vec<&str>>();
+        let vals = val_binding.split(',').collect::<Vec<&str>>();
+
         let update_stmt = cols.iter().zip(vals.iter()).map(|(c, v)|
-            format!("\"{}\" = '{}'", c, v)).collect::<Vec<_>>().join(", ");
-        driver.exec(&format!("UPDATE {} SET {} WHERE id = '{}'", table, update_stmt, id))
+            format!("\"{}\" = {}", c, v)).collect::<Vec<_>>().join(", ");
+
+        driver.exec(&format!("UPDATE {} SET {} WHERE uuid = '{}'", entry.get_name(), update_stmt, uuid))
             .expect("Update failed.");
         Ok(())
     }
@@ -102,18 +127,18 @@ pub trait Table {
     /// * `driver` - The database driver.
     /// * `table` - The table to delete from.
     /// * `user_id` - The id of the user to delete.
-    fn delete(driver: &mut PgDriver, table: &str, user_id: String) -> anyhow::Result<()> {
-        driver.exec(&format!("DELETE FROM {} WHERE id='{}'", table, user_id))
+    fn delete<E: Table>(driver: &mut PgDriver, entry: E, uuid: Uuid) -> anyhow::Result<()> {
+        driver.exec(&format!("DELETE FROM {} WHERE uuid='{}'", entry.get_name(), uuid))
             .expect("Deletion failed.");
         Ok(())
     }
 
     /// The table specific implementation for adding a new entry.
-    fn store(&mut self, driver: &mut PgDriver) -> anyhow::Result<()>;
+    fn store(&self, driver: &mut PgDriver) -> anyhow::Result<()>;
 
     /// The table specific implementation for retrieving an entry.
     /// As of now, there is no use case for this.
-    //fn retrieve(driver: PgDriver) -> Vec<User>;
+    // fn retrieve(driver: PgDriver) -> Vec<User>;
 
     /// The table specific implementation for editing an entry.
     fn update(&self, driver: &mut PgDriver) -> anyhow::Result<()>;

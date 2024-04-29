@@ -1,10 +1,11 @@
 use uuid::Uuid;
+
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
 #[derive(Debug)]
 pub struct ICalendar {
-    uuid: Uuid,
+    pub(crate) uuid: Uuid,
 }
 
 impl ICalendar {
@@ -15,16 +16,38 @@ impl ICalendar {
     }
 }
 
-impl Table for &ICalendar {
-    fn get_name(&self) -> String {
+impl Table for ICalendar {
+    fn get_name() -> String {
         String::from("calendars")
     }
 
-    fn get_fmt_cols(&self) -> String {
+    fn get_fmt_cols() -> String {
         String::from("uuid")
     }
 
-    fn get_fmt_cols_no_id(&self) -> String {
+    fn get_fmt_cols_no_id() -> String {
+        String::from("")
+    }
+
+    fn get_fmt_vals(&self) -> String {
+        format!("'{}'", self.uuid)
+    }
+
+    fn get_fmt_vals_no_id(&self) -> String {
+        format!("")
+    }
+}
+
+impl Table for &ICalendar {
+    fn get_name() -> String {
+        String::from("calendars")
+    }
+
+    fn get_fmt_cols() -> String {
+        String::from("uuid")
+    }
+
+    fn get_fmt_cols_no_id() -> String {
         String::from("")
     }
 
@@ -38,23 +61,41 @@ impl Table for &ICalendar {
 }
 
 impl DbActions for ICalendar {
+    type Item = ICalendar;
+
     fn store(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
         Self::insert(driver, self)
     }
 
-    /// As a calendar only has an uuid, it should have no reason to change.
-    fn update(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        unimplemented!("You can't update a calendar.")
+    /// As a calendar db entry only has an uuid, it should have no reason to change.
+    fn update(&self, _driver: &mut PgDriver) -> anyhow::Result<()> {
+        unimplemented!("You can't update a calendar db entry, as it does only consist of an uuid.")
     }
 
     fn remove(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        Self::delete(driver, self, self.uuid)
+        Self::delete::<&Self>(driver, self.uuid)
+    }
+
+    fn retrieve(driver: &mut PgDriver, mut cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item> {
+        let mut res: Vec<ICalendar> = vec![];
+
+        if cols.contains(&"*".to_string()) && cols.len() == 1 {
+            cols = ICalendar::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
+        }
+        if let Ok(rows) = Self::read(driver, "calendars", cols, condition) {
+            for row in rows {
+                let val = row.get("uuid");
+                res.push(ICalendar { uuid: val })
+            };
+        }
+
+        res
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::time::{Duration, Instant};
+
     use crate::db_actions::DbActions;
     use crate::pg_driver::PgDriver;
     use crate::table_calendars::ICalendar;
@@ -62,22 +103,83 @@ mod tests {
     #[test]
     pub fn test_calendar_insertion() {
         let mut res = false;
-        let mut cal = ICalendar::new();
-        let start_time;
-        let mut elapsed_time = Duration::from_millis(0);
+        let cal = ICalendar::new();
 
         let mut driver = PgDriver::setup();
         match driver.connect() {
             Ok(driver) => {
-                start_time = Instant::now();
                 cal.store(driver).expect("Storing calendar failed at calendar.store()");
-                elapsed_time = start_time.elapsed();
                 res = true;
-            },
+            }
             Err(e) => println!("{}", e)
         }
 
-        println!("Inserting a new empty calendar (only a name) took: {:?}", elapsed_time);
         assert_eq!(res, true);
+    }
+
+    #[test]
+    pub fn test_calendar_deletion() {
+        let mut res = false;
+        let cal = ICalendar::new();
+        let mut driver = PgDriver::setup();
+
+        match driver.connect() {
+            Ok(driver) => {
+                cal.store(driver).expect("Storing calendar failed at calendar.store()");
+                match cal.remove(driver) {
+                    Ok(_) => res = true,
+                    Err(e) => println!("Removing calendar failed with error: {}", e)
+                }
+            }
+            Err(e) => println!("{}", e)
+        }
+
+        assert_eq!(res, true);
+    }
+
+    #[test]
+    fn test_retrieve_all_columns_no_condition() {
+        let mut driver = PgDriver::setup();
+        driver.connect().unwrap();
+
+        // Store enough calendars
+        for _ in 0..10 {
+            let cal = ICalendar::new();
+            cal.store(&mut driver).unwrap();
+        }
+
+        let result = ICalendar::retrieve(&mut driver, vec!["*".to_string()], None);
+        assert!(result.len() >= 10); // Assert that at least 10 calendars were retrieved
+    }
+
+    #[test]
+    fn test_retrieve_one_column_no_condition() {
+        let mut driver = PgDriver::setup();
+        driver.connect().unwrap();
+
+        // Store enough calendars
+        for _ in 0..10 {
+            let cal = ICalendar::new();
+            cal.store(&mut driver).unwrap();
+        }
+
+        let result = ICalendar::retrieve(&mut driver, vec!["uuid".to_string()], None);
+        assert!(result.len() >= 10); // Assert that at least 10 calendars were retrieved
+    }
+
+    #[test]
+    fn test_retrieve_with_condition() {
+        let mut driver = PgDriver::setup();
+        driver.connect().unwrap();
+
+        // Store a calendar and keep its uuid
+        let cal = ICalendar::new();
+        cal.store(&mut driver).unwrap();
+        let uuid = cal.uuid;
+
+        let condition = format!("uuid = '{}'", uuid);
+        let result = ICalendar::retrieve(&mut driver, vec!["*".to_string()], Some(condition));
+        assert_eq!(result.len(), 1); // Assert that only one calendar was retrieved
+        assert_eq!(result[0].uuid, uuid); // Assert that the retrieved calendar has the correct uuid
     }
 }

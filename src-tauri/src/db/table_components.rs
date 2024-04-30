@@ -3,20 +3,39 @@ use uuid::Uuid;
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
+#[derive(Debug)]
+pub enum ComponentType {
+    EVENT,
+    TODO,
+    VENUE,
+    OTHER
+}
+
+impl ComponentType {
+    pub fn parse(c_type: &str) -> Self {
+        match c_type {
+            "event" => Self::EVENT,
+            "todo" => Self::TODO,
+            "venue" => Self::VENUE,
+            _ => Self::OTHER
+        }
+    }
+}
+
 pub struct IComponent {
     uuid: Uuid,
-    c_type: String,
+    c_type: ComponentType,
 }
 
 impl IComponent {
-    pub fn new(c_type: String) -> Self {
+    pub fn new(c_type: ComponentType) -> Self {
         Self {
             uuid: Uuid::new_v4(),
             c_type,
         }
     }
 
-    pub fn from(uuid: Uuid, c_type: String) -> Self {
+    pub fn from(uuid: Uuid, c_type: ComponentType) -> Self {
         Self {
             uuid,
             c_type,
@@ -38,11 +57,11 @@ impl Table for &IComponent {
     }
 
     fn get_fmt_vals(&self) -> String {
-        format!("'{}', '{}'", self.uuid.to_string(), self.c_type)
+        format!("'{}', '{:?}'", self.uuid.to_string(), self.c_type)
     }
 
     fn get_fmt_vals_no_id(&self) -> String {
-        format!("'{}'", self.c_type)
+        format!("'{:?}'", self.c_type)
     }
 }
 
@@ -60,11 +79,11 @@ impl Table for IComponent {
     }
 
     fn get_fmt_vals(&self) -> String {
-        format!("'{}', '{}'", self.uuid.to_string(), self.c_type)
+        format!("'{}', '{:?}'", self.uuid.to_string(), self.c_type)
     }
 
     fn get_fmt_vals_no_id(&self) -> String {
-        format!("'{}'", self.c_type)
+        format!("'{:?}'", self.c_type)
     }
 }
 
@@ -92,7 +111,8 @@ impl DbActions for IComponent {
 
         if let Ok(res) = Self::read(driver, Self::get_name().as_str(), cols, condition) {
             for entry in res {
-                matches.push(IComponent::from(entry.get("uuid"), entry.get("c_type")))
+                let c_type = ComponentType::parse(entry.get("c_type"));
+                matches.push(IComponent::from(entry.get("uuid"), c_type))
             }
         };
 
@@ -113,7 +133,7 @@ mod tests {
         if let Err(e) = driver.connect() {
             panic!("Driver conn failed")
         }
-        let component = IComponent::new(String::from("test_type"));
+        let component = IComponent::new(ComponentType::EVENT);
         assert!(component.store(&mut driver).is_ok());
     }
 
@@ -123,9 +143,9 @@ mod tests {
         if let Err(e) = driver.connect() {
             panic!("Driver conn failed")
         }
-        let mut component = IComponent::new(String::from("test_type"));
+        let mut component = IComponent::new(ComponentType::EVENT);
         assert!(component.store(&mut driver).is_ok());
-        component.c_type = String::from("another_test_type");
+        component.c_type = ComponentType::TODO;
         assert!(component.update(&mut driver).is_ok());
     }
 
@@ -135,7 +155,7 @@ mod tests {
         if let Err(e) = driver.connect() {
             panic!("Driver conn failed")
         }
-        let component = IComponent::new(String::from("test_type"));
+        let component = IComponent::new(ComponentType::EVENT);
         assert!(component.store(&mut driver).is_ok());
         assert!(component.remove(&mut driver).is_ok());
     }
@@ -146,7 +166,7 @@ mod tests {
         if let Err(e) = driver.connect() {
             panic!("Driver conn failed")
         }
-        let component = IComponent::new(String::from("test_type"));
+        let component = IComponent::new(ComponentType::EVENT);
         assert!(component.store(&mut driver).is_ok());
         let retrieved = IComponent::retrieve(&mut driver, vec![String::from("*")], None);
         assert!(retrieved.len() >= 1);

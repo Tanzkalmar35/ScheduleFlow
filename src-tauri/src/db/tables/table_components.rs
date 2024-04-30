@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn test_insert() {
         let mut driver = PgDriver::setup();
-        if let Err(e) = driver.connect() {
+        if let Err(_) = driver.connect() {
             panic!("Driver conn failed")
         }
         let component = IComponent::new(ComponentType::EVENT);
@@ -140,7 +140,7 @@ mod tests {
     #[test]
     fn test_update() {
         let mut driver = PgDriver::setup();
-        if let Err(e) = driver.connect() {
+        if let Err(_) = driver.connect() {
             panic!("Driver conn failed")
         }
         let mut component = IComponent::new(ComponentType::EVENT);
@@ -152,7 +152,7 @@ mod tests {
     #[test]
     fn test_delete() {
         let mut driver = PgDriver::setup();
-        if let Err(e) = driver.connect() {
+        if let Err(_) = driver.connect() {
             panic!("Driver conn failed")
         }
         let component = IComponent::new(ComponentType::EVENT);
@@ -163,7 +163,7 @@ mod tests {
     #[test]
     fn test_retrieve() {
         let mut driver = PgDriver::setup();
-        if let Err(e) = driver.connect() {
+        if let Err(_) = driver.connect() {
             panic!("Driver conn failed")
         }
         let component = IComponent::new(ComponentType::EVENT);

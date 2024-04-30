@@ -184,7 +184,7 @@ impl DbActions for User {
         Self::delete::<&Self>(driver, self.uuid)
     }
 
-    fn retrieve(driver: &mut PgDriver, cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item> {
+    fn retrieve(_driver: &mut PgDriver, _cols: Vec<String>, _condition: Option<String>) -> Vec<Self::Item> {
         todo!()
     }
 }

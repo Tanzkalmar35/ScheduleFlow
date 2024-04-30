@@ -75,7 +75,7 @@ pub trait DbActions {
     /// * `table` - The table to query.
     /// * `cols` - The columns to query.
     /// * `condition` - The condition to query. Optional.
-    fn read(driver: &mut PgDriver, table: &str, mut cols: Vec<String>, condition: Option<String>) -> anyhow::Result<Vec<Row>> {
+    fn read(driver: &mut PgDriver, table: &str, cols: Vec<String>, condition: Option<String>) -> anyhow::Result<Vec<Row>> {
         let fmt_cols = cols.join(", ");
 
         let rows = match condition {

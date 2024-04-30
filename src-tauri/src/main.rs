@@ -10,11 +10,11 @@ fn greet(name: &str) -> String {
 #[path="calendar/icalendar_util.rs"]
 mod icalendar_util;
 
-#[path="db/table_users.rs"]
+#[path="db/tables/table_users.rs"]
 mod table_users;
-#[path="db/table_calendars.rs"]
+#[path="db/tables/table_calendars.rs"]
 mod table_calendars;
-#[path="db/table_components.rs"]
+#[path= "db/tables/table_components.rs"]
 mod table_components;
 #[path="db/db_actions.rs"]
 mod db_actions;

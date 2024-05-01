@@ -14,8 +14,10 @@ mod icalendar_util;
 mod table_users;
 #[path="db/tables/table_calendars.rs"]
 mod table_calendars;
-#[path= "db/tables/table_components.rs"]
+#[path="db/tables/table_components.rs"]
 mod table_components;
+#[path="db/tables/table_properties.rs"]
+mod table_properties;
 #[path="db/db_actions.rs"]
 mod db_actions;
 #[path= "db/pg_driver.rs"]

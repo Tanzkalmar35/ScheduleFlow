@@ -3,6 +3,10 @@ use uuid::Uuid;
 
 use crate::pg_driver::PgDriver;
 
+pub trait TableCombination {
+
+}
+
 pub trait Table {
     /// Returns the name of the table.
     fn get_name() -> String;

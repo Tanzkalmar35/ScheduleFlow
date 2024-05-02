@@ -18,6 +18,8 @@ mod table_calendars;
 mod table_components;
 #[path="db/tables/table_properties.rs"]
 mod table_properties;
+#[path="db/tables/table_calendars_components.rs"]
+mod table_calendars_components;
 #[path="db/db_actions.rs"]
 mod db_actions;
 #[path= "db/pg_driver.rs"]

@@ -25,6 +25,10 @@ impl Table for ICalendar {
         String::from("uuid")
     }
 
+    fn get_fk_uuid_name() -> String {
+        String::from("calendar_uuid")
+    }
+
     fn get_fmt_cols_no_id() -> String {
         String::from("")
     }
@@ -45,6 +49,10 @@ impl Table for &ICalendar {
 
     fn get_fmt_cols() -> String {
         String::from("uuid")
+    }
+
+    fn get_fk_uuid_name() -> String {
+        String::from("calendar_uuid")
     }
 
     fn get_fmt_cols_no_id() -> String {

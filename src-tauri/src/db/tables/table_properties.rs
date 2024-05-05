@@ -3,8 +3,8 @@ use uuid::Uuid;
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
-struct IProperty {
-    uuid: Uuid,
+pub struct IProperty {
+    pub(crate) uuid: Uuid,
     key: String,
     val: String,
 }
@@ -36,6 +36,10 @@ impl Table for IProperty {
         String::from("uuid, key, value")
     }
 
+    fn get_fk_uuid_name() -> String {
+        String::from("property_uuid")
+    }
+
     fn get_fmt_cols_no_id() -> String {
         String::from("key, value")
     }
@@ -56,6 +60,10 @@ impl Table for &IProperty {
 
     fn get_fmt_cols() -> String {
         String::from("uuid, key, value")
+    }
+
+    fn get_fk_uuid_name() -> String {
+        String::from("property_uuid")
     }
 
     fn get_fmt_cols_no_id() -> String {

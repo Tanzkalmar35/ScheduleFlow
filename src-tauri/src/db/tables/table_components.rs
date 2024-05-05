@@ -23,7 +23,7 @@ impl ComponentType {
 }
 
 pub struct IComponent {
-    uuid: Uuid,
+    pub(crate) uuid: Uuid,
     c_type: ComponentType,
 }
 
@@ -52,6 +52,10 @@ impl Table for &IComponent {
         String::from("uuid, c_type")
     }
 
+    fn get_fk_uuid_name() -> String {
+        String::from("component_uuid")
+    }
+
     fn get_fmt_cols_no_id() -> String {
         String::from("c_type")
     }
@@ -72,6 +76,10 @@ impl Table for IComponent {
 
     fn get_fmt_cols() -> String {
         String::from("uuid, c_type")
+    }
+
+    fn get_fk_uuid_name() -> String {
+        String::from("component_uuid")
     }
 
     fn get_fmt_cols_no_id() -> String {

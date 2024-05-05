@@ -12,6 +12,13 @@ pub trait Table {
     fn get_name() -> String;
     /// Returns a for a psql expression formatted String containing all columns of the table.
     fn get_fmt_cols() -> String;
+    /// The name of the uuid column if referenced as fk.
+    ///
+    /// # To be fixed:
+    /// Although this concept works, it's not ideal.
+    ///
+    /// Todo: Find a better way to obtain these names of tables
+    fn get_fk_uuid_name() -> String;
     /// Returns a for a psql expression formatted String containing all columns except for the id
     /// field of the table.
     fn get_fmt_cols_no_id() -> String;
@@ -113,7 +120,7 @@ pub trait DbActions {
         Ok(())
     }
 
-    /// Deletes an entry from a given table.
+    /// Deletes an entry from a given table using the 'uuid' column.
     ///
     /// # Arguments
     /// * `driver` - The database driver.
@@ -121,6 +128,19 @@ pub trait DbActions {
     /// * `user_id` - The id of the user to delete.
     fn delete<E: Table>(driver: &mut PgDriver, uuid: Uuid) -> anyhow::Result<()> {
         driver.exec(&format!("DELETE FROM {} WHERE uuid='{}'", E::get_name(), uuid))
+            .expect("Deletion failed.");
+        Ok(())
+    }
+
+    /// Deletes an entry from a given table using a specific given column.
+    ///
+    /// # Arguments
+    /// * `driver` - The database driver.
+    /// * `table` - The table to delete from.
+    /// * `col` - The name of the column the uuid is matched on.
+    /// * `uuid` - The uuid of the entry to be deleted.
+    fn delete_spec_col<E: Table>(driver: &mut PgDriver, col: String, uuid: Uuid) -> anyhow::Result<()> {
+        driver.exec(&format!("DELETE FROM {} WHERE {}='{}'", E::get_name(), col, uuid))
             .expect("Deletion failed.");
         Ok(())
     }

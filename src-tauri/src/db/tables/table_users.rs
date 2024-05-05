@@ -43,6 +43,10 @@ impl Table for &User {
         String::from("uuid, username, password, email")
     }
 
+    fn get_fk_uuid_name() -> String {
+        String::from("user_uuid")
+    }
+
     fn get_fmt_cols_no_id() -> String {
         String::from("username, password, email")
     }

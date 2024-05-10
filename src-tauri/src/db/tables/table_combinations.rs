@@ -2,7 +2,6 @@ use std::marker::PhantomData;
 use uuid::Uuid;
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
-use crate::table_calendars::ICalendar;
 
 pub struct TableCombination<T1: Table, T2: Table> {
     uuid1: Uuid,

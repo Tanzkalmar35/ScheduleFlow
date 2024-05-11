@@ -1,7 +1,10 @@
+use icalendar::{Alarm, Component, Event, Todo, Venue};
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
+use crate::table_combinations::TableCombination;
+use crate::table_properties::IProperty;
 
 #[derive(Debug)]
 pub enum ComponentType {
@@ -40,6 +43,56 @@ impl IComponent {
             uuid,
             c_type,
         }
+    }
+
+    /// Collects all entries from the components table and builds it with all its properties into
+    /// icalendar::Component.
+    pub fn collect(driver: &mut PgDriver) -> Vec<dyn Component> {
+        let mut res: Vec<dyn Component> = Vec::new();
+
+        let query_res = Self::retrieve(driver, vec!["*".to_string()], None);
+        for component in query_res {
+            let mut properties: Vec<IProperty>;
+            let properties_uuids = TableCombination::<IComponent, IProperty>::retrieve(
+                driver,
+                vec!["property_uuid".to_string()],
+                Some(format!("component_uuid = '{}'", component.uuid))
+            );
+            for property in properties_uuids {
+                let property_uuid = property.uuid2;
+                properties = IProperty::retrieve(
+                    driver,
+                    vec!["key".to_string(), "value".to_string()],
+                    Some(format!("uuid = '{}'", property_uuid))
+                );
+            }
+            match component.c_type {
+                ComponentType::EVENT => {
+                    let mut event = Event::new();
+                    for property in &properties {
+                        event.add_property(property.key.as_str(), property.val.as_str())
+                    }
+                    res.push(event);
+                }
+                ComponentType::TODO => {
+                    let mut todo = Todo::new();
+                    for property in &properties {
+                        todo.add_property(property.key.as_str(), property.val.as_str())
+                    }
+                    res.push(todo);
+                }
+                ComponentType::VENUE => {
+                    let mut venue = Venue::new();
+                    for property in &properties {
+                        venue.add_property(property.key.as_str(), property.val.as_str())
+                    }
+                    res.push(venue);
+                }
+                ComponentType::OTHER => unimplemented!("TODO")
+            }
+        }
+
+        res
     }
 }
 

@@ -5,8 +5,8 @@ use crate::pg_driver::PgDriver;
 
 pub struct IProperty {
     pub(crate) uuid: Uuid,
-    key: String,
-    val: String,
+    pub(crate) key: String,
+    pub(crate) val: String,
 }
 
 impl IProperty {

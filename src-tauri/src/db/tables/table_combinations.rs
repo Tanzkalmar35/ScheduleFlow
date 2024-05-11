@@ -4,8 +4,8 @@ use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
 pub struct TableCombination<T1: Table, T2: Table> {
-    uuid1: Uuid,
-    uuid2: Uuid,
+    pub(crate) uuid1: Uuid,
+    pub(crate) uuid2: Uuid,
     phantom1: PhantomData<T1>,
     phantom2: PhantomData<T2>,
 }

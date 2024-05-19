@@ -90,9 +90,9 @@ pub trait DbActions {
         let fmt_cols = cols.join(", ");
 
         let rows = match condition {
-            Some(condition) => driver.query(&format!("SELECT {} FROM {} WHERE {}", fmt_cols, table, condition))
+            Some(condition) => driver.exec(&format!("SELECT {} FROM {} WHERE {}", fmt_cols, table, condition))
                 .expect("Query with condition failed."),
-            None => driver.query(&format!("SELECT {} FROM {}", fmt_cols, table))
+            None => driver.exec(&format!("SELECT {} FROM {}", fmt_cols, table))
                 .expect("Query without condition failed.")
         };
 

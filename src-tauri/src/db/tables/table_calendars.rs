@@ -4,11 +4,11 @@ use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
 #[derive(Debug)]
-pub struct ICalendar {
+pub struct CalendarDAO {
     pub(crate) uuid: Uuid,
 }
 
-impl ICalendar {
+impl CalendarDAO {
     pub fn new() -> Self {
         Self {
             uuid: Uuid::new_v4(),
@@ -16,7 +16,7 @@ impl ICalendar {
     }
 }
 
-impl Table for ICalendar {
+impl Table for CalendarDAO {
     fn get_name() -> String {
         String::from("calendars")
     }
@@ -42,7 +42,7 @@ impl Table for ICalendar {
     }
 }
 
-impl Table for &ICalendar {
+impl Table for &CalendarDAO {
     fn get_name() -> String {
         String::from("calendars")
     }
@@ -68,8 +68,8 @@ impl Table for &ICalendar {
     }
 }
 
-impl DbActions for ICalendar {
-    type Item = ICalendar;
+impl DbActions for CalendarDAO {
+    type Item = CalendarDAO;
 
     fn store(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
         Self::insert(driver, self)
@@ -85,15 +85,15 @@ impl DbActions for ICalendar {
     }
 
     fn retrieve(driver: &mut PgDriver, mut cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item> {
-        let mut res: Vec<ICalendar> = vec![];
+        let mut res: Vec<CalendarDAO> = vec![];
 
         if cols.contains(&"*".to_string()) && cols.len() == 1 {
-            cols = ICalendar::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
+            cols = CalendarDAO::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
         }
         if let Ok(rows) = Self::read(driver, "calendars", cols, condition) {
             for row in rows {
                 let val = row.get("uuid");
-                res.push(ICalendar { uuid: val })
+                res.push(CalendarDAO { uuid: val })
             };
         }
 
@@ -106,12 +106,12 @@ mod tests {
 
     use crate::db_actions::DbActions;
     use crate::pg_driver::PgDriver;
-    use crate::table_calendars::ICalendar;
+    use crate::table_calendars::CalendarDAO;
 
     #[test]
     pub fn test_calendar_insertion() {
         let mut res = false;
-        let cal = ICalendar::new();
+        let cal = CalendarDAO::new();
 
         let mut driver = PgDriver::setup();
         match driver.connect() {
@@ -128,7 +128,7 @@ mod tests {
     #[test]
     pub fn test_calendar_deletion() {
         let mut res = false;
-        let cal = ICalendar::new();
+        let cal = CalendarDAO::new();
         let mut driver = PgDriver::setup();
 
         match driver.connect() {
@@ -152,11 +152,11 @@ mod tests {
 
         // Store enough calendars
         for _ in 0..10 {
-            let cal = ICalendar::new();
+            let cal = CalendarDAO::new();
             cal.store(&mut driver).unwrap();
         }
 
-        let result = ICalendar::retrieve(&mut driver, vec!["*".to_string()], None);
+        let result = CalendarDAO::retrieve(&mut driver, vec!["*".to_string()], None);
         assert!(result.len() >= 10); // Assert that at least 10 calendars were retrieved
     }
 
@@ -167,11 +167,11 @@ mod tests {
 
         // Store enough calendars
         for _ in 0..10 {
-            let cal = ICalendar::new();
+            let cal = CalendarDAO::new();
             cal.store(&mut driver).unwrap();
         }
 
-        let result = ICalendar::retrieve(&mut driver, vec!["uuid".to_string()], None);
+        let result = CalendarDAO::retrieve(&mut driver, vec!["uuid".to_string()], None);
         assert!(result.len() >= 10); // Assert that at least 10 calendars were retrieved
     }
 
@@ -181,12 +181,12 @@ mod tests {
         driver.connect().unwrap();
 
         // Store a calendar and keep its uuid
-        let cal = ICalendar::new();
+        let cal = CalendarDAO::new();
         cal.store(&mut driver).unwrap();
         let uuid = cal.uuid;
 
         let condition = format!("uuid = '{}'", uuid);
-        let result = ICalendar::retrieve(&mut driver, vec!["*".to_string()], Some(condition));
+        let result = CalendarDAO::retrieve(&mut driver, vec!["*".to_string()], Some(condition));
         assert_eq!(result.len(), 1); // Assert that only one calendar was retrieved
         assert_eq!(result[0].uuid, uuid); // Assert that the retrieved calendar has the correct uuid
     }

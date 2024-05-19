@@ -110,15 +110,15 @@ impl<T1: Table, T2: Table> DbActions for TableCombination<T1, T2> {
 mod tests_icalendar_icomponent {
     use crate::db_actions::DbActions;
     use crate::pg_driver::PgDriver;
-    use crate::table_calendars::ICalendar;
+    use crate::table_calendars::CalendarDAO;
     use crate::table_combinations::TableCombination;
-    use crate::table_components::{ComponentType, IComponent};
+    use crate::table_components::{ComponentType, ComponentDAO};
 
     #[test]
     pub fn test_storing_calendar_component_combination() {
         let mut driver = PgDriver::setup();
-        let cal = ICalendar::new();
-        let component = IComponent::new(ComponentType::EVENT);
+        let cal = CalendarDAO::new();
+        let component = ComponentDAO::new(ComponentType::EVENT);
 
         if let Err(e) = driver.connect() {
             panic!("Driver conn failed: {}", e)
@@ -129,7 +129,7 @@ mod tests_icalendar_icomponent {
         if let Err(e) = component.store(&mut driver) {
             panic!("Storing event calendar failed: {}", e)
         }
-        let calendar_component: TableCombination<ICalendar, IComponent> = TableCombination::new(cal.uuid, component.uuid);
+        let calendar_component: TableCombination<CalendarDAO, ComponentDAO> = TableCombination::new(cal.uuid, component.uuid);
         if let Err(e) = calendar_component.store(&mut driver) {
             panic!("Storing combination failed: {}", e)
         }
@@ -138,8 +138,8 @@ mod tests_icalendar_icomponent {
     #[test]
     pub fn test_removing_calendar_component_combination() {
         let mut driver = PgDriver::setup();
-        let cal = ICalendar::new();
-        let component = IComponent::new(ComponentType::EVENT);
+        let cal = CalendarDAO::new();
+        let component = ComponentDAO::new(ComponentType::EVENT);
 
         if let Err(e) = driver.connect() {
             panic!("Driver conn failed: {}", e)
@@ -150,7 +150,7 @@ mod tests_icalendar_icomponent {
         if let Err(e) = component.store(&mut driver) {
             panic!("Storing event calendar failed: {}", e)
         }
-        let calendar_component: TableCombination<ICalendar, IComponent> = TableCombination::new(cal.uuid, component.uuid);
+        let calendar_component: TableCombination<CalendarDAO, ComponentDAO> = TableCombination::new(cal.uuid, component.uuid);
         if let Err(e) = calendar_component.store(&mut driver) {
             panic!("Storing combination failed: {}", e)
         }
@@ -162,8 +162,8 @@ mod tests_icalendar_icomponent {
     #[test]
     pub fn test_retrieving_calendar_component_combination() {
         let mut driver = PgDriver::setup();
-        let cal = ICalendar::new();
-        let component = IComponent::new(ComponentType::EVENT);
+        let cal = CalendarDAO::new();
+        let component = ComponentDAO::new(ComponentType::EVENT);
 
         if let Err(e) = driver.connect() {
             panic!("Driver conn failed: {}", e)
@@ -174,11 +174,11 @@ mod tests_icalendar_icomponent {
         if let Err(e) = component.store(&mut driver) {
             panic!("Storing event calendar failed: {}", e)
         }
-        let calendar_component: TableCombination<ICalendar, IComponent> = TableCombination::new(cal.uuid, component.uuid);
+        let calendar_component: TableCombination<CalendarDAO, ComponentDAO> = TableCombination::new(cal.uuid, component.uuid);
         if let Err(e) = calendar_component.store(&mut driver) {
             panic!("Storing combination failed: {}", e)
         }
-        assert!(TableCombination::<ICalendar, IComponent>::retrieve(&mut driver, vec!["*".to_string()], None).len() >= 1)
+        assert!(TableCombination::<CalendarDAO, ComponentDAO>::retrieve(&mut driver, vec!["*".to_string()], None).len() >= 1)
     }
 }
 
@@ -186,16 +186,16 @@ mod tests_icalendar_icomponent {
 mod tests_icalendar_iproperty {
     use crate::db_actions::DbActions;
     use crate::pg_driver::PgDriver;
-    use crate::table_calendars::ICalendar;
+    use crate::table_calendars::CalendarDAO;
     use crate::table_combinations::TableCombination;
-    use crate::table_properties::IProperty;
+    use crate::table_properties::PropertyDAO;
 
     #[test]
     pub fn test_storing_calendar_property_combination() {
         let mut driver = PgDriver::setup();
-        let cal = ICalendar::new();
-        let property = IProperty::new(String::from("test_key"), String::from("test_value"));
-        let combination = TableCombination::<ICalendar, IProperty>::new(cal.uuid, property.uuid);
+        let cal = CalendarDAO::new();
+        let property = PropertyDAO::new(String::from("test_key"), String::from("test_value"));
+        let combination = TableCombination::<CalendarDAO, PropertyDAO>::new(cal.uuid, property.uuid);
 
         if let Err(_) = driver.connect() {
             panic!("Driver conn failed")
@@ -214,9 +214,9 @@ mod tests_icalendar_iproperty {
     #[test]
     pub fn test_removing_calendar_property_combination() {
         let mut driver = PgDriver::setup();
-        let cal = ICalendar::new();
-        let property = IProperty::new(String::from("test_key"), String::from("test_value"));
-        let combination = TableCombination::<ICalendar, IProperty>::new(cal.uuid, property.uuid);
+        let cal = CalendarDAO::new();
+        let property = PropertyDAO::new(String::from("test_key"), String::from("test_value"));
+        let combination = TableCombination::<CalendarDAO, PropertyDAO>::new(cal.uuid, property.uuid);
 
         if let Err(_) = driver.connect() {
             panic!("Driver conn failed")
@@ -238,9 +238,9 @@ mod tests_icalendar_iproperty {
     #[test]
     pub fn test_retrieving_calendar_property_combination() {
         let mut driver = PgDriver::setup();
-        let cal = ICalendar::new();
-        let property = IProperty::new(String::from("test_key"), String::from("test_value"));
-        let combination = TableCombination::<ICalendar, IProperty>::new(cal.uuid, property.uuid);
+        let cal = CalendarDAO::new();
+        let property = PropertyDAO::new(String::from("test_key"), String::from("test_value"));
+        let combination = TableCombination::<CalendarDAO, PropertyDAO>::new(cal.uuid, property.uuid);
 
         if let Err(_) = driver.connect() {
             panic!("Driver conn failed")
@@ -254,7 +254,7 @@ mod tests_icalendar_iproperty {
         if let Err(e) = combination.store(&mut driver) {
             panic!("Error storing combination: {}", e)
         }
-        assert!(TableCombination::<ICalendar, IProperty>::retrieve(&mut driver, vec!["*".to_string()], None).len() >= 1)
+        assert!(TableCombination::<CalendarDAO, PropertyDAO>::retrieve(&mut driver, vec!["*".to_string()], None).len() >= 1)
     }
 }
 

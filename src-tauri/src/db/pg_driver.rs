@@ -40,6 +40,9 @@ impl PgDriver {
     }
 
     /// Executes a query on the database.
+    ///
+    /// # Returns
+    /// The affected Rows, if there are any. If not, an Error.
     pub fn exec(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
         match self.client.as_mut() {
             Some(client) => {
@@ -48,11 +51,5 @@ impl PgDriver {
             }
             None => Err(anyhow::anyhow!("Database client is not connected.")),
         }
-    }
-
-    /// Queries the database.
-    pub fn query(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
-        let rows = self.client.as_mut().unwrap().query(query, &[]);
-        Ok(rows?)
     }
 }

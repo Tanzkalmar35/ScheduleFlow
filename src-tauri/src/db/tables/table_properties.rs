@@ -1,9 +1,11 @@
+use std::iter::Cloned;
 use std::ops::Deref;
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
+#[derive(Clone)]
 pub struct PropertyDAO {
     pub(crate) uuid: Uuid,
     pub(crate) key: String,
@@ -27,27 +29,9 @@ impl PropertyDAO {
         }
     }
 
-    pub fn retrieve_single(driver: &mut PgDriver, cols: Vec<String>, condition: Option<String>) -> Self::Item {
-        Self::retrieve(driver, cols, condition).get(0).unwrap()
+    pub fn retrieve_single(driver: &mut PgDriver, cols: Vec<String>, condition: Option<String>) -> Self {
+        Self::retrieve(driver, cols, condition).first().cloned().unwrap()
     }
-
-    // pub fn collect_from(driver: &mut PgDriver, property_uuids: Vec<Uuid>) -> Vec<PropertyDAO> {
-    //     let mut properties: Vec<PropertyDAO> = vec![];
-    //
-    //     for uuid in property_uuids {
-    //         let res = PropertyDAO::retrieve(
-    //             driver,
-    //             vec!["key".to_string(), "value".to_string()],
-    //             Some(format!("uuid = '{}'", uuid)),
-    //         ).get(0);
-    //
-    //         if let Some(prop) = res {
-    //             properties.push(prop);
-    //         }
-    //     }
-    //
-    //     properties
-    // }
 }
 
 impl Table for PropertyDAO {

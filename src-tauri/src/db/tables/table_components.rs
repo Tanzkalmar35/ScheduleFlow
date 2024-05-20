@@ -1,11 +1,8 @@
-use icalendar::{Component, Event, Todo, Venue};
+use icalendar::{Component};
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
-use crate::table_combinations::TableCombination;
-use crate::table_properties::PropertyDAO;
-
 #[derive(Debug)]
 pub enum ComponentType {
     EVENT,

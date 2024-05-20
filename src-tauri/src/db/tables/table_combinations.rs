@@ -94,6 +94,7 @@ impl<T1: Table, T2: Table> DbActions for TableCombination<T1, T2> {
         if cols.contains(&"*".to_string()) && cols.len() == 1 {
             cols = Self::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
         }
+        // Error = Row has only got the property_uuid
         if let Ok(rows) = Self::read(driver, Self::get_name().as_str(), cols, condition) {
             for row in rows {
                 let uuid1 = row.get(T1::get_fk_uuid_name().as_str());

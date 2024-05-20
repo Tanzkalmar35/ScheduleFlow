@@ -3,9 +3,7 @@ use uuid::Uuid;
 
 use crate::pg_driver::PgDriver;
 
-pub trait TableCombination {
-
-}
+pub trait TableCombination {}
 
 pub trait Table {
     /// Returns the name of the table.
@@ -50,7 +48,6 @@ pub trait Table {
 ///    User::insert(args);
 /// }
 pub trait DbActions {
-
     /// The type the DbActions got implemented for.
     type Item;
 
@@ -90,8 +87,10 @@ pub trait DbActions {
         let fmt_cols = cols.join(", ");
 
         let rows = match condition {
-            Some(condition) => driver.exec(&format!("SELECT {} FROM {} WHERE {}", fmt_cols, table, condition))
-                .expect("Query with condition failed."),
+            Some(condition) => {
+                let x = &format!("SELECT {} FROM {} WHERE {}", fmt_cols, table, condition);
+                driver.exec(x).expect("Query with condition failed.")
+            }
             None => driver.exec(&format!("SELECT {} FROM {}", fmt_cols, table))
                 .expect("Query without condition failed.")
         };

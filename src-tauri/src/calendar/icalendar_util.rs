@@ -18,7 +18,7 @@ impl ICalendarUtil {
     /// Initializes a new icalendar::Calendar.
     pub fn init(table_calendar: CalendarDAO) -> ICalendarUtil {
         Self {
-            is_new: false,
+            is_new: true,
             table_calendar,
             calendar: Calendar::new().done(),
         }
@@ -35,7 +35,10 @@ impl ICalendarUtil {
     }
 
     // pub fn store(&mut self, driver: &mut PgDriver) {
-    //     self.table_calendar.store(driver);
+    //     match self.table_calendar.store(driver) {
+    //         Ok(_) => {},
+    //         Err(err) => println!("{:?}", err)
+    //     }
     //     if self.is_new {
     //         for component in self.calendar.components {
     //             if let Some(c_type) = component.as_event() {

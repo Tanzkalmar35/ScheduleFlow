@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use icalendar::{Calendar, CalendarComponent, Component, Event, Property, Todo, Venue};
 use uuid::Uuid;
 
@@ -16,7 +15,6 @@ pub(crate) struct ICalendarAdapter;
 
 /// Converts data from the base class to the entity class.
 impl ICalendarAdapter {
-
     /// Bundles a CalendarDAO with all its Components and Properties into one icalendar::Calendar object.
     pub fn bundle_calendar(driver: &mut PgDriver, from: CalendarDAO) -> Calendar {
         let mut cal = Self::build_calendar(driver, &from);
@@ -52,7 +50,6 @@ impl ICalendarAdapter {
         for property in properties_uuids {
             res.push(PropertyDAO::retrieve_single(
                 driver,
-                vec!["key".to_string(), "value".to_string()],
                 Some(format!("uuid = '{}'", property)),
             ));
         }
@@ -63,9 +60,16 @@ impl ICalendarAdapter {
     fn build_components(driver: &mut PgDriver, cal_uuid: Uuid) -> Vec<CalendarComponent> {
         let mut res: Vec<CalendarComponent> = Vec::new();
         let condition = format!("calendar_uuid = '{}'", cal_uuid);
-        let query_res = ComponentDAO::retrieve(driver, vec!["*".to_string()], Some(condition));
+        let query_res: Vec<TableCombination<CalendarDAO, ComponentDAO>> = TableCombination::retrieve(driver, Some(condition));
 
-        for mut component in query_res {
+        let mut components: Vec<ComponentDAO> = vec![];
+
+        for combination in query_res {
+            let condition = format!("uuid = '{}'", combination.uuid2);
+            components.push(ComponentDAO::retrieve_single(driver, Some(condition)));
+        }
+
+        for mut component in components {
             let mut properties: Vec<PropertyDAO> = vec![];
             let properties_uuids = Self::get_properties_of::<ComponentDAO>(driver, component.uuid);
 
@@ -74,7 +78,6 @@ impl ICalendarAdapter {
                 properties.push(
                     PropertyDAO::retrieve_single(
                         driver,
-                        vec!["key".to_string(), "value".to_string()],
                         Some(format!("uuid = '{}'", property_uuid)),
                     )
                 );
@@ -119,7 +122,6 @@ impl ICalendarAdapter {
     fn get_properties_of<T: Table>(driver: &mut PgDriver, of: Uuid) -> Vec<TableCombination<T, PropertyDAO>> {
         TableCombination::<T, PropertyDAO>::retrieve(
             driver,
-            vec!["property_uuid".to_string()],
             Some(format!("{} = '{}'", T::get_fk_uuid_name(), of)),
         )
     }

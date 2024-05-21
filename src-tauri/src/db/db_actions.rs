@@ -83,15 +83,13 @@ pub trait DbActions {
     /// * `table` - The table to query.
     /// * `cols` - The columns to query.
     /// * `condition` - The condition to query. Optional.
-    fn read(driver: &mut PgDriver, table: &str, cols: Vec<String>, condition: Option<String>) -> anyhow::Result<Vec<Row>> {
-        let fmt_cols = cols.join(", ");
-
+    fn read(driver: &mut PgDriver, table: &str, condition: Option<String>) -> anyhow::Result<Vec<Row>> {
         let rows = match condition {
             Some(condition) => {
-                let x = &format!("SELECT {} FROM {} WHERE {}", fmt_cols, table, condition);
-                driver.exec(x).expect("Query with condition failed.")
+                let x = &format!("SELECT * FROM {} WHERE {}", table, condition);
+                driver.exec(x).expect("Query with condition failed")
             }
-            None => driver.exec(&format!("SELECT {} FROM {}", fmt_cols, table))
+            None => driver.exec(&format!("SELECT * FROM {}", table))
                 .expect("Query without condition failed.")
         };
 
@@ -154,5 +152,5 @@ pub trait DbActions {
     fn remove(&self, driver: &mut PgDriver) -> anyhow::Result<()>;
 
     /// The table specific implementation for retrieving an entry.
-    fn retrieve(driver: &mut PgDriver, cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item>;
+    fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Self::Item>;
 }

@@ -29,8 +29,8 @@ impl PropertyDAO {
         }
     }
 
-    pub fn retrieve_single(driver: &mut PgDriver, cols: Vec<String>, condition: Option<String>) -> Self {
-        Self::retrieve(driver, cols, condition).first().cloned().unwrap()
+    pub fn retrieve_single(driver: &mut PgDriver, condition: Option<String>) -> Self {
+        Self::retrieve(driver, condition).first().cloned().unwrap()
     }
 }
 
@@ -101,14 +101,10 @@ impl DbActions for PropertyDAO {
         Self::delete::<PropertyDAO>(driver, self.uuid)
     }
 
-    fn retrieve(driver: &mut PgDriver, mut cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item> {
+    fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Self::Item> {
         let mut matches: Vec<PropertyDAO> = vec![];
 
-        if cols.contains(&"*".to_string()) && cols.len() == 1 {
-            cols = PropertyDAO::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
-        }
-
-        if let Ok(rows) = Self::read(driver, Self::get_name().as_str(), cols, condition) {
+        if let Ok(rows) = Self::read(driver, Self::get_name().as_str(), condition) {
             for row in rows {
                 matches.push(PropertyDAO::from(
                     row.get("uuid"),
@@ -171,7 +167,7 @@ mod tests {
         }
         let property = PropertyDAO::new(String::from("test_key"), String::from("test_value"));
         assert!(property.store(&mut driver).is_ok());
-        let retrieved = PropertyDAO::retrieve(&mut driver, vec![String::from("*")], None);
+        let retrieved = PropertyDAO::retrieve(&mut driver, None);
         assert!(retrieved.len() >= 1);
     }
 }

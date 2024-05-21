@@ -1,19 +1,20 @@
-use icalendar::{Component};
+use icalendar::Component;
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
-#[derive(Debug)]
+
+#[derive(Debug, Clone)]
 pub enum ComponentType {
     EVENT,
     TODO,
     VENUE,
-    OTHER
+    OTHER,
 }
 
 impl ComponentType {
     pub fn parse(c_type: &str) -> Self {
-        match c_type {
+        match c_type.to_lowercase().as_str() {
             "event" => Self::EVENT,
             "todo" => Self::TODO,
             "venue" => Self::VENUE,
@@ -22,6 +23,7 @@ impl ComponentType {
     }
 }
 
+#[derive(Clone)]
 pub struct ComponentDAO {
     pub(crate) uuid: Uuid,
     pub(crate) c_type: ComponentType,
@@ -40,6 +42,10 @@ impl ComponentDAO {
             uuid,
             c_type,
         }
+    }
+
+    pub fn retrieve_single(driver: &mut PgDriver, condition: Option<String>) -> Self {
+        Self::retrieve(driver, condition).first().cloned().unwrap()
     }
 }
 
@@ -110,14 +116,10 @@ impl DbActions for ComponentDAO {
         Self::delete::<ComponentDAO>(driver, self.uuid)
     }
 
-    fn retrieve(driver: &mut PgDriver, mut cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item> {
+    fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Self::Item> {
         let mut matches: Vec<ComponentDAO> = vec![];
 
-        if cols.contains(&"*".to_string()) && cols.len() == 1 {
-            cols = ComponentDAO::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
-        }
-
-        if let Ok(res) = Self::read(driver, Self::get_name().as_str(), cols, condition) {
+        if let Ok(res) = Self::read(driver, Self::get_name().as_str(), condition) {
             for entry in res {
                 let c_type = ComponentType::parse(entry.get("c_type"));
                 matches.push(ComponentDAO::from(entry.get("uuid"), c_type))
@@ -176,7 +178,7 @@ mod tests {
         }
         let component = ComponentDAO::new(ComponentType::EVENT);
         assert!(component.store(&mut driver).is_ok());
-        let retrieved = ComponentDAO::retrieve(&mut driver, vec![String::from("*")], None);
+        let retrieved = ComponentDAO::retrieve(&mut driver, None);
         assert!(retrieved.len() >= 1);
     }
 }

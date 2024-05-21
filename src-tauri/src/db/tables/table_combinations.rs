@@ -1,5 +1,7 @@
 use std::marker::PhantomData;
+
 use uuid::Uuid;
+
 use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 
@@ -88,14 +90,10 @@ impl<T1: Table, T2: Table> DbActions for TableCombination<T1, T2> {
         Self::delete_spec_col::<&Self>(driver, T1::get_fk_uuid_name(), self.uuid1)
     }
 
-    fn retrieve(driver: &mut PgDriver, mut cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item> {
+    fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Self::Item> {
         let mut res: Vec<Self> = vec![];
 
-        if cols.contains(&"*".to_string()) && cols.len() == 1 {
-            cols = Self::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
-        }
-        // Error = Row has only got the property_uuid
-        if let Ok(rows) = Self::read(driver, Self::get_name().as_str(), cols, condition) {
+        if let Ok(rows) = Self::read(driver, Self::get_name().as_str(), condition) {
             for row in rows {
                 let uuid1 = row.get(T1::get_fk_uuid_name().as_str());
                 let uuid2 = row.get(T2::get_fk_uuid_name().as_str());
@@ -113,7 +111,7 @@ mod tests_icalendar_icomponent {
     use crate::pg_driver::PgDriver;
     use crate::table_calendars::CalendarDAO;
     use crate::table_combinations::TableCombination;
-    use crate::table_components::{ComponentType, ComponentDAO};
+    use crate::table_components::{ComponentDAO, ComponentType};
 
     #[test]
     pub fn test_storing_calendar_component_combination() {
@@ -179,7 +177,7 @@ mod tests_icalendar_icomponent {
         if let Err(e) = calendar_component.store(&mut driver) {
             panic!("Storing combination failed: {}", e)
         }
-        assert!(TableCombination::<CalendarDAO, ComponentDAO>::retrieve(&mut driver, vec!["*".to_string()], None).len() >= 1)
+        assert!(TableCombination::<CalendarDAO, ComponentDAO>::retrieve(&mut driver, None).len() >= 1)
     }
 }
 
@@ -255,7 +253,7 @@ mod tests_icalendar_iproperty {
         if let Err(e) = combination.store(&mut driver) {
             panic!("Error storing combination: {}", e)
         }
-        assert!(TableCombination::<CalendarDAO, PropertyDAO>::retrieve(&mut driver, vec!["*".to_string()], None).len() >= 1)
+        assert!(TableCombination::<CalendarDAO, PropertyDAO>::retrieve(&mut driver, None).len() >= 1)
     }
 }
 

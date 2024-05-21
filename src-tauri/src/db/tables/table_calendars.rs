@@ -84,13 +84,10 @@ impl DbActions for CalendarDAO {
         Self::delete::<&Self>(driver, self.uuid)
     }
 
-    fn retrieve(driver: &mut PgDriver, mut cols: Vec<String>, condition: Option<String>) -> Vec<Self::Item> {
+    fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Self::Item> {
         let mut res: Vec<CalendarDAO> = vec![];
 
-        if cols.contains(&"*".to_string()) && cols.len() == 1 {
-            cols = CalendarDAO::get_fmt_cols().split(", ").map(|c| c.to_string()).collect();
-        }
-        if let Ok(rows) = Self::read(driver, "calendars", cols, condition) {
+        if let Ok(rows) = Self::read(driver, "calendars", condition) {
             for row in rows {
                 let val = row.get("uuid");
                 res.push(CalendarDAO { uuid: val })
@@ -103,7 +100,6 @@ impl DbActions for CalendarDAO {
 
 #[cfg(test)]
 mod tests {
-
     use crate::db_actions::DbActions;
     use crate::pg_driver::PgDriver;
     use crate::table_calendars::CalendarDAO;
@@ -156,22 +152,7 @@ mod tests {
             cal.store(&mut driver).unwrap();
         }
 
-        let result = CalendarDAO::retrieve(&mut driver, vec!["*".to_string()], None);
-        assert!(result.len() >= 10); // Assert that at least 10 calendars were retrieved
-    }
-
-    #[test]
-    fn test_retrieve_one_column_no_condition() {
-        let mut driver = PgDriver::setup();
-        driver.connect().unwrap();
-
-        // Store enough calendars
-        for _ in 0..10 {
-            let cal = CalendarDAO::new();
-            cal.store(&mut driver).unwrap();
-        }
-
-        let result = CalendarDAO::retrieve(&mut driver, vec!["uuid".to_string()], None);
+        let result = CalendarDAO::retrieve(&mut driver, None);
         assert!(result.len() >= 10); // Assert that at least 10 calendars were retrieved
     }
 
@@ -186,7 +167,7 @@ mod tests {
         let uuid = cal.uuid;
 
         let condition = format!("uuid = '{}'", uuid);
-        let result = CalendarDAO::retrieve(&mut driver, vec!["*".to_string()], Some(condition));
+        let result = CalendarDAO::retrieve(&mut driver, Some(condition));
         assert_eq!(result.len(), 1); // Assert that only one calendar was retrieved
         assert_eq!(result[0].uuid, uuid); // Assert that the retrieved calendar has the correct uuid
     }

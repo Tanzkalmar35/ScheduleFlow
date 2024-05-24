@@ -30,7 +30,7 @@ impl ICalendarAdapter {
     /// Builds an icalendar::Calendar out of the CalendarDAO and appends all its properties.
     fn build_calendar(driver: &mut PgDriver, cal: &CalendarDAO) -> Calendar {
         let mut res = Calendar::new();
-        let mut properties;
+        let properties;
 
         let properties_uuids = Self::get_properties_of::<CalendarDAO>(driver, cal.uuid);
         let uuid = properties_uuids.iter().map(|prop| prop.uuid2).collect();
@@ -60,7 +60,8 @@ impl ICalendarAdapter {
     fn build_components(driver: &mut PgDriver, cal_uuid: Uuid) -> Vec<CalendarComponent> {
         let mut res: Vec<CalendarComponent> = Vec::new();
         let condition = format!("calendar_uuid = '{}'", cal_uuid);
-        let query_res: Vec<TableCombination<CalendarDAO, ComponentDAO>> = TableCombination::retrieve(driver, Some(condition));
+        let query_res: Vec<TableCombination<CalendarDAO, ComponentDAO>> =
+            TableCombination::retrieve(driver, Some(condition));
 
         let mut components: Vec<ComponentDAO> = vec![];
 
@@ -75,22 +76,26 @@ impl ICalendarAdapter {
 
             for property in properties_uuids {
                 let property_uuid = property.uuid2;
-                properties.push(
-                    PropertyDAO::retrieve_single(
-                        driver,
-                        Some(format!("uuid = '{}'", property_uuid)),
-                    )
-                );
+                properties.push(PropertyDAO::retrieve_single(
+                    driver,
+                    Some(format!("uuid = '{}'", property_uuid)),
+                ));
             }
 
-            res.push(Self::build_component_from_props(&mut component, &mut properties));
+            res.push(Self::build_component_from_props(
+                &mut component,
+                &mut properties,
+            ));
         }
 
         res
     }
 
     /// Creates an icalendar::Component (Event, ...) out of the components and adds the properties.
-    fn build_component_from_props(component: &mut ComponentDAO, properties: &mut Vec<PropertyDAO>) -> CalendarComponent {
+    fn build_component_from_props(
+        component: &mut ComponentDAO,
+        properties: &mut Vec<PropertyDAO>,
+    ) -> CalendarComponent {
         match component.c_type {
             ComponentType::EVENT => {
                 let mut event = Event::new();
@@ -113,16 +118,52 @@ impl ICalendarAdapter {
                 }
                 CalendarComponent::Venue(venue)
             }
-            _ => unimplemented!("TODO")
+            _ => unimplemented!("TODO"),
         }
     }
 
     /// Retrieves the property of an object that has a TableCombination with properties, for example
     /// the table components_properties.
-    fn get_properties_of<T: Table>(driver: &mut PgDriver, of: Uuid) -> Vec<TableCombination<T, PropertyDAO>> {
+    fn get_properties_of<T: Table>(
+        driver: &mut PgDriver,
+        of: Uuid,
+    ) -> Vec<TableCombination<T, PropertyDAO>> {
         TableCombination::<T, PropertyDAO>::retrieve(
             driver,
             Some(format!("{} = '{}'", T::get_fk_uuid_name(), of)),
         )
     }
 }
+
+//pub struct CalendarDaoAdapter;
+
+//impl CalendarDaoAdapter {
+//
+//    /// Builds a CalendarDAO object from a Calendar object.
+//    pub fn bundle_calendar_dao(driver: &mut PgDriver, from: Calendar) -> CalendarDAO {
+//        let mut cal = Self::build_calendar_dao(driver, &from);
+//        let components = Self::build_components_dao(driver, from);
+//
+//        for component in components {
+//            cal.push(component);
+//        }
+//
+//        cal
+//    }
+//
+//    pub fn build_calendar_dao(driver: &mut PgDriver, cal: &Calendar) -> CalendarDAO {
+//        let mut res = CalendarDAO::new();
+//        let properties = cal.properties();
+//
+//        for property in properties {
+//            let prop = PropertyDAO::new(
+//                property.name().to_string(),
+//                property.value().to_string(),
+//                res.uuid,
+//            );
+//            prop.store(driver);
+//        }
+//
+//        res
+//    }
+//}

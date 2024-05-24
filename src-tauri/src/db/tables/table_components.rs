@@ -1,4 +1,3 @@
-use icalendar::Component;
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
@@ -18,7 +17,7 @@ impl ComponentType {
             "event" => Self::EVENT,
             "todo" => Self::TODO,
             "venue" => Self::VENUE,
-            _ => Self::OTHER
+            _ => Self::OTHER,
         }
     }
 }
@@ -38,10 +37,7 @@ impl ComponentDAO {
     }
 
     pub fn from(uuid: Uuid, c_type: ComponentType) -> Self {
-        Self {
-            uuid,
-            c_type,
-        }
+        Self { uuid, c_type }
     }
 
     pub fn retrieve_single(driver: &mut PgDriver, condition: Option<String>) -> Self {

@@ -1,7 +1,64 @@
 * {
-  --main-bg-color: #212121
+    margin: 0;
+    padding: 0;
+
+    --purple-gradient-start: rgb(65, 41, 90);
+    --purple-gradient-end: rgb(65, 41, 90);
+    --main-bg-color: #151030;
+    --dark-bg-color: #212121;
+
+    --size-bezel: .5rem;
+    --size-radius: 4px;
 }
 
-body {
-  background-color: var(--main-bg-color);
+.poppins-regular {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+#login-page {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(90deg, var(--purple-gradient-start), var(--purple-gradient-end));
+}
+
+#login-modal {
+    width: 40vw;
+    height: 90vh;
+}
+
+.login-modal-header {
+    display: flex;
+    align-items: center;
+}
+
+.modal-b-wrapper {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-b-dark {
+    background-color: var(--dark-bg-color);
+    color: white;
+    box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.2), 0 10px 10px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 1.5%;
+}
+
+.login-modal-header {
+    margin: 2.5rem;
+    display: flex;
+}
+
+.input__field {
+    box-sizing: border-box;
+    display: block;
+    width: 40%;
+    border: 3px solid currentColor;
+    padding: calc(var(--size-bezel) * 1.5) var(--size-bezel);
+    color: currentColor;
+    border-radius: var(--size-radius);
 }

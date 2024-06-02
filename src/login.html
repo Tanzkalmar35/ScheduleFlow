@@ -14,11 +14,25 @@
         <div class="login-modal-header">
             <h1>Scheduleflow</h1>
         </div>
-        <div id="login-modal-content">
-            <label class="input">
-                <input class="input__field" type="text" placeholder=" " />
-                <span class="input__label">Some Fancy Label</span>
-            </label>
+        <div class="login-modal-content-wrapper">
+            <div class="login-modal-content">
+                <h1 class="login-modal-headline">Log in</h1>
+                <form id="login-form">
+                    <label>
+                        <input id="login-modal-username" class="input__field" type="text" placeholder="Username"/>
+                    </label>
+                    <label>
+                        <input id="login-modal-email" class="input__field" type="email" placeholder="Email"/>
+                    </label>
+                    <label>
+                        <input id="login-modal-password" class="input__field" type="password" placeholder="Password"/>
+                    </label>
+                    <label class="flex">
+                        <input id="login-modal-remember-me" type="checkbox" aria-selected="true"/>
+                        <span>Remember me</span>
+                    </label>
+                </form>
+            </div>
         </div>
     </div>
 </div>

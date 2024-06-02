@@ -17,6 +17,10 @@
     font-style: normal;
 }
 
+.flex {
+    display: flex;
+}
+
 #login-page {
     width: 100vw;
     height: 100vh;
@@ -26,7 +30,7 @@
 #login-modal {
     width: 40vw;
     height: 90vh;
-}
+ }
 
 .login-modal-header {
     display: flex;
@@ -53,12 +57,43 @@
     display: flex;
 }
 
-.input__field {
-    box-sizing: border-box;
-    display: block;
+.login-modal-content {
     width: 40%;
-    border: 3px solid currentColor;
-    padding: calc(var(--size-bezel) * 1.5) var(--size-bezel);
-    color: currentColor;
-    border-radius: var(--size-radius);
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 3vh;
+    text-align: center;
 }
+
+.login-modal-content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input__field {
+    width: 100%;
+    padding: 1rem;
+    border-radius: var(--size-radius);
+    border: none;
+    color: black;
+    font-size: medium;
+}
+
+input:focus {
+    outline: none;
+}
+
+.login-modal-headline {
+    margin-bottom: 5vh;
+    margin-top: 3vh;
+}
+
+#login-modal-remember-me {
+    margin-right: 1vw;
+    padding: 1rem;
+}
+
+

@@ -17,7 +17,7 @@
         <div class="login-modal-content-wrapper">
             <div class="login-modal-content">
                 <h1 class="login-modal-headline">Log in</h1>
-                <form id="login-form">
+                <form id="login-form" onsubmit="submitLoginForm()">
                     <label>
                         <input id="login-modal-username" class="input__field" type="text" placeholder="Username"/>
                     </label>
@@ -31,6 +31,7 @@
                         <input id="login-modal-remember-me" type="checkbox" aria-selected="true"/>
                         <span>Remember me</span>
                     </label>
+                    <button id="login-btn" type="submit">Log in</button>
                 </form>
             </div>
         </div>
@@ -39,3 +40,4 @@
 </body>
 <script src="./Router.ts"></script>
 </html>
+

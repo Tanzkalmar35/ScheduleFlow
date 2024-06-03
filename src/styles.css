@@ -62,8 +62,14 @@
     height: fit-content;
     display: flex;
     flex-direction: column;
-    gap: 3vh;
     text-align: center;
+}
+
+#login-form {
+    margin-top: 3vh;
+    display: flex;
+    flex-direction: column;
+    gap: 3vh;
 }
 
 .login-modal-content-wrapper {
@@ -96,4 +102,6 @@ input:focus {
     padding: 1rem;
 }
 
+#login-btn {
 
+}

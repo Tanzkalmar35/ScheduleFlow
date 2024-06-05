@@ -1,18 +1,17 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/src/styles.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Tauri App</title>
-    <script type="module" src="/src/main.ts" defer></script>
-  </head>
+    <script type="module" src="/src/main.js" defer></script>
+</head>
 
-  <body class="poppins-regular">
-    <div class="container">
-      <h1>Welcome to index.html</h1>
-      <button onclick="navigateToLoginPage()">To Users page</button>
-    </div>
-  </body>
-  <script src="src/Router.ts"></script>
+<body class="poppins-regular">
+<div class="container">
+    <h1>Welcome to index.html</h1>
+    <button onclick="window.location.href = '../src/login.html'">To Users page</button>
+</div>
+</body>
 </html>

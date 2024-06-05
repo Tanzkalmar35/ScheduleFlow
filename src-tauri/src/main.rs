@@ -4,12 +4,7 @@
 
 use icalendar::{Component};
 use crate::db_actions::DbActions;
-
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use crate::login_util::attempt_login;
 
 #[path="calendar/icalendar_util.rs"]
 mod icalendar_util;
@@ -30,37 +25,11 @@ mod db_actions;
 mod pg_driver;
 #[path= "db/tables/adapter.rs"]
 mod adapter;
+mod login_util;
 
 fn main() {
-    // let mut driver = PgDriver::setup();
-    // if let Err(_) = driver.connect() {
-    //     panic!("Driver conn failed")
-    // }
-    //
-    // let cal = CalendarDAO::new();
-    // let cal_prop = PropertyDAO::new("NAME".to_string(), "CONVERTED_CAL".to_string());
-    // let event = ComponentDAO::new(EVENT);
-    // let event_prop = PropertyDAO::new("DATE".to_string(), "TODAY".to_string());
-    // let cal_component_comb: TableCombination<CalendarDAO, ComponentDAO> = TableCombination::new(cal.uuid, event.uuid);
-    // let cal_prop_comb: TableCombination<CalendarDAO, PropertyDAO> = TableCombination::new(cal.uuid, cal_prop.uuid);
-    // let event_prop_comb: TableCombination<ComponentDAO, PropertyDAO> = TableCombination::new(event.uuid, event_prop.uuid);
-    //
-    // cal.store(&mut driver);
-    // cal_prop.store(&mut driver);
-    // cal_prop_comb.store(&mut driver);
-    //
-    // event.store(&mut driver);
-    // event_prop.store(&mut driver);
-    // event_prop_comb.store(&mut driver);
-    //
-    // cal_component_comb.store(&mut driver);
-    //
-    // let cal = adapter::ICalendarAdapter::bundle_calendar(&mut driver, cal);
-    //
-    // println!("{}", cal);
-
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![attempt_login])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

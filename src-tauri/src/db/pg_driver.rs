@@ -1,7 +1,9 @@
 use dotenv::dotenv;
 use postgres::{Client, NoTls, Row};
+use serde::{Deserialize, Deserializer, Serialize};
 
 /// The database driver for PostgreSQL.
+#[derive(Default)]
 pub struct PgDriver {
     user: String,
     pass: String,
@@ -13,6 +15,7 @@ pub struct PgDriver {
 }
 
 impl PgDriver {
+
     /// Sets up the database driver.
     pub fn setup() -> Self {
         dotenv().ok();

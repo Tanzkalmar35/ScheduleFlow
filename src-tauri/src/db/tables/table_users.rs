@@ -1,3 +1,4 @@
+use std::ops::{Deref, DerefMut};
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
@@ -14,7 +15,7 @@ pub struct User {
 impl User {
 
     /// Creates a new user and prepares the raw values into values ready to be stored.
-    pub(crate) fn new(username: String, password: String, email: String) -> Self {
+    pub(crate) fn new(username: String, email: String, password: String) -> Self {
         Self {
             uuid: Uuid::new_v4(),
             username,
@@ -24,7 +25,7 @@ impl User {
     }
 
     /// Creates a User object from values that already exist in the db.
-    pub(crate) fn from(uuid: Uuid, username: String, password: String, email: String) -> Self {
+    pub(crate) fn from(uuid: Uuid, username: String, email: String, password: String) -> Self {
         Self {
             uuid,
             username,
@@ -189,7 +190,7 @@ impl DbActions for User {
     }
 
     fn retrieve(_driver: &mut PgDriver, _condition: Option<String>) -> Vec<Self::Item> {
-        todo!()
+        unimplemented!()
     }
 }
 

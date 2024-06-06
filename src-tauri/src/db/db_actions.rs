@@ -59,7 +59,6 @@ pub trait DbActions {
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
     fn insert<E: Table>(driver: &mut PgDriver, entry: E) -> anyhow::Result<()> {
-        // Todo: Could potentially fail due to duplicate uuid, if so, regenerate uuid and try again
         let stmt = &format!(
             "INSERT INTO {} ({}) VALUES ({})",
             E::get_name(),

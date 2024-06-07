@@ -2,7 +2,9 @@ use std::ops::{Deref, DerefMut};
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
+use crate::driver;
 use crate::pg_driver::PgDriver;
+use crate::table_calendars::CalendarDAO;
 
 #[derive(Debug)]
 pub struct User {
@@ -32,6 +34,18 @@ impl User {
             password,
             email,
         }
+    }
+
+    /// Checks if a user with a given email already exists.
+    ///
+    /// # Returns
+    /// True, if there is no user with the given email, otherwise false.
+    pub(crate) fn is_existing(driver: &mut PgDriver, email: &str) -> bool {
+        let condition = format!("email = '{}'", email);
+
+        let res = Self::retrieve(driver, Some(condition));
+
+        !res.is_empty()
     }
 }
 
@@ -189,8 +203,21 @@ impl DbActions for User {
         Self::delete::<&Self>(driver, self.uuid)
     }
 
-    fn retrieve(_driver: &mut PgDriver, _condition: Option<String>) -> Vec<Self::Item> {
-        unimplemented!()
+    fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Self::Item> {
+        let mut res: Vec<User> = vec![];
+
+        if let Ok(rows) = Self::read(driver, "users", condition) {
+            for row in rows {
+                res.push(User {
+                    uuid: row.get("uuid"),
+                    username: row.get("username"),
+                    password: row.get("password"),
+                    email: row.get("email"),
+                })
+            };
+        }
+
+        res
     }
 }
 

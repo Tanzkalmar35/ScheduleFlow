@@ -5,7 +5,6 @@
 use std::ops::DerefMut;
 use std::sync::{Mutex, OnceLock};
 use icalendar::Component;
-use lazy_static::lazy_static;
 use tauri::Runtime;
 
 use crate::db_actions::DbActions;
@@ -31,7 +30,9 @@ mod db_actions;
 mod pg_driver;
 #[path = "db/tables/adapter.rs"]
 mod adapter;
+
 mod login_util;
+mod errors;
 
 fn driver() -> &'static Mutex<PgDriver> {
     static PG_DRIVER: OnceLock<Mutex<PgDriver>> = OnceLock::new();

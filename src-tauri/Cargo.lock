@@ -2409,7 +2409,6 @@ dependencies = [
  "chrono",
  "dotenv",
  "icalendar",
- "lazy_static",
  "postgres",
  "serde",
  "serde_json",

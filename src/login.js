@@ -15,6 +15,6 @@ export async function submitLoginForm(event) {
         email: loginEmail.value,
         password: loginPassword.value
     })
-        .then(e => console.log("DONE"))
-        .catch(e => console.log("NOT DONE"))
+        .then(m => console.log(m))
+        .catch(e => console.log(e))
 }

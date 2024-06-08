@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 use postgres::{Client, NoTls, Row};
 use serde::{Deserialize, Deserializer, Serialize};
+use crate::errors::ENV_VAR_NOT_SET;
 
 /// The database driver for PostgreSQL.
 #[derive(Default)]
@@ -19,10 +20,10 @@ impl PgDriver {
     /// Sets up the database driver.
     pub fn setup() -> Self {
         dotenv().ok();
-        let name = std::env::var("PSQL_NAME").expect("PSQL_NAME must be set.");
-        let user = std::env::var("PSQL_USER").expect("PSQL_USER must be set.");
-        let pass = std::env::var("PSQL_PASS").expect("PSQL_PASS must be set.");
-        let address = std::env::var("PSQL_IP").expect("PSQL_IP must be set.");
+        let name = std::env::var("PSQL_NAME").expect(ENV_VAR_NOT_SET);
+        let user = std::env::var("PSQL_USER").expect(ENV_VAR_NOT_SET);
+        let pass = std::env::var("PSQL_PASS").expect(ENV_VAR_NOT_SET);
+        let address = std::env::var("PSQL_IP").expect(ENV_VAR_NOT_SET);
         let url = format!("postgres://{}:{}@{}/{}", user, pass, address, name);
         Self {
             user,

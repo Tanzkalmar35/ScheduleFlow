@@ -8,13 +8,16 @@ export async function submitLoginForm(event) {
     event.preventDefault();
     const loginUsername = document.getElementById("login-modal-username"),
         loginEmail = document.getElementById("login-modal-email"),
-        loginPassword = document.getElementById("login-modal-password")
+        loginPassword = document.getElementById("login-modal-password"),
+        rememberMe = document.getElementById("login-modal-remember-me")
+
 
     await invoke("attempt_login", {
         username: loginUsername.value,
         email: loginEmail.value,
-        password: loginPassword.value
+        password: loginPassword.value,
+        remember: rememberMe.checked
     })
         .then(m => console.log(m))
-        .catch(e => console.log(e))
+        .catch(e => console.error(e))
 }

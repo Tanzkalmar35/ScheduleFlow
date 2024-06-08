@@ -9,7 +9,7 @@ use crate::errors::{SUCCESS, USER_ALREADY_EXISTING_ERR};
 use crate::pg_driver::PgDriver;
 
 #[tauri::command]
-pub fn attempt_login(username: String, email: String, password: String) -> Result<(), &'static str> {
+pub fn attempt_login(username: String, email: String, password: String, remember: bool) -> Result<(), &'static str> {
     let hashed_password = hash(password, DEFAULT_COST).unwrap();
     let user = User::new(username,( &*email).into(), hashed_password);
 
@@ -21,7 +21,9 @@ pub fn attempt_login(username: String, email: String, password: String) -> Resul
         println!("Storing user failed: {}", e)
     };
 
+    if remember {
+
+    }
+
     return Ok(());
 }
-
-

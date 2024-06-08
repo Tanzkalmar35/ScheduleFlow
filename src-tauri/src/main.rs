@@ -33,6 +33,7 @@ mod adapter;
 
 mod login_util;
 mod errors;
+mod jwt_controller;
 
 fn driver() -> &'static Mutex<PgDriver> {
     static PG_DRIVER: OnceLock<Mutex<PgDriver>> = OnceLock::new();

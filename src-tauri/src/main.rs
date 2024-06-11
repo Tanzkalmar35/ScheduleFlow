@@ -24,6 +24,8 @@ mod table_components;
 mod table_properties;
 #[path = "db/tables/table_combinations.rs"]
 mod table_combinations;
+#[path = "db/tables/table_jwt_tokens.rs"]
+mod table_jwt_tokens;
 #[path = "db/db_actions.rs"]
 mod db_actions;
 #[path = "db/pg_driver.rs"]

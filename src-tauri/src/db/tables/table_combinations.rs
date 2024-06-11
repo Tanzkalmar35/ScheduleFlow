@@ -87,7 +87,7 @@ impl<T1: Table, T2: Table> DbActions for TableCombination<T1, T2> {
     }
 
     fn remove(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        Self::delete_spec_col::<&Self>(driver, T1::get_fk_uuid_name(), self.uuid1)
+        Self::delete_spec_col::<&Self>(driver, T1::get_fk_uuid_name(), self.uuid1.to_string())
     }
 
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Self::Item> {

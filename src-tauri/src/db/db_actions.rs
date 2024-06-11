@@ -135,8 +135,8 @@ pub trait DbActions {
     /// * `table` - The table to delete from.
     /// * `col` - The name of the column the uuid is matched on.
     /// * `uuid` - The uuid of the entry to be deleted.
-    fn delete_spec_col<E: Table>(driver: &mut PgDriver, col: String, uuid: Uuid) -> anyhow::Result<()> {
-        driver.exec(&format!("DELETE FROM {} WHERE {}='{}'", E::get_name(), col, uuid))
+    fn delete_spec_col<E: Table>(driver: &mut PgDriver, col: String, val: String) -> anyhow::Result<()> {
+        driver.exec(&format!("DELETE FROM {} WHERE {}='{}'", E::get_name(), col, val))
             .expect("Deletion failed.");
         Ok(())
     }

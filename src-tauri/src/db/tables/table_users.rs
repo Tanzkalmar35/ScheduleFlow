@@ -8,7 +8,7 @@ use crate::table_calendars::CalendarDAO;
 
 #[derive(Debug)]
 pub struct User {
-    uuid: Uuid,
+    pub(crate) uuid: Uuid,
     pub(crate) username: String,
     pub(crate) password: String,
     pub(crate) email: String,

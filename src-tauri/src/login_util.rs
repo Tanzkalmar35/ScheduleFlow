@@ -13,7 +13,7 @@ use crate::jwt_controller::generate_jwt;
 use crate::pg_driver::PgDriver;
 
 #[tauri::command]
-pub fn attempt_login(window: Window, username: String, email: String, password: String, remember: bool) -> Result<(), &'static str> {
+pub fn attempt_login(window: Window, username: String, email: String, password: String, remember: bool) -> Result<&'static str, &'static str> {
     let hashed_password = hash(password, DEFAULT_COST).unwrap();
     let user = User::new(username,( &*email).into(), hashed_password);
 
@@ -37,5 +37,5 @@ pub fn attempt_login(window: Window, username: String, email: String, password: 
 
     // TODO: Redirect to home page
 
-    return Ok(());
+    return Ok("Logged in successfully.");
 }

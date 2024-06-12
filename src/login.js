@@ -1,5 +1,6 @@
 import {invoke} from "@tauri-apps/api/tauri";
 import {listen} from "@tauri-apps/api/event";
+import {createErrorToast, createSuccessToast} from "./toast.js";
 
 let loginForm = document.getElementById("login-form");
 
@@ -19,12 +20,12 @@ export async function submitLoginForm(event) {
         password: loginPassword.value,
         remember: rememberMe.checked
     })
-        .then(_ => console.log("Logged in successfully"))
-        .catch(e => console.error(e))
+        .then(m => createSuccessToast(m))
+        .catch(e => createErrorToast(e))
 }
 
 listen('setJwtCookie', (event) => {
     document.cookie = `jwt=${event.payload}; path=/; Secure; SameSite=Strict`;
 })
-    .then(m => console.log(m))
-    .catch(e => console.log(e));
+    .then(m => createSuccessToast(m))
+    .catch(e => createErrorToast(e));

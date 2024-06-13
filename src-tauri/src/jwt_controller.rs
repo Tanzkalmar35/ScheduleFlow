@@ -26,16 +26,12 @@ pub fn is_valid_session(token: String) -> bool {
     let mut token_obj: JwtToken = JwtToken::empty();
     let mut user_tokens: Vec<JwtToken> = vec![];
 
-    println!("Token data: {:?}", token_data);
-
     if let Ok(data) = token_data {
         let user_uuid = data.claims.user_uuid;
         token_obj = JwtToken {token, user_uuid};
         let condition_user_matches = format!("user_uuid = '{}'", user_uuid);
 
         user_tokens = JwtToken::retrieve(driver().lock().unwrap().deref_mut(), Some(condition_user_matches));
-
-        user_tokens.iter().map(|t| println!("User token: {}", t.token));
     }
 
     user_tokens.contains(&token_obj)
@@ -59,14 +55,14 @@ pub fn generate_jwt(user_uuid: Uuid) -> JwtToken {
 pub fn decode_jwt(
     token: &str,
 ) -> Result<jsonwebtoken::TokenData<Claims>, jsonwebtoken::errors::Error> {
-    println!("Token: {}", token);
+
     let key = env::var("SCHEDULEFLOW_JWT_SECRET").expect(ENV_VAR_NOT_SET);
     let decoding_key = jsonwebtoken::DecodingKey::from_secret(&key.as_ref());
+
     let mut validation = Validation::new(Algorithm::HS256);
     validation.required_spec_claims = HashSet::new();
-    let token_data = decode::<Claims>(token, &decoding_key, &validation);
-    println!("DATA: {:?}", token_data);
-    token_data
+
+    decode::<Claims>(token, &decoding_key, &validation)
 }
 
 fn generate_secret_key() -> String {

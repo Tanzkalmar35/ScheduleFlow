@@ -2469,6 +2469,7 @@ dependencies = [
  "dotenv",
  "icalendar",
  "jsonwebtoken",
+ "once_cell",
  "postgres",
  "rand 0.8.5",
  "serde",

@@ -20,12 +20,16 @@ export async function submitLoginForm(event) {
         password: loginPassword.value,
         remember: rememberMe.checked
     })
-        .then(m => createSuccessToast(m))
+        .then(_ => {
+            window.location.href = "../index.html";
+        })
         .catch(e => createErrorToast(e))
 }
 
 listen('setJwtCookie', (event) => {
-    document.cookie = `jwt=${event.payload}; path=/; Secure; SameSite=Strict`;
+    let expirationDate = new Date();
+    expirationDate.setMonth(expirationDate.getMonth() + 1, expirationDate.getDay());
+    document.cookie = `jwt=${event.payload}; expires=${expirationDate.toUTCString()}; path=/; Secure; SameSite=Strict`;
 })
     .then(m => createSuccessToast(m))
     .catch(e => createErrorToast(e));

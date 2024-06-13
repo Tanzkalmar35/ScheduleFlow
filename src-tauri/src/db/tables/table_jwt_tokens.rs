@@ -5,7 +5,7 @@ use crate::db_actions::{DbActions, Table};
 use crate::pg_driver::PgDriver;
 use uuid::Uuid;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, PartialEq)]
 pub struct JwtToken {
     pub(crate) token: String,
     pub(crate) user_uuid: Uuid,
@@ -14,6 +14,13 @@ pub struct JwtToken {
 impl JwtToken {
     pub fn new(token: String, user_uuid: Uuid) -> Self {
         Self { token, user_uuid }
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            token: String::new(),
+            user_uuid: Uuid::default()
+        }
     }
 }
 

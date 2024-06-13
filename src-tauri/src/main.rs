@@ -3,11 +3,15 @@
 #![allow(unused)]
 
 use std::ops::DerefMut;
-use std::sync::{Mutex, OnceLock};
+use std::sync::{Arc, Mutex, OnceLock};
+use dotenv::dotenv;
 use icalendar::Component;
-use tauri::Runtime;
+use once_cell::sync::{Lazy, OnceCell};
+use table_users::User;
+use tauri::{Manager, Runtime};
 
 use crate::db_actions::DbActions;
+use crate::jwt_controller::is_valid_session;
 use crate::login_util::attempt_login;
 use crate::pg_driver::PgDriver;
 
@@ -46,9 +50,27 @@ fn driver() -> &'static Mutex<PgDriver> {
     })
 }
 
+pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
+
+pub fn set_current_user(user: User) {
+    CURRENT_USER.get_or_init(|| Mutex::new(Some(user)));
+}
+
+pub fn get_current_user() -> &'static Mutex<Option<User>> {
+    CURRENT_USER.get().expect("Current user is not initialized")
+}
+
+pub fn reset_current_user() {
+    if let Some(user_mutex) = CURRENT_USER.get() {
+        let mut user_option = user_mutex.lock().unwrap();
+        *user_option = None;
+    } else {
+        panic!("Current user is not initialized");
+    }}
 fn main() {
+    dotenv().ok();
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![attempt_login])
+        .invoke_handler(tauri::generate_handler![attempt_login, is_valid_session])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

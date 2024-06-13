@@ -19,7 +19,6 @@ impl PgDriver {
 
     /// Sets up the database driver.
     pub fn setup() -> Self {
-        dotenv().ok();
         let name = std::env::var("PSQL_NAME").expect(ENV_VAR_NOT_SET);
         let user = std::env::var("PSQL_USER").expect(ENV_VAR_NOT_SET);
         let pass = std::env::var("PSQL_PASS").expect(ENV_VAR_NOT_SET);
@@ -37,8 +36,7 @@ impl PgDriver {
 
     /// Initializes the database connection client.
     pub fn connect(&mut self) -> anyhow::Result<&mut Self> {
-        let client =
-            Client::connect(&self.url, NoTls)?;
+        let client = Client::connect(&self.url, NoTls).expect("Cannot establish connection to the database.");
         self.client = Some(client);
         Ok(self)
     }
@@ -55,5 +53,16 @@ impl PgDriver {
             }
             None => Err(anyhow::anyhow!("Database client is not connected.")),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::driver;
+    use crate::pg_driver::PgDriver;
+
+    #[test]
+    pub fn test_db_connection() {
+        assert!(driver().lock().is_ok())
     }
 }

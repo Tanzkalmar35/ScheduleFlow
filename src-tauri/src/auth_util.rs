@@ -13,6 +13,7 @@ use crate::{CURRENT_USER, driver, set_current_user};
 use crate::errors::{SUCCESS, USER_ALREADY_EXISTING_ERR};
 use crate::jwt_controller::generate_jwt;
 use crate::pg_driver::PgDriver;
+use crate::table_jwt_tokens::JwtToken;
 
 #[tauri::command]
 pub fn attempt_login(window: Window, username: String, email: String, password: String, remember: bool) -> Result<(), &'static str> {
@@ -40,4 +41,21 @@ pub fn attempt_login(window: Window, username: String, email: String, password: 
     set_current_user(user);
 
     return Ok(());
+}
+
+#[tauri::command]
+pub fn attempt_sign_up() {
+
+}
+
+#[tauri::command]
+pub fn logout(token: String) -> Result<(), &'static str> {
+
+    JwtToken::delete_spec_col::<JwtToken>(
+        driver().lock().unwrap().deref_mut(),
+        String::from("token"),
+        token
+    );
+
+    Ok(())
 }

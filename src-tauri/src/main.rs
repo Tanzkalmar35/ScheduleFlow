@@ -12,7 +12,7 @@ use tauri::{Manager, Runtime};
 
 use crate::db_actions::DbActions;
 use crate::jwt_controller::is_valid_session;
-use crate::login_util::attempt_login;
+use crate::auth_util::{attempt_login, logout};
 use crate::pg_driver::PgDriver;
 
 #[path = "calendar/icalendar_util.rs"]
@@ -37,7 +37,7 @@ mod pg_driver;
 #[path = "db/tables/adapter.rs"]
 mod adapter;
 
-mod login_util;
+mod auth_util;
 mod errors;
 mod jwt_controller;
 
@@ -66,11 +66,13 @@ pub fn reset_current_user() {
         *user_option = None;
     } else {
         panic!("Current user is not initialized");
-    }}
+    }
+}
+
 fn main() {
     dotenv().ok();
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![attempt_login, is_valid_session])
+        .invoke_handler(tauri::generate_handler![attempt_login, logout, is_valid_session])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

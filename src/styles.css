@@ -103,7 +103,13 @@ input:focus {
 }
 
 #login-btn {
-
+    width: 17.7vw;
+    padding: 1rem;
+    border-radius: var(--size-radius);
+    border: none;
+    color: black;
+    font-size: medium;
+    cursor: pointer;
 }
 
 .notifications {

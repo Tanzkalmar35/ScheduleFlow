@@ -92,9 +92,13 @@ input:focus {
     outline: none;
 }
 
+.login-modal-subheadline {
+    margin-bottom: 3vh;
+}
+
 .login-modal-headline {
-    margin-bottom: 5vh;
     margin-top: 3vh;
+    margin-bottom: 1vh;
 }
 
 #login-modal-remember-me {
@@ -102,14 +106,16 @@ input:focus {
     padding: 1rem;
 }
 
-#login-btn {
+.submit-button {
     width: 17.7vw;
     padding: 1rem;
     border-radius: var(--size-radius);
     border: none;
-    color: black;
-    font-size: medium;
+    font-size: large;
+    font-weight: bold;
     cursor: pointer;
+    background: linear-gradient(to right, #8e2de3, #4a00e0);
+    color: white;
 }
 
 .notifications {
@@ -197,4 +203,8 @@ input:focus {
 .toast.info {
     --color: #3498db;
     background-image: linear-gradient(to right, #3498db55, #22242f 30%);
+}
+
+.text-white {
+    color: white;
 }

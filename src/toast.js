@@ -20,7 +20,9 @@ export function createSuccessToast(text) {
     let type = 'success';
     let icon = 'fa-solid fa-circle-check';
     let title = 'Success';
-    createToast(type, icon, title, text);
+    if (!text.toString().includes("=>")) { // Filtering messages that are just lambda functions
+        createToast(type, icon, title, text);
+    }
 }
 
 export function createErrorToast(text) {

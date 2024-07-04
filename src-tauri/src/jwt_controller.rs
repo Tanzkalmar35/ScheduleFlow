@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::db_actions::DbActions;
 
-use crate::errors::{ENCODING_ERR, ENV_VAR_NOT_SET};
+use crate::errors::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
 use crate::table_jwt_tokens::JwtToken;
 use crate::table_users::User;
 
@@ -47,7 +47,7 @@ pub fn generate_jwt(user_uuid: Uuid) -> JwtToken {
     let token = encode(&Header::default(), &my_claims, &encoding_key);
 
     JwtToken {
-        token: token.expect(ENCODING_ERR),
+        token: token.expect(BCRYPT_ENCODING_ERR),
         user_uuid,
     }
 }

@@ -1,7 +1,7 @@
 extern crate bcrypt;
 
 use crate::db_actions::DbActions;
-use crate::errors::{SUCCESS, USER_ALREADY_EXISTING_ERR};
+use crate::errors::{BCRYPT_DECODING_ERR, SUCCESS, USER_ALREADY_EXISTING_ERR, USER_EMAIL_NOT_FOUND_ERR, USER_NOT_FOUND_ERR};
 use crate::jwt_controller::generate_jwt;
 use crate::pg_driver::PgDriver;
 use crate::table_jwt_tokens::JwtToken;
@@ -17,6 +17,38 @@ use tauri::{window, Window};
 
 #[tauri::command]
 pub fn attempt_login(
+    window: Window,
+    email: String,
+    password: String,
+    remember: bool
+) -> Result<(), &'static str> {
+    let user_exists = User::is_existing(driver().lock().unwrap().deref_mut(), email.as_str());
+
+    if !user_exists {
+        return Err(USER_EMAIL_NOT_FOUND_ERR);
+    }
+
+    let user = User::get_by_email(driver().lock().unwrap().deref_mut(), email).unwrap();
+    let user_pass = &user.get_password();
+
+    let password_matches = verify(
+        password,
+        user_pass
+    );
+
+    if let Err(e) = password_matches {
+        return Err(BCRYPT_DECODING_ERR);
+    }
+
+    if password_matches.unwrap() {
+        return Ok(());
+    }
+
+    Err(USER_NOT_FOUND_ERR)
+}
+
+#[tauri::command]
+pub fn attempt_signup(
     window: Window,
     username: String,
     email: String,
@@ -43,15 +75,9 @@ pub fn attempt_login(
             return Err("Error setting a http jwt cookie");
         }
     }
-
     set_current_user(user);
 
     return Ok(());
-}
-
-#[tauri::command]
-pub fn attempt_sign_up() {
-
 }
 
 #[tauri::command]

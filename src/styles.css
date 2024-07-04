@@ -21,7 +21,7 @@
     display: flex;
 }
 
-#login-page {
+.login-body {
     width: 100vw;
     height: 100vh;
     background: linear-gradient(90deg, var(--purple-gradient-start), var(--purple-gradient-end));
@@ -99,6 +99,11 @@ input:focus {
 .login-modal-headline {
     margin-top: 3vh;
     margin-bottom: 1vh;
+}
+
+.login-modal-headline-2 {
+    margin-top: 3vh;
+    margin-bottom: 3vh;
 }
 
 #login-modal-remember-me {

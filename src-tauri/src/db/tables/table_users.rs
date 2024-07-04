@@ -1,12 +1,14 @@
 use std::ops::{Deref, DerefMut};
+use anyhow::Error;
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
 use crate::driver;
+use crate::errors::USER_EMAIL_NOT_FOUND_ERR;
 use crate::pg_driver::PgDriver;
 use crate::table_calendars::CalendarDAO;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct User {
     pub(crate) uuid: Uuid,
     pub(crate) username: String,
@@ -39,13 +41,27 @@ impl User {
     /// Checks if a user with a given email already exists.
     ///
     /// # Returns
-    /// True, if there is no user with the given email, otherwise false.
+    /// True, if there is a user with the given email, otherwise false.
     pub(crate) fn is_existing(driver: &mut PgDriver, email: &str) -> bool {
         let condition = format!("email = '{}'", email);
 
         let res = Self::retrieve(driver, Some(condition));
 
         !res.is_empty()
+    }
+
+    pub(crate) fn get_password(self) -> String {
+        self.password
+    }
+
+    pub(crate) fn get_by_email(driver: &mut PgDriver, email: String) -> anyhow::Result<Self> {
+        let condition = format!("email = {}", email);
+        let user_opt = User::retrieve(driver, Some(condition)).get(0).cloned();
+        if let Some(user) = user_opt {
+            Ok(user)
+        } else {
+            Err(anyhow::anyhow!(USER_EMAIL_NOT_FOUND_ERR))
+        }
     }
 }
 

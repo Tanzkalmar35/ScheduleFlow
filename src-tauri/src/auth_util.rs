@@ -1,19 +1,19 @@
 extern crate bcrypt;
 
+use std::fmt::Debug;
+use std::ops::DerefMut;
+use std::sync::MutexGuard;
+
+use bcrypt::{DEFAULT_COST, hash, verify};
+use tauri::Window;
+
+use crate::{driver, set_current_user};
 use crate::db_actions::DbActions;
-use crate::errors::{BCRYPT_DECODING_ERR, SUCCESS, USER_ALREADY_EXISTING_ERR, USER_EMAIL_NOT_FOUND_ERR, USER_NOT_FOUND_ERR};
+use crate::errors::{BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
 use crate::jwt_controller::generate_jwt;
 use crate::pg_driver::PgDriver;
 use crate::table_jwt_tokens::JwtToken;
 use crate::table_users::User;
-use crate::{driver, set_current_user, CURRENT_USER};
-use bcrypt::{hash, verify, DEFAULT_COST};
-use once_cell::sync::Lazy;
-use std::error::Error;
-use std::fmt::{format, Debug};
-use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
-use tauri::{window, Window};
 
 #[tauri::command]
 pub fn attempt_login(
@@ -22,29 +22,27 @@ pub fn attempt_login(
     password: String,
     remember: bool
 ) -> Result<(), &'static str> {
-    let user_exists = User::is_existing(driver().lock().unwrap().deref_mut(), email.as_str());
+    let mut driver = driver().lock().unwrap();
+    let user_exists = User::is_existing(driver.deref_mut(), &email);
 
-    if !user_exists {
-        return Err(USER_EMAIL_NOT_FOUND_ERR);
-    }
-
-    let user = User::get_by_email(driver().lock().unwrap().deref_mut(), email).unwrap();
+    let user = User::get_by_email(driver.deref_mut(), email)?;
     let user_pass = &user.get_password();
 
-    let password_matches = verify(
-        password,
-        user_pass
-    );
-
-    if let Err(e) = password_matches {
-        return Err(BCRYPT_DECODING_ERR);
+    match verify(password, user_pass) {
+        Ok(password_matches) => {
+            if !password_matches {
+                return Err(USER_NOT_FOUND_ERR)
+            }
+        },
+        Err(_) => return Err(BCRYPT_DECODING_ERR),
     }
 
-    if password_matches.unwrap() {
-        return Ok(());
+    if remember {
+        populate_jwt_cookie(window, &user, driver)?;
     }
 
-    Err(USER_NOT_FOUND_ERR)
+    set_current_user(user);
+    Ok(())
 }
 
 #[tauri::command]
@@ -57,27 +55,29 @@ pub fn attempt_signup(
 ) -> Result<(), &'static str> {
     let hashed_password = hash(password, DEFAULT_COST).unwrap();
     let user = User::new(username, (&*email).into(), hashed_password);
+    let mut driver = driver().lock().unwrap();
 
-    if (User::is_existing(driver().lock().unwrap().deref_mut(), email.as_str())) {
+    if User::is_existing(driver.deref_mut(), &email) {
         return Err(USER_ALREADY_EXISTING_ERR);
     }
 
-    if let Err(e) = user.store(driver().lock().unwrap().deref_mut()) {
-        println!("Storing user failed: {}", e)
-    };
+    user.store(driver.deref_mut()).unwrap();
 
     if remember {
-        let token = generate_jwt(user.uuid);
-        token.store(driver().lock().unwrap().deref_mut());
-
-        if let Err(e) = window.emit("setJwtCookie", token.token) {
-            println!("Error setting a http jwt cookie: {}", e);
-            return Err("Error setting a http jwt cookie");
-        }
+        populate_jwt_cookie(window, &user, driver)?;
     }
-    set_current_user(user);
 
-    return Ok(());
+    set_current_user(user);
+    Ok(())
+}
+
+fn populate_jwt_cookie(window: Window, user: &User, mut driver: MutexGuard<PgDriver>) -> Result<(), &'static str> {
+    let token = generate_jwt(user.uuid);
+    token.store(driver.deref_mut());
+
+    window.emit("setJwtCookie", token.token)
+        .map_err(|_| JWT_COOKIE_ERR)?;
+    Ok(())
 }
 
 #[tauri::command]

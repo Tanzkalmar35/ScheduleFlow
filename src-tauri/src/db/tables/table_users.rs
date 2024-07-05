@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
 use crate::driver;
-use crate::errors::USER_EMAIL_NOT_FOUND_ERR;
+use crate::errors::USER_NOT_FOUND_ERR;
 use crate::pg_driver::PgDriver;
 use crate::table_calendars::CalendarDAO;
 
@@ -50,17 +50,17 @@ impl User {
         !res.is_empty()
     }
 
-    pub(crate) fn get_password(self) -> String {
-        self.password
+    pub(crate) fn get_password(&self) -> &String {
+        &self.password
     }
 
-    pub(crate) fn get_by_email(driver: &mut PgDriver, email: String) -> anyhow::Result<Self> {
-        let condition = format!("email = {}", email);
+    pub(crate) fn get_by_email(driver: &mut PgDriver, email: String) -> Result<Self, &'static str> {
+        let condition = format!("email = '{}'", email);
         let user_opt = User::retrieve(driver, Some(condition)).get(0).cloned();
         if let Some(user) = user_opt {
             Ok(user)
         } else {
-            Err(anyhow::anyhow!(USER_EMAIL_NOT_FOUND_ERR))
+            Err(USER_NOT_FOUND_ERR)
         }
     }
 }

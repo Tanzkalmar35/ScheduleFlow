@@ -14,13 +14,30 @@ export async function isValidSession() {
 
 export async function submitLoginForm(event) {
     event.preventDefault();
-    const loginUsername = document.getElementById("login-modal-username"),
-        loginEmail = document.getElementById("login-modal-email"),
+    const loginEmail = document.getElementById("login-modal-email"),
         loginPassword = document.getElementById("login-modal-password"),
         rememberMe = document.getElementById("login-modal-remember-me")
 
-
     await invoke("attempt_login", {
+        email: loginEmail.value,
+        password: loginPassword.value,
+        remember: rememberMe.checked
+    })
+        .then(_ => {
+            window.location.href = "../index.html"
+        })
+        .catch(e => createErrorToast(e))
+}
+
+export async function submitSignupForm(event) {
+    event.preventDefault();
+    const loginUsername = document.getElementById("signup-modal-username"),
+        loginEmail = document.getElementById("signup-modal-email"),
+        loginPassword = document.getElementById("signup-modal-password"),
+        rememberMe = document.getElementById("signup-modal-remember-me")
+
+
+    await invoke("attempt_signup", {
         username: loginUsername.value,
         email: loginEmail.value,
         password: loginPassword.value,

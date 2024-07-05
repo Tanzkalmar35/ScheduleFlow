@@ -85,8 +85,8 @@ pub trait DbActions {
     fn read(driver: &mut PgDriver, table: &str, condition: Option<String>) -> anyhow::Result<Vec<Row>> {
         let rows = match condition {
             Some(condition) => {
-                let x = &format!("SELECT * FROM {} WHERE {}", table, condition);
-                driver.exec(x).expect("Query with condition failed")
+                driver.exec(&format!("SELECT * FROM {} WHERE {}", table, condition))
+                    .expect("Query with condition failed")
             }
             None => driver.exec(&format!("SELECT * FROM {}", table))
                 .expect("Query without condition failed.")

@@ -1,3 +1,5 @@
+import {listen} from "@tauri-apps/api/event";
+
 let notifications = document.querySelector('.notifications');
 let loginForm = document.getElementById("login-btn");
 
@@ -45,3 +47,22 @@ export function createInfoToast(text) {
     let title = 'Info';
     createToast(type, icon, title, text);
 }
+
+listen("createToast", (type, text) => {
+    switch (type) {
+        case "success":
+            createSuccessToast(text);
+            break;
+        case "error":
+            createErrorToast(text);
+            break;
+        case "info":
+            createInfoToast(text);
+            break;
+         case "warning":
+            createWarningToast(text);
+            break;
+    }
+})
+    .then(r => {})
+    .catch(e => {})

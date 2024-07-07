@@ -2469,6 +2469,7 @@ dependencies = [
  "dotenv",
  "icalendar",
  "jsonwebtoken",
+ "lazy_static",
  "once_cell",
  "postgres",
  "rand 0.8.5",

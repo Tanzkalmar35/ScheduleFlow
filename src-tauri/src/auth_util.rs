@@ -2,16 +2,16 @@ extern crate bcrypt;
 
 use std::fmt::Debug;
 use std::ops::DerefMut;
-use std::sync::MutexGuard;
+use std::sync::{Mutex, MutexGuard};
 
 use bcrypt::{DEFAULT_COST, hash, verify};
 use tauri::Window;
 
-use crate::{driver, set_current_user};
 use crate::db_actions::DbActions;
 use crate::errors::{BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
 use crate::jwt_controller::generate_jwt;
 use crate::pg_driver::PgDriver;
+use crate::runtime_objects::{CURRENT_WINDOW, driver, get_current_window, set_current_user, set_current_window};
 use crate::table_jwt_tokens::JwtToken;
 use crate::table_users::User;
 
@@ -38,7 +38,7 @@ pub fn attempt_login(
     }
 
     if remember {
-        populate_jwt_cookie(window, &user, driver)?;
+        populate_jwt_cookie(&user, driver)?;
     }
 
     set_current_user(user);
@@ -57,6 +57,8 @@ pub fn attempt_signup(
     let user = User::new(username, (&*email).into(), hashed_password);
     let mut driver = driver().lock().unwrap();
 
+    set_current_window(window);
+
     if User::is_existing(driver.deref_mut(), &email) {
         return Err(USER_ALREADY_EXISTING_ERR);
     }
@@ -64,18 +66,18 @@ pub fn attempt_signup(
     user.store(driver.deref_mut()).unwrap();
 
     if remember {
-        populate_jwt_cookie(window, &user, driver)?;
+        populate_jwt_cookie(&user, driver)?;
     }
 
     set_current_user(user);
     Ok(())
 }
 
-fn populate_jwt_cookie(window: Window, user: &User, mut driver: MutexGuard<PgDriver>) -> Result<(), &'static str> {
+fn populate_jwt_cookie(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<(), &'static str> {
     let token = generate_jwt(user.uuid);
     token.store(driver.deref_mut());
 
-    window.emit("setJwtCookie", token.token)
+    get_current_window().unwrap().emit("setJwtCookie", token.token)
         .map_err(|_| JWT_COOKIE_ERR)?;
     Ok(())
 }

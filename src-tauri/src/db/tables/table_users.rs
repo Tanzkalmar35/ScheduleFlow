@@ -3,7 +3,6 @@ use anyhow::Error;
 use uuid::Uuid;
 
 use crate::db_actions::{DbActions, Table};
-use crate::driver;
 use crate::errors::USER_NOT_FOUND_ERR;
 use crate::pg_driver::PgDriver;
 use crate::table_calendars::CalendarDAO;

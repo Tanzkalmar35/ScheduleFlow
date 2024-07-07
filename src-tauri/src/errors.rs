@@ -9,3 +9,7 @@ pub const BCRYPT_ENCODING_ERR: &str = "There was an error while an encoding proc
 pub const BCRYPT_DECODING_ERR: &str = "There was an error while an decoding process.";
 
 pub const JWT_COOKIE_ERR: &str = "There was an error storing your session. Please try again.";
+
+pub const NO_DB_CONNECTION_ERR: &str = "Unable to connect to the database. Please connect a database.";
+
+pub const ERROR_QUEUE_NOT_INITIALIZED_ERR: &str = "No error queue running at the moment";

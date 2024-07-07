@@ -2,7 +2,6 @@ use std::collections::HashSet;
 use std::env;
 use std::ops::DerefMut;
 
-use crate::{CURRENT_USER, driver};
 use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
 use jsonwebtoken::errors::ErrorKind;
 use rand::distributions::Alphanumeric;
@@ -12,6 +11,7 @@ use uuid::Uuid;
 use crate::db_actions::DbActions;
 
 use crate::errors::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
+use crate::runtime_objects::driver;
 use crate::table_jwt_tokens::JwtToken;
 use crate::table_users::User;
 

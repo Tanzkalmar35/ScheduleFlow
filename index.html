@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="/src/styles.css"/>
+    <link rel="stylesheet" href="/src/styles/main.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Tauri App</title>
     <script type="module" src="/src/main.js" defer></script>
@@ -12,7 +12,17 @@
 <div class="notifications"></div>
 <div class="container">
     <h1>Welcome to index.html</h1>
-    <button onclick="window.location.href = 'src/html/login.html'">To Users page</button>
+</div>
+<div class="calendar">
+    <div class="calendar-header">
+        <h2 id="month-year"></h2>
+        <button id="prev-month" onclick="prevMonth()">‹</button>
+        <button id="next-month" onclick="nextMonth()">›</button>
+    </div>
+    <div class="calendar-body">
+        <div id="calendar-days"></div>
+        <div id="events"></div>
+    </div>
 </div>
 <div>
     <button id="logout-btn">Log out</button>

@@ -38,13 +38,11 @@ impl ErrorQueue {
                 rx.recv().unwrap();
                 let mut queue = queue_clone.lock().unwrap();
                 while let Some(mut err) = queue.pop_front() {
-                    println!("Now waiting for timeout {:?}", err.timeout);
                     thread::sleep(err.timeout);
+
                     if (err.population_condition)() {
-                        println!("Now creating the toast");
-                        get_current_window().unwrap().emit("creatToast", ("error", err.message));
+                        get_current_window().unwrap().emit("createToast", ("error", err.message));
                     } else {
-                        println!("Giving the err a timeout of 1 sec...");
                         err.timeout = Duration::from_secs(1);
                         queue.push_back(err);
                     }
@@ -56,9 +54,7 @@ impl ErrorQueue {
     }
 
     pub(crate) fn enqueue(&self, err: Error) {
-        println!("Enqueing now");
         self.queue.lock().unwrap().push_back(err);
-        println!("Sending dummy signal");
         self.tx.send(()).unwrap(); // Send a dummy message to the receiver to wake the thread up
     }
 }

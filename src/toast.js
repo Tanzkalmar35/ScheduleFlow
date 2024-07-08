@@ -48,21 +48,24 @@ export function createInfoToast(text) {
     createToast(type, icon, title, text);
 }
 
-listen("createToast", (type, text) => {
-    switch (type) {
+listen("createToast", (payload) => {
+    console.log("CREATING TOAST IN JS")
+    console.log("Type: ", payload.payload[0], payload.payload[1])
+    switch (payload.payload[0]) {
         case "success":
-            createSuccessToast(text);
+            createSuccessToast(payload.payload[1]);
             break;
         case "error":
-            createErrorToast(text);
+            console.log("Creating error toast now")
+            createErrorToast(payload.payload[1]);
             break;
         case "info":
-            createInfoToast(text);
+            createInfoToast(payload.payload[1]);
             break;
          case "warning":
-            createWarningToast(text);
+            createWarningToast(payload.payload[1]);
             break;
     }
 })
-    .then(r => {})
-    .catch(e => {})
+    .then(r => console.log("Toast created"))
+    .catch(e => console.log("Toast not created due to err: ", e))

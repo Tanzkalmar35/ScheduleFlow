@@ -59,9 +59,9 @@ pub fn reset_error_queue() {
     }
 }
 
+#[tauri::command]
 pub fn set_current_window(window: Window) {
-    let mut current_window = CURRENT_WINDOW.lock().unwrap();
-    *current_window = Some(window);
+    *CURRENT_WINDOW.lock().unwrap() = Some(window);
 }
 
 pub fn get_current_window() -> Option<Window> {

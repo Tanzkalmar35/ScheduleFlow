@@ -22,11 +22,13 @@ pub fn attempt_login(
     password: String,
     remember: bool
 ) -> Result<(), &'static str> {
+    set_current_window(window);
+
     let mut driver = driver().lock().unwrap();
     let user_exists = User::is_existing(driver.deref_mut(), &email);
-
     let user = User::get_by_email(driver.deref_mut(), email)?;
     let user_pass = &user.get_password();
+
 
     match verify(password, user_pass) {
         Ok(password_matches) => {
@@ -53,11 +55,12 @@ pub fn attempt_signup(
     password: String,
     remember: bool,
 ) -> Result<(), &'static str> {
+    set_current_window(window);
+
     let hashed_password = hash(password, DEFAULT_COST).unwrap();
     let user = User::new(username, (&*email).into(), hashed_password);
     let mut driver = driver().lock().unwrap();
 
-    set_current_window(window);
 
     if User::is_existing(driver.deref_mut(), &email) {
         return Err(USER_ALREADY_EXISTING_ERR);

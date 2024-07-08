@@ -66,10 +66,10 @@ impl PgDriver {
     /// # Returns
     /// The affected Rows, if there are any. If not, an Error.
     pub fn exec(&mut self, query: &str) -> anyhow::Result<Vec<Row>> {
+        let mut rows: Vec<Row> = vec![];
         match self.client.as_mut() {
             Some(client) => {
-                let rows = client.query(query, &[]);
-                Ok(rows?)
+                rows = client.query(query, &[])?;
             }
             None => {
                 let err = Error::new(
@@ -86,6 +86,7 @@ impl PgDriver {
                 };
             },
         }
+        Ok(rows)
     }
 }
 

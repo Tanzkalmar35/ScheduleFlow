@@ -2,7 +2,7 @@ use std::time::Duration;
 use dotenv::dotenv;
 use postgres::{Client, NoTls, Row};
 use serde::{Deserialize, Deserializer, Serialize};
-use crate::error_queue::Error;
+use crate::error_queue::{Error, ErrorHandler};
 use crate::errors::{ENV_VAR_NOT_SET, ERROR_QUEUE_NOT_INITIALIZED_ERR, NO_DB_CONNECTION_ERR};
 use crate::runtime_objects::{CURRENT_WINDOW, ERROR_QUEUE, get_current_window, get_error_queue};
 
@@ -44,14 +44,14 @@ impl PgDriver {
         if let Ok(client) = conn {
             self.client = Some(client);
         } else {
-            let err = Error::new(
-                NO_DB_CONNECTION_ERR.to_string(),
-                Box::new(|| get_current_window().is_some()),
-                Duration::from_secs(0)
-            );
+            let err = Error::default();
+            err.with_message(NO_DB_CONNECTION_ERR.to_string())
+                .with_condition(|| get_current_window().is_some())
+                .with_action(ErrorHandler::populate_toast(err.clone()));
+
             if let Some(error_queue) = get_error_queue() {
                 if let Some(error_queue_inner) = &*error_queue {
-                    error_queue_inner.enqueue(err);
+                    error_queue_inner.enqueue(err.clone());
                 } else {
                     panic!("{}", ERROR_QUEUE_NOT_INITIALIZED_ERR)
                 }
@@ -72,18 +72,18 @@ impl PgDriver {
                 rows = client.query(query, &[])?;
             }
             None => {
-                let err = Error::new(
-                    NO_DB_CONNECTION_ERR.to_string(),
-                    Box::new(|| get_current_window().is_some()),
-                    Duration::from_secs(0)
-                );
+                let err = Error::default();
+                err.with_message(NO_DB_CONNECTION_ERR.to_string())
+                    .with_condition(|| get_current_window().is_some())
+                    .with_action(ErrorHandler::populate_toast(&err));
+
                 if let Some(error_queue) = get_error_queue() {
                     if let Some(error_queue_inner) = &*error_queue {
                         error_queue_inner.enqueue(err);
                     } else {
                         panic!("{}", ERROR_QUEUE_NOT_INITIALIZED_ERR)
                     }
-                };
+                }
             },
         }
         Ok(rows)

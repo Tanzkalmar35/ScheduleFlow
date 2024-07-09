@@ -5,21 +5,85 @@ use std::time::Duration;
 
 use crate::runtime_objects::get_current_window;
 
+#[derive(Clone)]
 pub struct Error {
-    pub(crate) message: String,
-    population_condition: Box<dyn Fn() -> bool + Send>,
+    message: String,
+    population_condition: Option<Box<dyn Fn() -> bool + Send>>,
+    population_action: Box<dyn Fn() + Send>,
     timeout: Duration,
 }
 
 impl Error {
     /**
-     * Initializes a new error
+     * Creates a new default Error object with all dummy fields.
      */
-    pub(crate) fn new(
-        message: String,
-        population_condition: Box<dyn Fn() -> bool + Send>,
-        timeout: Duration) -> Self {
-        Self { message, population_condition, timeout }
+    pub(crate) fn default() -> Self {
+        Self {
+            message: String::new(),
+            population_condition: None,
+            population_action: Box::new(|| {}),
+            timeout: Duration::from_secs(0),
+        }
+    }
+
+    /**
+     * Initializes the error message of the error.
+     *
+     * # Params
+     * - message: The error message to be displayed - Should describe why the error occurred.
+     */
+    pub(crate) fn with_message(mut self, message: String) -> Self {
+        self.message = message;
+        self
+    }
+
+    /**
+     * Initializes the initial timeout of the error.
+     *
+     * # Params
+     * - timeout: The initial timeout the error handler waits before attempting to process the error.
+     */
+    pub(crate) fn with_timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = timeout;
+        self
+    }
+
+    /**
+     * Initializes the condition, on which the error gets populated in the first place.
+     *
+     * # Params
+     * - condition: The condition that decides if the error is ready to be handled
+     */
+    pub(crate) fn with_condition<C>(mut self, condition: C) -> Self
+    where
+        C: Fn() -> bool + Send,
+    {
+        self.population_condition = Some(Box::new(condition));
+        self
+    }
+
+    /**
+     * Initializes the action, which is performed to handle the error.
+     *
+     * # Params
+     * - action: The action that handles the error.
+     */
+    pub(crate) fn with_action<A>(mut self, action: A) -> Self
+    where
+        A: Fn() + Send,
+    {
+        self.population_action = Box::new(action);
+        self
+    }
+}
+
+pub struct ErrorHandler;
+
+impl ErrorHandler {
+    pub(crate) fn populate_toast(error: Error) -> Box<dyn Fn() + Send> {
+        Box::new(|| {
+            get_current_window().unwrap().emit("createToast", ("error", &error.message));
+        })
     }
 }
 
@@ -40,11 +104,15 @@ impl ErrorQueue {
                 while let Some(mut err) = queue.pop_front() {
                     thread::sleep(err.timeout);
 
-                    if (err.population_condition)() {
-                        get_current_window().unwrap().emit("createToast", ("error", err.message));
+                    if (err.population_condition.is_some()) {
+                        if (err.population_condition).as_ref().unwrap()() {
+                            err.population_action;
+                        } else {
+                            err.timeout = Duration::from_secs(1);
+                            queue.push_back(err);
+                        }
                     } else {
-                        err.timeout = Duration::from_secs(1);
-                        queue.push_back(err);
+                        err.population_action;
                     }
                 }
             }

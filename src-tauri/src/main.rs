@@ -37,7 +37,6 @@ mod pg_driver;
 #[path = "db/tables/adapter.rs"]
 mod adapter;
 
-
 mod auth_util;
 mod errors;
 mod jwt_controller;
@@ -45,7 +44,6 @@ mod runtime_objects;
 mod error_queue;
 
 fn main() {
-
     init();
 
     tauri::Builder::default()

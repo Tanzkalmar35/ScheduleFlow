@@ -1,7 +1,7 @@
 use uuid::Uuid;
 
-use crate::db_actions::{DbActions, Table};
-use crate::pg_driver::PgDriver;
+use crate::db::db_actions::{DbActions, Table};
+use crate::db::pg_driver::PgDriver;
 
 #[derive(Debug, Clone)]
 pub enum ComponentType {
@@ -128,9 +128,6 @@ impl DbActions for ComponentDAO {
 
 #[cfg(test)]
 mod tests {
-    use crate::db_actions::DbActions;
-    use crate::pg_driver::PgDriver;
-
     use super::*;
 
     #[test]

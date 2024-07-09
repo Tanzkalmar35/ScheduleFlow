@@ -1,12 +1,12 @@
 use icalendar::{Calendar, CalendarComponent, Component, Event, Property, Todo, Venue};
 use uuid::Uuid;
 
-use crate::db_actions::{DbActions, Table};
-use crate::pg_driver::PgDriver;
-use crate::table_calendars::CalendarDAO;
-use crate::table_combinations::TableCombination;
-use crate::table_components::{ComponentDAO, ComponentType};
-use crate::table_properties::PropertyDAO;
+use crate::db::db_actions::Table;
+use crate::db::pg_driver::PgDriver;
+use crate::db::tables::table_calendars::CalendarDAO;
+use crate::db::tables::table_combinations::TableCombination;
+use crate::db::tables::table_components::{ComponentDAO, ComponentType};
+use crate::db::tables::table_properties::PropertyDAO;
 
 /// Acts like an adapter between the icalendar crate and my DAO objects
 ///
@@ -133,6 +133,11 @@ impl ICalendarAdapter {
             Some(format!("{} = '{}'", T::get_fk_uuid_name(), of)),
         )
     }
+}
+
+#[cfg(test)]
+mod tests {
+    todo!("Test adapter");
 }
 
 //pub struct CalendarDaoAdapter;

@@ -1,7 +1,7 @@
 use icalendar::{Calendar, Event, Todo};
 
-use crate::pg_driver::PgDriver;
-use crate::table_calendars::CalendarDAO;
+use crate::db::pg_driver::PgDriver;
+use crate::db::tables::table_calendars::CalendarDAO;
 
 #[derive(Debug)]
 pub struct ICalendarUtil {

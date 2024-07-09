@@ -2,18 +2,17 @@ extern crate bcrypt;
 
 use std::fmt::Debug;
 use std::ops::DerefMut;
-use std::sync::{Mutex, MutexGuard};
+use std::sync::MutexGuard;
 
 use bcrypt::{DEFAULT_COST, hash, verify};
 use tauri::Window;
 
-use crate::db_actions::DbActions;
-use crate::errors::{BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
+use crate::db::pg_driver::PgDriver;
+use crate::db::tables::table_users::User;
+use crate::errors::error_messages::{BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
 use crate::jwt_controller::generate_jwt;
-use crate::pg_driver::PgDriver;
-use crate::runtime_objects::{CURRENT_WINDOW, driver, get_current_window, set_current_user, set_current_window};
-use crate::table_jwt_tokens::JwtToken;
-use crate::table_users::User;
+use crate::jwt_controller::JwtToken;
+use crate::runtime_objects::{driver, get_current_window, set_current_user, set_current_window};
 
 #[tauri::command]
 pub fn attempt_login(

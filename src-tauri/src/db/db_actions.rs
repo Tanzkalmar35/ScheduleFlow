@@ -1,9 +1,7 @@
 use postgres::Row;
 use uuid::Uuid;
 
-use crate::pg_driver::PgDriver;
-
-pub trait TableCombination {}
+use crate::db::pg_driver::PgDriver;
 
 pub trait Table {
     /// Returns the name of the table.
@@ -11,11 +9,6 @@ pub trait Table {
     /// Returns a for a psql expression formatted String containing all columns of the table.
     fn get_fmt_cols() -> String;
     /// The name of the uuid column if referenced as fk.
-    ///
-    /// # To be fixed:
-    /// Although this concept works, it's not ideal.
-    ///
-    /// Todo: Find a better way to obtain these names of tables
     fn get_fk_uuid_name() -> String;
     /// Returns a for a psql expression formatted String containing all columns except for the id
     /// field of the table.

@@ -66,6 +66,4 @@ listen("createToast", (payload) => {
             createWarningToast(payload.payload[1]);
             break;
     }
-})
-    .then(r => console.log("Toast created"))
-    .catch(e => console.log("Toast not created due to err: ", e))
+}).catch(e => console.log("Toast not created due to err: ", e))

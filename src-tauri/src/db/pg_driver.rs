@@ -1,10 +1,10 @@
-use std::time::Duration;
-use dotenv::dotenv;
 use postgres::{Client, NoTls, Row};
 use serde::{Deserialize, Deserializer, Serialize};
-use crate::error_queue::Error;
-use crate::errors::{ENV_VAR_NOT_SET, ERROR_QUEUE_NOT_INITIALIZED_ERR, NO_DB_CONNECTION_ERR};
-use crate::runtime_objects::{CURRENT_WINDOW, ERROR_QUEUE, get_current_window, get_error_queue};
+
+use crate::errors::error_messages::{ENV_VAR_NOT_SET, ERROR_QUEUE_NOT_INITIALIZED_ERR};
+use crate::runtime_objects::get_error_queue;
+use crate::errors::error_impl::no_database_connection_error;
+use crate::errors::error_impl::no_database_connection_error::NoDatabaseConnectionError;
 
 /// The database driver for PostgreSQL.
 #[derive(Default)]
@@ -19,7 +19,6 @@ pub struct PgDriver {
 }
 
 impl PgDriver {
-
     /// Sets up the database driver.
     pub fn setup() -> Self {
         let name = std::env::var("PSQL_NAME").expect(ENV_VAR_NOT_SET);
@@ -44,18 +43,7 @@ impl PgDriver {
         if let Ok(client) = conn {
             self.client = Some(client);
         } else {
-            let err = Error::new(
-                NO_DB_CONNECTION_ERR.to_string(),
-                Box::new(|| get_current_window().is_some()),
-                Duration::from_secs(0)
-            );
-            if let Some(error_queue) = get_error_queue() {
-                if let Some(error_queue_inner) = &*error_queue {
-                    error_queue_inner.enqueue(err);
-                } else {
-                    panic!("{}", ERROR_QUEUE_NOT_INITIALIZED_ERR)
-                }
-            }
+
         }
 
         Ok(self)
@@ -72,19 +60,9 @@ impl PgDriver {
                 rows = client.query(query, &[])?;
             }
             None => {
-                let err = Error::new(
-                    NO_DB_CONNECTION_ERR.to_string(),
-                    Box::new(|| get_current_window().is_some()),
-                    Duration::from_secs(0)
-                );
-                if let Some(error_queue) = get_error_queue() {
-                    if let Some(error_queue_inner) = &*error_queue {
-                        error_queue_inner.enqueue(err);
-                    } else {
-                        panic!("{}", ERROR_QUEUE_NOT_INITIALIZED_ERR)
-                    }
-                };
-            },
+                let err = NoDatabaseConnectionError::new();
+                get_error_queue().enqueue(err);
+            }
         }
         Ok(rows)
     }
@@ -92,7 +70,6 @@ impl PgDriver {
 
 #[cfg(test)]
 mod tests {
-    use crate::pg_driver::PgDriver;
     use crate::runtime_objects::driver;
 
     #[test]

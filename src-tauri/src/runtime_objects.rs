@@ -1,11 +1,12 @@
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::{Mutex, MutexGuard, OnceLock};
+
 use lazy_static::lazy_static;
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::OnceCell;
 use tauri::Window;
-use crate::error_queue::ErrorQueue;
-use crate::errors::ERROR_QUEUE_NOT_INITIALIZED_ERR;
-use crate::pg_driver::PgDriver;
-use crate::table_users::User;
+use crate::db::pg_driver::PgDriver;
+use crate::db::tables::table_users::User;
+use crate::errors::error_messages::ERROR_QUEUE_NOT_INITIALIZED_ERR;
+use crate::errors::error_queue::ErrorQueue;
 
 pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
 pub static ERROR_QUEUE: OnceCell<Mutex<Option<ErrorQueue>>> = OnceCell::new();
@@ -44,10 +45,18 @@ pub fn set_error_queue(error_queue: ErrorQueue) {
     ERROR_QUEUE.get_or_init(|| Mutex::new(Some(error_queue)));
 }
 
-pub fn get_error_queue() -> Option<std::sync::MutexGuard<'static, Option<ErrorQueue>>> {
-    ERROR_QUEUE.get().map(|mutex| {
-        mutex.lock().unwrap()
-    })
+pub fn get_error_queue() -> &'static ErrorQueue {
+    // ERROR_QUEUE.get().map(|mutex| {
+    //     // if let Some(error_queue) = mutex.lock().unwrap() {
+    //     //     if let Some(error_queue_inner) = &*error_queue {
+    //     //         return error_queue_inner;
+    //     //     } else {
+    //     //         panic!("{}", ERROR_QUEUE_NOT_INITIALIZED_ERR)
+    //     //     }
+    //     // }
+    //     mutex.lock().unwrap()
+    // })
+    ERROR_QUEUE.get().unwrap().lock().unwrap().as_ref().expect(ERROR_QUEUE_NOT_INITIALIZED_ERR)
 }
 
 pub fn reset_error_queue() {

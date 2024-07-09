@@ -1,11 +1,10 @@
 use std::ops::{Deref, DerefMut};
-use anyhow::Error;
+
 use uuid::Uuid;
 
-use crate::db_actions::{DbActions, Table};
-use crate::errors::USER_NOT_FOUND_ERR;
-use crate::pg_driver::PgDriver;
-use crate::table_calendars::CalendarDAO;
+use crate::db::db_actions::{DbActions, Table};
+use crate::db::pg_driver::PgDriver;
+use crate::errors::error_messages::USER_NOT_FOUND_ERR;
 
 #[derive(Debug, Clone)]
 pub struct User {

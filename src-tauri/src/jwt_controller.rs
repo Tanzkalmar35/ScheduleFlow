@@ -2,18 +2,15 @@ use std::collections::HashSet;
 use std::env;
 use std::ops::DerefMut;
 
-use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
-use jsonwebtoken::errors::ErrorKind;
+use jsonwebtoken::{Algorithm, decode, encode, Header, Validation};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::db_actions::DbActions;
 
-use crate::errors::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
+use crate::db::tables::table_jwt_tokens::JwtToken;
+use crate::errors::error_messages::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
 use crate::runtime_objects::driver;
-use crate::table_jwt_tokens::JwtToken;
-use crate::table_users::User;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {

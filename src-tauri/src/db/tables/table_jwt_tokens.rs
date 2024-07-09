@@ -1,9 +1,8 @@
-use std::fmt::format;
 use serde::Serialize;
-
-use crate::db_actions::{DbActions, Table};
-use crate::pg_driver::PgDriver;
 use uuid::Uuid;
+
+use crate::db::db_actions::{DbActions, Table};
+use crate::db::pg_driver::PgDriver;
 
 #[derive(Serialize, Clone, PartialEq)]
 pub struct JwtToken {
@@ -108,10 +107,9 @@ impl DbActions for JwtToken {
 
 #[cfg(test)]
 mod tests {
+    use crate::db::tables::table_users::User;
+
     use super::*;
-    use crate::pg_driver::PgDriver;
-    use uuid::Uuid;
-    use crate::table_users::User;
 
     #[test]
     fn test_store() {

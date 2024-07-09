@@ -2,8 +2,8 @@ use std::marker::PhantomData;
 
 use uuid::Uuid;
 
-use crate::db_actions::{DbActions, Table};
-use crate::pg_driver::PgDriver;
+use crate::db::db_actions::{DbActions, Table};
+use crate::db::pg_driver::PgDriver;
 
 pub struct TableCombination<T1: Table, T2: Table> {
     pub(crate) uuid1: Uuid,
@@ -107,11 +107,11 @@ impl<T1: Table, T2: Table> DbActions for TableCombination<T1, T2> {
 
 #[cfg(test)]
 mod tests_icalendar_icomponent {
-    use crate::db_actions::DbActions;
-    use crate::pg_driver::PgDriver;
-    use crate::table_calendars::CalendarDAO;
-    use crate::table_combinations::TableCombination;
-    use crate::table_components::{ComponentDAO, ComponentType};
+    use crate::db::db_actions::DbActions;
+    use crate::db::pg_driver::PgDriver;
+    use crate::db::tables::table_calendars::CalendarDAO;
+    use crate::db::tables::table_combinations::TableCombination;
+    use crate::db::tables::table_components::{ComponentDAO, ComponentType};
 
     #[test]
     pub fn test_storing_calendar_component_combination() {
@@ -183,11 +183,11 @@ mod tests_icalendar_icomponent {
 
 #[cfg(test)]
 mod tests_icalendar_iproperty {
-    use crate::db_actions::DbActions;
-    use crate::pg_driver::PgDriver;
-    use crate::table_calendars::CalendarDAO;
-    use crate::table_combinations::TableCombination;
-    use crate::table_properties::PropertyDAO;
+    use crate::db::db_actions::DbActions;
+    use crate::db::pg_driver::PgDriver;
+    use crate::db::tables::table_calendars::CalendarDAO;
+    use crate::db::tables::table_combinations::TableCombination;
+    use crate::db::tables::table_properties::PropertyDAO;
 
     #[test]
     pub fn test_storing_calendar_property_combination() {

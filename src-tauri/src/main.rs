@@ -10,8 +10,6 @@ use icalendar::Component;
 use tauri::{Manager, Runtime};
 
 use crate::auth_util::{attempt_login, attempt_signup, logout};
-use crate::db_actions::DbActions;
-use crate::error_queue::ErrorQueue;
 use crate::errors::error_queue::ErrorQueue;
 use crate::jwt_controller::is_valid_session;
 use crate::runtime_objects::{driver, set_current_window, set_error_queue};

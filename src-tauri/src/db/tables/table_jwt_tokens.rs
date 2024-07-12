@@ -5,7 +5,7 @@ use crate::db::db_actions::{DbActions, Table};
 use crate::db::pg_driver::PgDriver;
 
 #[derive(Serialize, Clone, PartialEq)]
-pub struct JwtToken {
+pub(crate) struct JwtToken {
     pub(crate) token: String,
     pub(crate) user_uuid: Uuid,
 }

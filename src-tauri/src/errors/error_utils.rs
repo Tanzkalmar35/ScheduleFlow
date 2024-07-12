@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use std::time::Duration;
 use crate::runtime_objects::get_current_window;
 
@@ -20,10 +21,10 @@ pub enum ErrorCode {
 pub trait Error {
 
     fn error_code(&self) -> u32;
-    fn message(&self) -> String;
+    fn message(&self) -> &String;
     fn timeout(&self) -> Duration;
-    fn condition(&self) -> Option<dyn Fn() -> bool + Send>;
-    fn handler(&self) -> dyn Fn() + Send;
+    fn condition(&self) -> &Option<Box<dyn Fn() -> bool + Send>>;
+    fn handler(&self) -> &Box<dyn Fn() + Send>;
 
     /// Initializes a custom timeout for the error.
     ///
@@ -36,6 +37,12 @@ pub trait Error {
     /// # Params
     /// * `message` - The custom error message that will be displayed
     fn set_message(&mut self, message: String);
+
+    /// Initializes a custom error handler for the error.
+    ///
+    /// # Params
+    /// * `handler` - The custom ErrorHandler function that is responsible for handling the error properly.
+    fn set_handler(&mut self, handler: Box<dyn Fn() + Send>);
 }
 
 /// Implements methods that handle errors in various ways.
@@ -47,12 +54,9 @@ impl ErrorHandler {
     ///
     /// # Params
     /// * `error` - The custom error implementation.
-    pub(crate) fn populate_toast<E: Error>(error: E) -> Box<dyn Fn() + Send>
-    where
-        E: Error,
-    {
-        Box::new(|| {
-            get_current_window().unwrap().emit("createToast", ("error", error.message()));
+    pub(crate) fn populate_toast(message: String) -> Box<dyn Fn() + Send + 'static> {
+        Box::new(move || {
+            get_current_window().unwrap().emit("createToast", ("error", message.clone()));
         })
     }
 }

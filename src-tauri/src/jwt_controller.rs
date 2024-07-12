@@ -7,7 +7,7 @@ use rand::distributions::Alphanumeric;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
+use crate::db::db_actions::DbActions;
 use crate::db::tables::table_jwt_tokens::JwtToken;
 use crate::errors::error_messages::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
 use crate::runtime_objects::driver;

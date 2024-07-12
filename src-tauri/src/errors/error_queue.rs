@@ -1,19 +1,20 @@
-use std::{fmt, thread};
 use std::collections::VecDeque;
 use std::sync::{Arc, mpsc, Mutex};
+use std::thread;
 use std::time::Duration;
-use crate::errors::error_utils::Error;
-use crate::runtime_objects::get_current_window;
 
+use crate::errors::error_utils::Error;
+
+#[derive(Clone)]
 pub struct ErrorQueue {
-    queue: Arc<Mutex<VecDeque<dyn Error>>>,
+    queue: Arc<Mutex<VecDeque<Box<dyn Error + Send>>>>,
     tx: mpsc::Sender<()>,
 }
 
 impl ErrorQueue {
     pub(crate) fn new() -> Self {
         let (tx, rx) = mpsc::channel();
-        let queue = Arc::new(Mutex::new(VecDeque::<dyn Error>::new()));
+        let queue = Arc::new(Mutex::new(VecDeque::<Box<dyn Error + Send>>::new()));
         let queue_clone = Arc::clone(&queue);
         let handle = thread::spawn(move || {
             loop {
@@ -23,14 +24,15 @@ impl ErrorQueue {
                     thread::sleep(err.timeout());
 
                     if (err.condition().is_some()) {
-                        if (err.condition()).as_ref().unwrap()() {
-                            err.handler();
+                        if err.condition().as_ref().unwrap()() {
+                            println!("An error occured: {}", err.message());
+                            err.handler()();
                         } else {
                             err.set_timeout(Duration::from_secs(1));
                             queue.push_back(err);
                         }
                     } else {
-                        err.handler();
+                        err.handler()();
                     }
                 }
             }
@@ -39,8 +41,8 @@ impl ErrorQueue {
         ErrorQueue { queue, tx }
     }
 
-    pub(crate) fn enqueue(&self, err: impl Error) {
-        self.queue.lock().unwrap().push_back(err);
+    pub(crate) fn enqueue(&self, err: impl Error + Send + 'static) {
+        self.queue.lock().unwrap().push_back(Box::new(err));
         self.tx.send(()).unwrap(); // Send a dummy message to the receiver to wake the thread up
     }
 }

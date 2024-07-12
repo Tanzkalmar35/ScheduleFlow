@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
 use lazy_static::lazy_static;
@@ -45,7 +46,7 @@ pub fn set_error_queue(error_queue: ErrorQueue) {
     ERROR_QUEUE.get_or_init(|| Mutex::new(Some(error_queue)));
 }
 
-pub fn get_error_queue() -> &'static ErrorQueue {
+pub fn get_error_queue() -> ErrorQueue {
     // ERROR_QUEUE.get().map(|mutex| {
     //     // if let Some(error_queue) = mutex.lock().unwrap() {
     //     //     if let Some(error_queue_inner) = &*error_queue {
@@ -56,7 +57,10 @@ pub fn get_error_queue() -> &'static ErrorQueue {
     //     // }
     //     mutex.lock().unwrap()
     // })
-    ERROR_QUEUE.get().unwrap().lock().unwrap().as_ref().expect(ERROR_QUEUE_NOT_INITIALIZED_ERR)
+    ERROR_QUEUE.get()
+        .and_then(|mutex| mutex.lock().ok())
+        .and_then(|guard| guard.as_ref().cloned())
+        .expect(ERROR_QUEUE_NOT_INITIALIZED_ERR)
 }
 
 pub fn reset_error_queue() {

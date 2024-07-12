@@ -8,10 +8,11 @@ use bcrypt::{DEFAULT_COST, hash, verify};
 use tauri::Window;
 
 use crate::db::pg_driver::PgDriver;
+use crate::db::tables::table_jwt_tokens::JwtToken;
 use crate::db::tables::table_users::User;
+use crate::db::db_actions::DbActions;
 use crate::errors::error_messages::{BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
 use crate::jwt_controller::generate_jwt;
-use crate::jwt_controller::JwtToken;
 use crate::runtime_objects::{driver, get_current_window, set_current_user, set_current_window};
 
 #[tauri::command]

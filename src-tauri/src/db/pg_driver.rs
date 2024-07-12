@@ -43,7 +43,8 @@ impl PgDriver {
         if let Ok(client) = conn {
             self.client = Some(client);
         } else {
-
+            let err = NoDatabaseConnectionError::new();
+            get_error_queue().enqueue(err);
         }
 
         Ok(self)

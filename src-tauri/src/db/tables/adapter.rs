@@ -1,7 +1,7 @@
 use icalendar::{Calendar, CalendarComponent, Component, Event, Property, Todo, Venue};
 use uuid::Uuid;
 
-use crate::db::db_actions::Table;
+use crate::db::db_actions::{DbActions, Table};
 use crate::db::pg_driver::PgDriver;
 use crate::db::tables::table_calendars::CalendarDAO;
 use crate::db::tables::table_combinations::TableCombination;

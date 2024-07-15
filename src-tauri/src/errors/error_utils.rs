@@ -2,7 +2,9 @@ use std::sync::Arc;
 use std::time::Duration;
 use crate::runtime_objects::get_current_window;
 
+/// Enumerating all error codes so from this point, we can easily overview the errors grouped by code.
 pub enum ErrorCode {
+    /// Error code 1, indicates errors on database level.
     ONE = 1,
     TWO = 2,
 }
@@ -20,10 +22,19 @@ pub enum ErrorCode {
 /// The condition always needs to grant the action performed by the handler!!!
 pub trait Error {
 
+    /// A getter for the error code of this error.
     fn error_code(&self) -> u32;
+
+    /// A getter for the error message of this error.
     fn message(&self) -> &String;
+
+    /// A getter for the initial timeout of this error.
     fn timeout(&self) -> Duration;
+
+    /// A getter for the condition that needs to be met for the error to be populates.
     fn condition(&self) -> &Option<Box<dyn Fn() -> bool + Send>>;
+
+    /// A getter for the handler function, that handles the error properly.
     fn handler(&self) -> &Box<dyn Fn() + Send>;
 
     /// Initializes a custom timeout for the error.

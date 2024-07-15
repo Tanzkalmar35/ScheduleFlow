@@ -25,7 +25,6 @@ impl ErrorQueue {
 
                     if (err.condition().is_some()) {
                         if err.condition().as_ref().unwrap()() {
-                            println!("An error occured: {}", err.message());
                             err.handler()();
                         } else {
                             err.set_timeout(Duration::from_secs(1));

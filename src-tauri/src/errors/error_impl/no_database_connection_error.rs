@@ -17,14 +17,14 @@ impl NoDatabaseConnectionError {
     /// Initializes a new NoDatabaseConnectionError with its default params.
     ///
     /// # Default params
-    /// * `error_code` - 1, database related errors.
+    /// * `error_code` - ErrorCode::ONE (1), database related errors.
     /// * `message` - error_messages::NO_DB_CONNECTION_ERR.
     /// * `timeout` - 0 seconds, no default delay before population.
     /// * `condition` - get_current_window().is_some(), the current window needs to be set.
     /// * `handler` - ErrorHandler::populate_toast(), populates a toast in the frontend indicating the error.
     pub fn new() -> Self {
         NoDatabaseConnectionError {
-            error_code: 1,
+            error_code: ErrorCode::ONE as u32,
             message: NO_DB_CONNECTION_ERR.to_string(),
             timeout: Duration::from_secs(0),
             condition: Some(Box::new(|| get_current_window().is_some())),

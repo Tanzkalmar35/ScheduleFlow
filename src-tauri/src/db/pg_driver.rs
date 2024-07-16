@@ -1,6 +1,6 @@
 use postgres::{Client, NoTls, Row};
 use serde::{Deserialize, Deserializer, Serialize};
-
+use tracing::{error, info};
 use crate::errors::error_messages::{ENV_VAR_NOT_SET, ERROR_QUEUE_NOT_INITIALIZED_ERR};
 use crate::runtime_objects::get_error_queue;
 use crate::errors::error_impl::no_database_connection_error;
@@ -40,11 +40,16 @@ impl PgDriver {
     pub fn connect(&mut self) -> anyhow::Result<&mut Self> {
         let conn = Client::connect(&self.url, NoTls);
 
-        if let Ok(client) = conn {
-            self.client = Some(client);
-        } else {
-            let err = NoDatabaseConnectionError::new();
-            get_error_queue().enqueue(err);
+        match conn {
+            Ok(client) => {
+                self.client = Some(client);
+                info!("Database connection up and running!")
+            }
+            Err(e) => {
+                error!("No database connection could be established");
+                let err = NoDatabaseConnectionError::new();
+                get_error_queue().enqueue(err);
+            }
         }
 
         Ok(self)

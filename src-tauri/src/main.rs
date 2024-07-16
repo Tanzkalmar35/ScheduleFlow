@@ -8,7 +8,7 @@ use std::thread;
 use dotenv::dotenv;
 use icalendar::Component;
 use tauri::{Manager, Runtime};
-
+use tracing::Level;
 use crate::auth_util::{attempt_login, attempt_signup, logout};
 use crate::errors::error_queue::ErrorQueue;
 use crate::jwt_controller::is_valid_session;
@@ -23,6 +23,11 @@ mod jwt_controller;
 mod runtime_objects;
 
 fn main() {
+    tracing_subscriber::fmt::init();
+    let _guard = tracing::span!(Level::INFO, "main");
+
+    tracing::info!("Initializing the application");
+
     init();
 
     tauri::Builder::default()
@@ -32,6 +37,7 @@ fn main() {
 }
 
 fn init() {
+
     dotenv().ok();
     let error_queue = ErrorQueue::new();
     set_error_queue(error_queue);
@@ -39,4 +45,6 @@ fn init() {
     thread::spawn(move || {
         let driver = driver();
     });
+
+    tracing::info!("Initialization complete")
 }

@@ -37,7 +37,6 @@ fn main() {
 }
 
 fn init() {
-
     dotenv().ok();
     let error_queue = ErrorQueue::new();
     set_error_queue(error_queue);

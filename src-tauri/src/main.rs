@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![allow(unused)]
 
+use std::env;
 use std::ops::DerefMut;
 use std::thread;
 
@@ -26,7 +27,13 @@ fn main() {
     init();
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![attempt_signup, attempt_login, logout, is_valid_session, set_current_window])
+        .invoke_handler(tauri::generate_handler![
+            attempt_signup,
+            attempt_login,
+            logout,
+            is_valid_session,
+            set_current_window
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -135,40 +135,7 @@ impl ICalendarAdapter {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    todo!("Test adapter");
-}
-
-//pub struct CalendarDaoAdapter;
-
-//impl CalendarDaoAdapter {
-//
-//    /// Builds a CalendarDAO object from a Calendar object.
-//    pub fn bundle_calendar_dao(driver: &mut PgDriver, from: Calendar) -> CalendarDAO {
-//        let mut cal = Self::build_calendar_dao(driver, &from);
-//        let components = Self::build_components_dao(driver, from);
-//
-//        for component in components {
-//            cal.push(component);
-//        }
-//
-//        cal
-//    }
-//
-//    pub fn build_calendar_dao(driver: &mut PgDriver, cal: &Calendar) -> CalendarDAO {
-//        let mut res = CalendarDAO::new();
-//        let properties = cal.properties();
-//
-//        for property in properties {
-//            let prop = PropertyDAO::new(
-//                property.name().to_string(),
-//                property.value().to_string(),
-//                res.uuid,
-//            );
-//            prop.store(driver);
-//        }
-//
-//        res
-//    }
-//}
+// #[cfg(test)]
+// mod tests {
+//     todo!("Test adapter");
+// }

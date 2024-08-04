@@ -1,6 +1,6 @@
-import {invoke} from "@tauri-apps/api/tauri";
-import {createErrorToast, createSuccessToast} from "../toast.js";
-import {listen} from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/tauri";
+import { createErrorToast, createSuccessToast } from "../toast.js";
+import { listen } from "@tauri-apps/api/event";
 
 export async function isValidSession() {
     if (document.cookie === "") {
@@ -24,9 +24,13 @@ export async function submitLoginForm(event) {
         remember: rememberMe.checked
     })
         .then(_ => {
+            console.log("Now relocating to homepage");
             window.location.href = "../index.html"
         })
-        .catch(e => createErrorToast(e))
+        .catch(e => {
+            console.log("Hmm, seems like an error occured...")
+            createErrorToast(e);
+        })
 }
 
 export async function submitSignupForm(event) {
@@ -50,6 +54,7 @@ export async function submitSignupForm(event) {
 }
 
 listen('setJwtCookie', (event) => {
+    console.log("Setting the cookie now");
     let expirationDate = new Date();
     expirationDate.setMonth(expirationDate.getMonth() + 1, expirationDate.getDay());
     document.cookie = `jwt=${event.payload}; expires=${expirationDate.toUTCString()}; path=/; Secure; SameSite=Strict`;

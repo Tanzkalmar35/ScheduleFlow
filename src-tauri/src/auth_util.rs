@@ -4,14 +4,16 @@ use std::fmt::Debug;
 use std::ops::DerefMut;
 use std::sync::MutexGuard;
 
-use bcrypt::{DEFAULT_COST, hash, verify};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use tauri::Window;
 
+use crate::db::db_actions::DbActions;
 use crate::db::pg_driver::PgDriver;
 use crate::db::tables::table_jwt_tokens::JwtToken;
 use crate::db::tables::table_users::User;
-use crate::db::db_actions::DbActions;
-use crate::errors::error_messages::{BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
+use crate::errors::error_messages::{
+    BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
+};
 use crate::jwt_controller::generate_jwt;
 use crate::runtime_objects::{driver, get_current_window, set_current_user, set_current_window};
 
@@ -20,7 +22,7 @@ pub fn attempt_login(
     window: Window,
     email: String,
     password: String,
-    remember: bool
+    remember: bool,
 ) -> Result<(), &'static str> {
     set_current_window(window);
 
@@ -29,13 +31,12 @@ pub fn attempt_login(
     let user = User::get_by_email(driver.deref_mut(), email)?;
     let user_pass = &user.get_password();
 
-
     match verify(password, user_pass) {
         Ok(password_matches) => {
             if !password_matches {
-                return Err(USER_NOT_FOUND_ERR)
+                return Err(USER_NOT_FOUND_ERR);
             }
-        },
+        }
         Err(_) => return Err(BCRYPT_DECODING_ERR),
     }
 
@@ -44,6 +45,7 @@ pub fn attempt_login(
     }
 
     set_current_user(user);
+    println!("Everything ok setting up login, back to frontend");
     Ok(())
 }
 
@@ -61,7 +63,6 @@ pub fn attempt_signup(
     let user = User::new(username, (&*email).into(), hashed_password);
     let mut driver = driver().lock().unwrap();
 
-
     if User::is_existing(driver.deref_mut(), &email) {
         return Err(USER_ALREADY_EXISTING_ERR);
     }
@@ -77,11 +78,15 @@ pub fn attempt_signup(
 }
 
 fn populate_jwt_cookie(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<(), &'static str> {
+    println!("Setting jwt now");
     let token = generate_jwt(user.uuid);
     token.store(driver.deref_mut());
 
-    get_current_window().unwrap().emit("setJwtCookie", token.token)
+    get_current_window()
+        .unwrap()
+        .emit("setJwtCookie", token.token)
         .map_err(|_| JWT_COOKIE_ERR)?;
+    println!("Setting jwt worked just fine.");
     Ok(())
 }
 
@@ -90,7 +95,7 @@ pub fn logout(token: String) -> Result<(), &'static str> {
     JwtToken::delete_spec_col::<JwtToken>(
         driver().lock().unwrap().deref_mut(),
         String::from("token"),
-        token
+        token,
     );
 
     Ok(())

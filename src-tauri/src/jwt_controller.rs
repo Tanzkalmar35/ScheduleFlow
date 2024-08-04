@@ -2,15 +2,15 @@ use std::collections::HashSet;
 use std::env;
 use std::ops::DerefMut;
 
-use jsonwebtoken::{Algorithm, decode, encode, Header, Validation};
-use rand::distributions::Alphanumeric;
-use rand::Rng;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use crate::db::db_actions::DbActions;
 use crate::db::tables::table_jwt_tokens::JwtToken;
 use crate::errors::error_messages::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
 use crate::runtime_objects::driver;
+use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
+use rand::distributions::Alphanumeric;
+use rand::Rng;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -19,25 +19,28 @@ pub struct Claims {
 
 #[tauri::command]
 pub fn is_valid_session(token: String) -> bool {
+    println!("Is valid session???");
     let token_data = decode_jwt(&token);
     let mut token_obj: JwtToken = JwtToken::empty();
     let mut user_tokens: Vec<JwtToken> = vec![];
 
     if let Ok(data) = token_data {
         let user_uuid = data.claims.user_uuid;
-        token_obj = JwtToken {token, user_uuid};
+        token_obj = JwtToken { token, user_uuid };
         let condition_user_matches = format!("user_uuid = '{}'", user_uuid);
 
-        user_tokens = JwtToken::retrieve(driver().lock().unwrap().deref_mut(), Some(condition_user_matches));
+        user_tokens = JwtToken::retrieve(
+            driver().lock().unwrap().deref_mut(),
+            Some(condition_user_matches),
+        );
     }
 
+    println!("Is it valid?: {}", &user_tokens.contains(&token_obj));
     user_tokens.contains(&token_obj)
 }
 
 pub fn generate_jwt(user_uuid: Uuid) -> JwtToken {
-    let my_claims = Claims {
-        user_uuid,
-    };
+    let my_claims = Claims { user_uuid };
     let key = env::var("SCHEDULEFLOW_JWT_SECRET").expect(ENV_VAR_NOT_SET);
 
     let encoding_key = jsonwebtoken::EncodingKey::from_secret(key.as_ref());
@@ -52,7 +55,6 @@ pub fn generate_jwt(user_uuid: Uuid) -> JwtToken {
 pub fn decode_jwt(
     token: &str,
 ) -> Result<jsonwebtoken::TokenData<Claims>, jsonwebtoken::errors::Error> {
-
     let key = env::var("SCHEDULEFLOW_JWT_SECRET").expect(ENV_VAR_NOT_SET);
     let decoding_key = jsonwebtoken::DecodingKey::from_secret(&key.as_ref());
 

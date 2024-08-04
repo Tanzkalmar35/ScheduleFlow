@@ -1,10 +1,10 @@
 use postgres::{Client, NoTls, Row};
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::errors::error_messages::{ENV_VAR_NOT_SET, ERROR_QUEUE_NOT_INITIALIZED_ERR};
-use crate::runtime_objects::get_error_queue;
 use crate::errors::error_impl::no_database_connection_error;
 use crate::errors::error_impl::no_database_connection_error::NoDatabaseConnectionError;
+use crate::errors::error_messages::{ENV_VAR_NOT_SET, ERROR_QUEUE_NOT_INITIALIZED_ERR};
+use crate::runtime_objects::get_error_queue;
 
 /// The database driver for PostgreSQL.
 #[derive(Default)]
@@ -21,10 +21,10 @@ pub struct PgDriver {
 impl PgDriver {
     /// Sets up the database driver.
     pub fn setup() -> Self {
-        let name = std::env::var("PSQL_NAME").expect(ENV_VAR_NOT_SET);
-        let user = std::env::var("PSQL_USER").expect(ENV_VAR_NOT_SET);
-        let pass = std::env::var("PSQL_PASS").expect(ENV_VAR_NOT_SET);
-        let address = std::env::var("PSQL_IP").expect(ENV_VAR_NOT_SET);
+        let name = std::env::var("PSQL_NAME").expect("PSQL NAME NOT SET");
+        let user = std::env::var("PSQL_USER").expect("PSQL USER NOT SET");
+        let pass = std::env::var("PSQL_PASS").expect("PSQL PASS NOT SET");
+        let address = std::env::var("PSQL_IP").expect("PSQL ADDRESS NOT SET");
         let url = format!("postgres://{}:{}@{}/{}", user, pass, address, name);
         Self {
             user,

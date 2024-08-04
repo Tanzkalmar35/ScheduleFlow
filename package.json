@@ -10,7 +10,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1"
+    "@tauri-apps/api": "^1",
+    "vanilla-router": "^1.2.8",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1",

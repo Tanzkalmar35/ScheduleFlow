@@ -19,7 +19,6 @@ pub struct Claims {
 
 #[tauri::command]
 pub fn is_valid_session(token: String) -> bool {
-    println!("Is valid session???");
     let token_data = decode_jwt(&token);
     let mut token_obj: JwtToken = JwtToken::empty();
     let mut user_tokens: Vec<JwtToken> = vec![];
@@ -35,7 +34,6 @@ pub fn is_valid_session(token: String) -> bool {
         );
     }
 
-    println!("Is it valid?: {}", &user_tokens.contains(&token_obj));
     user_tokens.contains(&token_obj)
 }
 

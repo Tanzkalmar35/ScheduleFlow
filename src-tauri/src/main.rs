@@ -32,7 +32,7 @@ fn main() {
             attempt_login,
             logout,
             is_valid_session,
-            set_current_window
+            set_current_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

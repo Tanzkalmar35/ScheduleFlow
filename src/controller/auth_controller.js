@@ -24,11 +24,9 @@ export async function submitLoginForm(event) {
         remember: rememberMe.checked
     })
         .then(_ => {
-            console.log("Now relocating to homepage");
-            window.location.href = "../index.html"
+            window.location.href = "../../index.html"
         })
         .catch(e => {
-            console.log("Hmm, seems like an error occured...")
             createErrorToast(e);
         })
 }
@@ -54,10 +52,9 @@ export async function submitSignupForm(event) {
 }
 
 listen('setJwtCookie', (event) => {
-    console.log("Setting the cookie now");
     let expirationDate = new Date();
     expirationDate.setMonth(expirationDate.getMonth() + 1, expirationDate.getDay());
-    document.cookie = `jwt=${event.payload}; expires=${expirationDate.toUTCString()}; path=/; Secure; SameSite=Strict`;
+    document.cookie = `jwt=${event.payload}; expires=${expirationDate.toUTCString()}; path=/; ${window.location.protocol === 'https:' ? 'Secure;' : ''} SameSite=Strict`;
 })
     .then(m => createSuccessToast(m))
     .catch(e => createErrorToast(e));

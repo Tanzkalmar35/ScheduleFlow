@@ -45,7 +45,6 @@ pub fn attempt_login(
     }
 
     set_current_user(user);
-    println!("Everything ok setting up login, back to frontend");
     Ok(())
 }
 
@@ -78,7 +77,6 @@ pub fn attempt_signup(
 }
 
 fn populate_jwt_cookie(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<(), &'static str> {
-    println!("Setting jwt now");
     let token = generate_jwt(user.uuid);
     token.store(driver.deref_mut());
 
@@ -86,7 +84,6 @@ fn populate_jwt_cookie(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<
         .unwrap()
         .emit("setJwtCookie", token.token)
         .map_err(|_| JWT_COOKIE_ERR)?;
-    println!("Setting jwt worked just fine.");
     Ok(())
 }
 

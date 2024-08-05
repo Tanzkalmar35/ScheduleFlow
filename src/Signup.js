@@ -1,5 +1,5 @@
-import {submitSignupForm} from "./controller/auth_controller.js";
-import {invoke} from "@tauri-apps/api/tauri";
+import { submitSignupForm } from "./controller/AuthController.js";
+import { invoke } from "@tauri-apps/api/tauri";
 
 let signupForm = document.getElementById("signup-form");
 

@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="/src/styles/main.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tauri App</title>
-    <script type="module" src="/src/main.js" defer></script>
-    <script type="module" src="/src/calendar/calendar.js" defer></script>
+    <script type="module" src="/src/Main.js" defer></script>
+    <script type="module" src="/src/calendar/CalendarUtil.js" defer></script>
 </head>
 
 <body class="poppins-regular">
@@ -38,8 +38,8 @@
     </div>
     <script type="module">
         import {invoke} from "@tauri-apps/api/tauri";
-        import {createErrorToast} from "./src/toast.js";
-        import {invalidateJwtCookie} from "./src/controller/auth_controller.js";
+        import {createErrorToast} from "./src/Toast.js";
+        import {invalidateJwtCookie} from "./src/controller/AuthController.js";
 
         document.getElementById("logout-btn").onclick = logout;
 

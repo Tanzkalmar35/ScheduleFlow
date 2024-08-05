@@ -1,4 +1,4 @@
-import { isValidSession } from "./controller/auth_controller.js";
+import { isValidSession } from "./controller/AuthController.js";
 import { invoke } from "@tauri-apps/api/tauri";
 
 if (!await isValidSession()) {

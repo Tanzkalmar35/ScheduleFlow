@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/tauri";
-import { createErrorToast, createSuccessToast } from "../toast.js";
+import { createErrorToast, createSuccessToast } from "../Toast.js";
 import { listen } from "@tauri-apps/api/event";
 
 export async function isValidSession() {

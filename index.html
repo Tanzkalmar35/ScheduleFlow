@@ -1,48 +1,58 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="/src/styles/main.css"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tauri App</title>
     <script type="module" src="/src/main.js" defer></script>
+    <script type="module" src="/src/calendar/calendar.js" defer></script>
 </head>
 
 <body class="poppins-regular">
-<div class="notifications"></div>
-<div class="container">
-    <h1>Welcome to index.html</h1>
-</div>
-<div class="calendar">
-    <div class="calendar-header">
-        <h2 id="month-year"></h2>
-        <button id="prev-month" onclick="prevMonth()">‹</button>
-        <button id="next-month" onclick="nextMonth()">›</button>
+    <div class="notifications"></div>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h2 id="month-year"></h2>
+        </div>
+        <div class="calendar-body">
+            <div class="month-nav">
+                <button id="prev-month-btn" class="prev-month">Prev</button>
+                <button id="next-month-btn">Next</button>
+            </div>
+            <div class="day-of-week">
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+                <div>Sun</div>
+            </div>
+            <div id="calendar-dates"></div>
+        </div>
     </div>
-    <div class="calendar-body">
-        <div id="calendar-days"></div>
-        <div id="events"></div>
+    <div>
+        <button id="logout-btn">Log out</button>
     </div>
-</div>
-<div>
-    <button id="logout-btn">Log out</button>
-</div>
-<script type="module">
-    import {invoke} from "@tauri-apps/api/tauri";
-    import {createErrorToast} from "./src/toast.js";
-    import {invalidateJwtCookie} from "./src/controller/auth_controller.js";
+    <script type="module">
+        import {invoke} from "@tauri-apps/api/tauri";
+        import {createErrorToast} from "./src/toast.js";
+        import {invalidateJwtCookie} from "./src/controller/auth_controller.js";
 
-    document.getElementById("logout-btn").onclick = logout;
+        document.getElementById("logout-btn").onclick = logout;
 
-    async function logout() {
-        await invoke("logout", {
-            token: document.cookie.split("=")[1]
-        })
-            .catch(e => createErrorToast(e));
+        async function logout() {
+            await invoke("logout", {
+                token: document.cookie.split("=")[1]
+            })
+                .catch(e => createErrorToast(e));
 
-        invalidateJwtCookie();
-        window.location.reload();
-    }
-</script>
+            invalidateJwtCookie();
+            window.location.reload();
+        }
+    </script>
 </body>
+
 </html>

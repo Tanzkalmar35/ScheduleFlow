@@ -1,23 +1,59 @@
-// The representation of rust's icalendar::Calendar on the frontend.
-class Calendar {
+// script.js
+const calendarContainer = document.querySelector('.calendar-container');
+const monthYearElement = document.getElementById('month-year');
+const calendarDatesElement = document.getElementById('calendar-dates');
+const navigateToNextMonthBtn = document.getElementById('next-month-btn');
+const navigateToPrevMonthBtn = document.getElementById('prev-month-btn');
 
-    // A list of key-value pairs - properties that describe the calendar.
-    properties;
+// Get current date
+let currentDate = new Date();
 
-    // A list of components (like Events, Todos, ...),
-    // that are essentially just lists of Properties too
-    components;
+/**
+*   Renders the calendar to the home page
+*
+*   @param {Date} date - The current date
+*/
+function renderCalendar(date) {
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    constructor(properties, components) {
-        this.properties = properties;
-        this.components = components;
+    // Calculate the day of the week on which the month starts
+    const firstDayOfMonth = new Date(year, month, 0);
+    const firstDayOfWeek = firstDayOfMonth.getDay();
+
+    // Clear previous dates
+    calendarDatesElement.innerHTML = '';
+
+    // Render blank cells for days before the first day of the month
+    for (let i = 0; i < firstDayOfWeek; i++) {
+        const blankCell = document.createElement('div');
+        blankCell.classList.add('date');
+        blankCell.classList.add('blank');
+        calendarDatesElement.appendChild(blankCell);
     }
 
-    getProperties() {
-        return this.properties;
+    // Render dates
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dateElement = document.createElement('div');
+        dateElement.classList.add('date');
+        dateElement.textContent = i;
+        calendarDatesElement.appendChild(dateElement);
     }
 
-    getComponents() {
-        return this.components;
-    }
+    // Update month and year
+    monthYearElement.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
 }
+
+// Render calendar for current date
+renderCalendar(currentDate);
+
+navigateToNextMonthBtn.addEventListener("click", function() {
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
+    renderCalendar(currentDate);
+});
+
+navigateToPrevMonthBtn.addEventListener("click", function() {
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
+    renderCalendar(currentDate);
+});

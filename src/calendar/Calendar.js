@@ -27,32 +27,32 @@ class Calendar {
     }
 
     /**
-     *  Map icalendar::Calendar from the backend to this Calendar, 
+     *  Map icalendar::Calendar from the backend to this Calendar,
      *  which we can use in the frontend to render the calendar.
      *
-     *  @param {object} calendar an object containing the icalendar's data.
+     *  @param {object} iCalendar an object containing the icalendar's data.
      */
-    map(icalendar) {
+    map(iCalendar) {
         let result;
         let components = [];
         let properties = [];
 
         // Map all components
-        for (let icomponent in icalendar.components) {
+        for (let iComponent in iCalendar.components) {
             let type;
 
-            switch (icomponent.type) {
+            switch (iComponent.type) {
                 case "Event": type = ComponentType.Event;
                 // TODO: Handle all types of components.
             }
 
-            let component = new Component(icomponent.properties, type);
+            let component = new Component(iComponent.properties, type);
             components.push(component);
         }
 
         // Map all properties
-        for (let iproperty in icalendar.properties) {
-            properties.push(property);
+        for (let iProperty in iCalendar.properties) {
+            properties.push(iProperty);
         }
 
         result = new Calendar(components, properties);
@@ -89,8 +89,7 @@ class Component {
     }
 }
 
-// A Javascript enum for component types, 
-// each name is a color in hex format assigned.
+// A Javascript enum for component types, each name is a color in hex format assigned.
 const ComponentType = {
     Event: '#111111',
 }

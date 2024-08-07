@@ -48,11 +48,13 @@ function renderCalendar(date) {
 // Render calendar for current date
 renderCalendar(currentDate);
 
+// Render next month
 navigateToNextMonthBtn.addEventListener("click", function() {
     currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
     renderCalendar(currentDate);
 });
 
+// Render previous month
 navigateToPrevMonthBtn.addEventListener("click", function() {
     currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
     renderCalendar(currentDate);

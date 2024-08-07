@@ -11,6 +11,7 @@ use icalendar::Component;
 use tauri::{Manager, Runtime};
 
 use crate::auth_util::{attempt_login, attempt_signup, logout};
+use crate::calendar::icalendar_util::get_calendar_of_current_user;
 use crate::errors::error_queue::ErrorQueue;
 use crate::jwt_controller::is_valid_session;
 use crate::runtime_objects::{driver, set_current_window, set_error_queue};
@@ -33,6 +34,7 @@ fn main() {
             logout,
             is_valid_session,
             set_current_window,
+            get_calendar_of_current_user,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

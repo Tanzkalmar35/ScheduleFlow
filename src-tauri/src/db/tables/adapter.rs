@@ -11,7 +11,7 @@ use crate::db::tables::table_properties::PropertyDAO;
 /// Acts like an adapter between the icalendar crate and my DAO objects
 ///
 /// Contains all the logic for converting from one to another.
-pub(crate) struct ICalendarAdapter;
+pub struct ICalendarAdapter;
 
 /// Converts data from the base class to the entity class.
 impl ICalendarAdapter {

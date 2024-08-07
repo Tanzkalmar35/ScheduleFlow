@@ -1,4 +1,4 @@
-mod adapter;
+pub(crate) mod adapter;
 pub(crate) mod table_calendars;
 mod table_combinations;
 mod table_components;

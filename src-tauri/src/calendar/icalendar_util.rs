@@ -1,8 +1,11 @@
 use std::borrow::Borrow;
+use std::collections::BTreeMap;
 use std::error::Error;
 use std::ops::DerefMut;
 
+use icalendar::parser::Calendar;
 use icalendar::{Calendar, Event, Todo};
+use serde::{Deserialize, Serialize};
 
 use crate::db::db_actions::DbActions;
 use crate::db::pg_driver::PgDriver;
@@ -82,11 +85,60 @@ impl ICalendarUtil {
     }
 }
 
-struct SerializableCalendar {}
+// #[tauri::command]
+// pub fn get_calendar_of_current_user() -> Vec<SimpleSerializableCalendar> {
+//     let calendars =
+//         ICalendarUtil::get_user_calendars(get_current_user().lock().unwrap().as_ref().unwrap());
+//     // Ok(calendars)
+//     todo!("")
+// }
 
-#[tauri::command]
-pub fn get_calendar_of_current_user() -> Result<Vec<Calendar>, ()> {
-    let calendars =
-        ICalendarUtil::get_user_calendars(get_current_user().lock().unwrap().as_ref().unwrap());
-    Ok(calendars)
-}
+// #[derive(Serialize, Deserialize)]
+// pub struct SimpleSerializableCalendar {
+//     properties: Vec<SimpleSerializableProperty>,
+//     components: Vec<SimpleSerializableComponent>,
+// }
+//
+// #[derive(Serialize, Deserialize)]
+// struct SimpleSerializableProperty {
+//     name: String,
+//     value: String,
+// }
+//
+// #[derive(Serialize, Deserialize)]
+// struct SimpleSerializableComponent {
+//     pub properties: BTreeMap<String, SimpleSerializableProperty>,
+// }
+//
+// impl SimpleSerializableCalendar {
+//     pub fn default() -> Self {
+//         Self {
+//             properties: vec![],
+//             components: vec![],
+//         }
+//     }
+//
+//     pub fn from(calendar: Calendar) -> Self {
+//         let res = SimpleSerializableCalendar::default();
+//
+//         for component in calendar.components {
+//             let name = component.name;
+//             let properties = component.properties;
+//             // res.components.push(component);
+//         }
+//
+//         res
+//     }
+// }
+//
+// impl SimpleSerializableProperty {
+//     pub fn new(name: String, value: String) -> Self {
+//         Self { name, value }
+//     }
+// }
+//
+// impl SimpleSerializableComponent {
+//     pub fn new(properties: Vec<SimpleSerializableProperty>) -> Self {
+//         Self { properties }
+//     }
+// }

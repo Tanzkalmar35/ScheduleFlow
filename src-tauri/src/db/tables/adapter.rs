@@ -48,7 +48,7 @@ impl ICalendarAdapter {
     fn get_properties(driver: &mut PgDriver, properties_uuids: Vec<Uuid>) -> Vec<PropertyDAO> {
         let mut res: Vec<PropertyDAO> = Vec::new();
         for property in properties_uuids {
-            res.push(PropertyDAO::retrieve_single(
+            res.push(PropertyDAO::retrieve_first(
                 driver,
                 Some(format!("uuid = '{}'", property)),
             ));
@@ -76,7 +76,7 @@ impl ICalendarAdapter {
 
             for property in properties_uuids {
                 let property_uuid = property.uuid2;
-                properties.push(PropertyDAO::retrieve_single(
+                properties.push(PropertyDAO::retrieve_first(
                     driver,
                     Some(format!("uuid = '{}'", property_uuid)),
                 ));

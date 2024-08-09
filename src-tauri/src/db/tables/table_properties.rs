@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::ops::Deref;
 
 use uuid::Uuid;
@@ -29,9 +30,7 @@ impl PropertyDAO {
         }
     }
 
-    pub fn retrieve_single(driver: &mut PgDriver, condition: Option<String>) -> Self {
-        Self::retrieve(driver, condition).first().cloned().unwrap()
-    }
+
 }
 
 impl Table for PropertyDAO {

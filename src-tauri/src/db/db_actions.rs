@@ -102,6 +102,7 @@ pub trait DbActions<M, R: Table<M>> {
                 update_stmt,
                 uuid
             ))
+            // Should not happen!
             .expect("Update failed.");
         Ok(())
     }
@@ -119,6 +120,7 @@ pub trait DbActions<M, R: Table<M>> {
                 R::get_name(),
                 uuid
             ))
+            // Should not happen!
             .expect("Deletion failed.");
         Ok(())
     }
@@ -138,6 +140,7 @@ pub trait DbActions<M, R: Table<M>> {
                 col,
                 val
             ))
+            // Should not happen!
             .expect("Deletion failed.");
         Ok(())
     }

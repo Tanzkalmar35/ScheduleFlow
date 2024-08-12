@@ -1,0 +1,63 @@
+use crate::db::{
+    db_actions::{DbActions, Table},
+    pg_driver::PgDriver,
+    tables::table_jwt_tokens::JwtToken,
+};
+
+pub struct JwtTokenRepository;
+
+impl JwtTokenRepository {}
+
+impl Table<JwtToken> for JwtTokenRepository {
+    fn get_name() -> String {
+        String::from("user_jwt_tokens")
+    }
+
+    fn get_fmt_cols() -> String {
+        String::from("token, user_uuid")
+    }
+
+    fn get_fk_uuid_name() -> String {
+        String::from("jwt_token")
+    }
+
+    fn get_fmt_cols_no_id() -> String {
+        Self::get_fmt_cols()
+    }
+
+    fn get_fmt_vals(token: &JwtToken) -> String {
+        format!("'{}', '{}'", token.token, token.user_uuid)
+    }
+
+    fn get_fmt_vals_no_id(token: &JwtToken) -> String {
+        Self::get_fmt_vals(token)
+    }
+}
+
+impl DbActions<JwtToken, Self> for JwtTokenRepository {
+    fn store(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
+        Self::insert(driver, self)
+    }
+
+    fn update(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
+        unimplemented!("JWT's are not supposed to be updated")
+    }
+
+    fn remove(&self, driver: &mut PgDriver, token: &JwtToken) -> anyhow::Result<()> {
+        Self::delete_spec_col(driver, String::from("token"), token.token.clone())
+    }
+
+    fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<JwtToken> {
+        let mut res: Vec<JwtToken> = vec![];
+
+        let rows = Self::read(driver, Self::get_name().as_str(), condition);
+
+        for row in rows {
+            let token = row.get("token");
+            let user_uuid = row.get("user_uuid");
+            res.push(JwtToken::new(token, user_uuid))
+        }
+
+        res
+    }
+}

@@ -1,3 +1,4 @@
+use jsonwebtoken::TokenData;
 use crate::db::{
     db_actions::{DbActions, Table},
     pg_driver::PgDriver,
@@ -35,15 +36,15 @@ impl Table<JwtToken> for JwtTokenRepository {
 }
 
 impl DbActions<JwtToken, Self> for JwtTokenRepository {
-    fn store(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
-        Self::insert(driver, self)
+    fn store(driver: &mut PgDriver, token: JwtToken) -> anyhow::Result<()> {
+        Self::insert(driver, token)
     }
 
-    fn update(&self, driver: &mut PgDriver) -> anyhow::Result<()> {
+    fn update(driver: &mut PgDriver, token: JwtToken) -> anyhow::Result<()> {
         unimplemented!("JWT's are not supposed to be updated")
     }
 
-    fn remove(&self, driver: &mut PgDriver, token: &JwtToken) -> anyhow::Result<()> {
+    fn remove(driver: &mut PgDriver, token: &JwtToken) -> anyhow::Result<()> {
         Self::delete_spec_col(driver, String::from("token"), token.token.clone())
     }
 

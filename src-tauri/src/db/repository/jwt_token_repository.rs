@@ -1,9 +1,9 @@
-use jsonwebtoken::TokenData;
 use crate::db::{
     db_actions::{DbActions, Table},
     pg_driver::PgDriver,
     tables::table_jwt_tokens::JwtToken,
 };
+use jsonwebtoken::TokenData;
 
 pub struct JwtTokenRepository;
 
@@ -51,7 +51,7 @@ impl DbActions<JwtToken, Self> for JwtTokenRepository {
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<JwtToken> {
         let mut res: Vec<JwtToken> = vec![];
 
-        let rows = Self::read(driver, Self::get_name().as_str(), condition);
+        let rows = Self::read(driver, &Self::get_name(), condition);
 
         for row in rows {
             let token = row.get("token");

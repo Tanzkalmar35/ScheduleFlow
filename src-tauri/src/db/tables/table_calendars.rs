@@ -91,7 +91,7 @@ impl DbActions for CalendarDAO {
             for row in rows {
                 let val = row.get("uuid");
                 res.push(CalendarDAO { uuid: val })
-            };
+            }
         }
 
         res
@@ -110,10 +110,11 @@ mod tests {
         let mut driver = PgDriver::setup();
         match driver.connect() {
             Ok(driver) => {
-                cal.store(driver).expect("Storing calendar failed at calendar.store()");
+                cal.store(driver)
+                    .expect("Storing calendar failed at calendar.store()");
                 res = true;
             }
-            Err(e) => println!("{}", e)
+            Err(e) => println!("{}", e),
         }
 
         assert_eq!(res, true);
@@ -127,13 +128,14 @@ mod tests {
 
         match driver.connect() {
             Ok(driver) => {
-                cal.store(driver).expect("Storing calendar failed at calendar.store()");
+                cal.store(driver)
+                    .expect("Storing calendar failed at calendar.store()");
                 match cal.remove(driver) {
                     Ok(_) => res = true,
-                    Err(e) => println!("Removing calendar failed with error: {}", e)
+                    Err(e) => println!("Removing calendar failed with error: {}", e),
                 }
             }
-            Err(e) => println!("{}", e)
+            Err(e) => println!("{}", e),
         }
 
         assert_eq!(res, true);

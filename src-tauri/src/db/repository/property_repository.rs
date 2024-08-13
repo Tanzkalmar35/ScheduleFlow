@@ -63,7 +63,7 @@ impl DbActions<Property, Self> for PropertyRepository {
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Property> {
         let mut matches: Vec<Property> = vec![];
 
-        let rows = Self::read(driver, Self::get_name().as_str(), condition);
+        let rows = Self::read(driver, &Self::get_name(), condition);
 
         for row in rows {
             matches.push(Property::from(

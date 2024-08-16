@@ -1,5 +1,7 @@
 use uuid::Uuid;
 
+use super::model::Model;
+
 #[derive(Debug, Clone)]
 pub struct User {
     uuid: Uuid,
@@ -9,7 +11,6 @@ pub struct User {
 }
 
 impl User {
-
     /// Creates a new user and prepares the raw values into values ready to be stored.
     pub(crate) fn new(username: String, email: String, password: String) -> Self {
         Self {
@@ -35,7 +36,7 @@ impl User {
     }
 
     pub(crate) fn get_username(&self) -> &String {
-           &self.username
+        &self.username
     }
 
     pub(crate) fn set_username(&mut self, username: String) {
@@ -58,3 +59,5 @@ impl User {
         self.email = email;
     }
 }
+
+impl Model for User {}

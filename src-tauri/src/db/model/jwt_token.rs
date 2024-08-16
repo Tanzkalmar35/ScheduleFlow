@@ -1,4 +1,7 @@
+use serde::Serialize;
 use uuid::Uuid;
+
+use super::model::Model;
 
 #[derive(Serialize, Clone, PartialEq)]
 pub(crate) struct JwtToken {
@@ -18,3 +21,5 @@ impl JwtToken {
         }
     }
 }
+
+impl Model for JwtToken {}

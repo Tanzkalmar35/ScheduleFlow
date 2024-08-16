@@ -1,3 +1,4 @@
+use crate::db::model::model::Model;
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -37,3 +38,6 @@ impl Component {
         Self { uuid, c_type }
     }
 }
+
+
+impl Model for Component {}

@@ -7,7 +7,6 @@ use std::ops::DerefMut;
 use std::thread;
 
 use dotenv::dotenv;
-use icalendar::Component;
 use tauri::{Manager, Runtime};
 
 use crate::auth_util::{attempt_login, attempt_signup, logout};

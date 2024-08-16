@@ -5,7 +5,7 @@ use crate::db::{
 };
 use crate::errors::error_messages::USER_NOT_FOUND_ERR;
 
-pub struct UserRepository;
+pub(crate) struct UserRepository;
 
 impl UserRepository {
     /// Checks if a user with a given email already exists.
@@ -73,15 +73,15 @@ impl Table<User> for UserRepository {
 }
 
 impl DbActions<User, Self> for UserRepository {
-    fn store(driver: &mut PgDriver, model: User) -> anyhow::Result<()> {
+    fn store(driver: &mut PgDriver, model: &User) -> anyhow::Result<()> {
         Self::insert(driver, model)
     }
 
-    fn update(driver: &mut PgDriver, model: User) -> anyhow::Result<()> {
+    fn update(driver: &mut PgDriver, model: &User) -> anyhow::Result<()> {
         Self::alter(driver, &model, model.get_uuid())
     }
 
-    fn remove(driver: &mut PgDriver, model: User) -> anyhow::Result<()> {
+    fn remove(driver: &mut PgDriver, model: &User) -> anyhow::Result<()> {
         Self::delete(driver, model.get_uuid())
     }
 

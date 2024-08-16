@@ -1,11 +1,11 @@
 use crate::db::{
     db_actions::{DbActions, Table},
     pg_driver::PgDriver,
-    tables::table_jwt_tokens::JwtToken,
 };
 use jsonwebtoken::TokenData;
+use crate::db::model::jwt_token::JwtToken;
 
-pub struct JwtTokenRepository;
+pub(crate) struct JwtTokenRepository;
 
 impl JwtTokenRepository {}
 
@@ -14,12 +14,12 @@ impl Table<JwtToken> for JwtTokenRepository {
         String::from("user_jwt_tokens")
     }
 
-    fn get_fmt_cols() -> String {
-        String::from("token, user_uuid")
-    }
-
     fn get_fk_uuid_name() -> String {
         String::from("jwt_token")
+    }
+
+    fn get_fmt_cols() -> String {
+        String::from("token, user_uuid")
     }
 
     fn get_fmt_cols_no_id() -> String {
@@ -36,11 +36,11 @@ impl Table<JwtToken> for JwtTokenRepository {
 }
 
 impl DbActions<JwtToken, Self> for JwtTokenRepository {
-    fn store(driver: &mut PgDriver, token: JwtToken) -> anyhow::Result<()> {
+    fn store(driver: &mut PgDriver, token: &JwtToken) -> anyhow::Result<()> {
         Self::insert(driver, token)
     }
 
-    fn update(driver: &mut PgDriver, token: JwtToken) -> anyhow::Result<()> {
+    fn update(driver: &mut PgDriver, token: &JwtToken) -> anyhow::Result<()> {
         unimplemented!("JWT's are not supposed to be updated")
     }
 

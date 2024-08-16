@@ -4,8 +4,8 @@ use std::sync::{Mutex, MutexGuard, OnceLock};
 use lazy_static::lazy_static;
 use once_cell::sync::OnceCell;
 use tauri::Window;
+use crate::db::model::user::User;
 use crate::db::pg_driver::PgDriver;
-use crate::db::tables::table_users::User;
 use crate::errors::error_messages::ERROR_QUEUE_NOT_INITIALIZED_ERR;
 use crate::errors::error_queue::ErrorQueue;
 

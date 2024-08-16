@@ -3,15 +3,23 @@ use crate::db::model::property::Property;
 use crate::db::pg_driver::PgDriver;
 use serde_json::json;
 
-pub struct PropertyRepository;
+pub(crate) struct PropertyRepository;
 
 impl PropertyRepository {
-    pub fn retrieve_first(driver: &mut PgDriver, condition: Option<String>) -> Option<&Property> {
+    pub fn retrieve_first(driver: &mut PgDriver, condition: Option<String>) -> Option<Property> {
+        let mut res;
+
         if let Some(condition) = condition {
             let limit_condition = format!("{} {}", condition, "LIMIT 1");
-            PropertyRepository::retrieve(driver, Some(limit_condition)).get(0)
+            res = PropertyRepository::retrieve(driver, Some(limit_condition));
         } else {
-            PropertyRepository::retrieve(driver, condition).get(0)
+            res = PropertyRepository::retrieve(driver, condition);
+        }
+
+        if res.len() >= 1 {
+            Some(res.remove(0))
+        } else {
+            None
         }
     }
 }
@@ -33,7 +41,7 @@ impl Table<Property> for PropertyRepository {
         String::from("key, value")
     }
 
-    fn get_fmt_vals(property: Property) -> String {
+    fn get_fmt_vals(property: &Property) -> String {
         format!(
             "'{}', '{}', '{}'",
             property.get_uuid(),
@@ -42,21 +50,21 @@ impl Table<Property> for PropertyRepository {
         )
     }
 
-    fn get_fmt_vals_no_id(property: Property) -> String {
+    fn get_fmt_vals_no_id(property: &Property) -> String {
         format!("'{}', '{}'", property.get_key(), property.get_val())
     }
 }
 
 impl DbActions<Property, Self> for PropertyRepository {
-    fn store(driver: &mut PgDriver, model: Property) -> anyhow::Result<()> {
+    fn store(driver: &mut PgDriver, model: &Property) -> anyhow::Result<()> {
         Self::insert(driver, model)
     }
 
-    fn update(driver: &mut PgDriver, model: Property) -> anyhow::Result<()> {
+    fn update(driver: &mut PgDriver, model: &Property) -> anyhow::Result<()> {
         Self::alter(driver, &model, model.get_uuid())
     }
 
-    fn remove(driver: &mut PgDriver, model: Property) -> anyhow::Result<()> {
+    fn remove(driver: &mut PgDriver, model: &Property) -> anyhow::Result<()> {
         Self::delete(driver, model.get_uuid())
     }
 

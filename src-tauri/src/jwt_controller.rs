@@ -3,7 +3,6 @@ use std::env;
 use std::ops::DerefMut;
 
 use crate::db::db_actions::DbActions;
-use crate::db::tables::table_jwt_tokens::JwtToken;
 use crate::errors::error_messages::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
 use crate::runtime_objects::driver;
 use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
@@ -11,6 +10,8 @@ use rand::distributions::Alphanumeric;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use crate::db::model::jwt_token::JwtToken;
+use crate::db::repository::jwt_token_repository::JwtTokenRepository;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -28,7 +29,7 @@ pub fn is_valid_session(token: String) -> bool {
         token_obj = JwtToken { token, user_uuid };
         let condition_user_matches = format!("user_uuid = '{}'", user_uuid);
 
-        user_tokens = JwtToken::retrieve(
+        user_tokens = JwtTokenRepository::retrieve(
             driver().lock().unwrap().deref_mut(),
             Some(condition_user_matches),
         );

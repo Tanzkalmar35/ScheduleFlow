@@ -1,13 +1,14 @@
 use uuid::Uuid;
 
+use super::model::Model;
+
 pub struct Property {
     uuid: Uuid,
     key: String,
-    val: String
+    val: String,
 }
 
 impl Property {
-
     pub fn new(key: String, val: String) -> Self {
         Self {
             uuid: Uuid::new_v4(),
@@ -17,11 +18,7 @@ impl Property {
     }
 
     pub fn from(uuid: Uuid, key: String, val: String) -> Self {
-        Self {
-            uuid,
-            key,
-            val,
-        }
+        Self { uuid, key, val }
     }
 
     pub fn get_uuid(&self) -> Uuid {
@@ -44,3 +41,5 @@ impl Property {
         self.val = val;
     }
 }
+
+impl Model for Property {}

@@ -40,12 +40,12 @@ pub trait DbActions<M, R: Table<M>> {
     /// * `table` - The table to insert into.
     /// * `cols` - The columns to insert into.
     /// * `vals` - The values to insert into the columns.
-    fn insert(driver: &mut PgDriver, entry: M) -> anyhow::Result<()> {
+    fn insert(driver: &mut PgDriver, entry: &M) -> anyhow::Result<()> {
         let stmt = &format!(
             "INSERT INTO {} ({}) VALUES ({})",
             R::get_name(),
             R::get_fmt_cols(),
-            R::get_fmt_vals(&entry)
+            R::get_fmt_vals(entry)
         );
         match driver.exec(stmt) {
             Ok(_) => Ok(()),
@@ -146,13 +146,13 @@ pub trait DbActions<M, R: Table<M>> {
     }
 
     /// The table specific implementation for adding a new entry.
-    fn store(driver: &mut PgDriver, model: M) -> anyhow::Result<()>;
+    fn store(driver: &mut PgDriver, model: &M) -> anyhow::Result<()>;
 
     /// The table specific implementation for editing an entry.
-    fn update(driver: &mut PgDriver, model: M) -> anyhow::Result<()>;
+    fn update(driver: &mut PgDriver, model: &M) -> anyhow::Result<()>;
 
     /// The table specific implementation for removing an entry.
-    fn remove(driver: &mut PgDriver, model: M) -> anyhow::Result<()>;
+    fn remove(driver: &mut PgDriver, model: &M) -> anyhow::Result<()>;
 
     /// The table specific implementation for retrieving an entry.
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<M>;

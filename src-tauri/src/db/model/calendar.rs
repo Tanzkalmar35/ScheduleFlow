@@ -1,6 +1,9 @@
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug)]
+use super::model::Model;
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Calendar {
     pub(crate) uuid: Uuid,
 }
@@ -16,3 +19,5 @@ impl Calendar {
         Self { uuid }
     }
 }
+
+impl Model for Calendar {}

@@ -8,9 +8,11 @@ use bcrypt::{hash, verify, DEFAULT_COST};
 use tauri::Window;
 
 use crate::db::db_actions::DbActions;
+use crate::db::model::jwt_token::JwtToken;
+use crate::db::model::user::User;
 use crate::db::pg_driver::PgDriver;
-use crate::db::tables::table_jwt_tokens::JwtToken;
-use crate::db::tables::table_users::User;
+use crate::db::repository::jwt_token_repository::JwtTokenRepository;
+use crate::db::repository::user_repository::UserRepository;
 use crate::errors::error_messages::{
     BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
 };
@@ -27,8 +29,8 @@ pub fn attempt_login(
     set_current_window(window);
 
     let mut driver = driver().lock().unwrap();
-    let user_exists = User::is_existing(driver.deref_mut(), &email);
-    let user = User::get_by_email(driver.deref_mut(), email)?;
+    let user_exists = UserRepository::is_existing(driver.deref_mut(), &email);
+    let user = UserRepository::get_by_email(driver.deref_mut(), email)?;
     let user_pass = &user.get_password();
 
     match verify(password, user_pass) {
@@ -62,11 +64,11 @@ pub fn attempt_signup(
     let user = User::new(username, (&*email).into(), hashed_password);
     let mut driver = driver().lock().unwrap();
 
-    if User::is_existing(driver.deref_mut(), &email) {
+    if UserRepository::is_existing(driver.deref_mut(), &email) {
         return Err(USER_ALREADY_EXISTING_ERR);
     }
 
-    user.store(driver.deref_mut()).unwrap();
+    UserRepository::store(driver.deref_mut(), &user).unwrap();
 
     if remember {
         populate_jwt_cookie(&user, driver)?;
@@ -77,8 +79,8 @@ pub fn attempt_signup(
 }
 
 fn populate_jwt_cookie(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<(), &'static str> {
-    let token = generate_jwt(user.uuid);
-    token.store(driver.deref_mut());
+    let token = generate_jwt(user.get_uuid());
+    JwtTokenRepository::store(driver.deref_mut(), &token);
 
     get_current_window()
         .unwrap()
@@ -87,13 +89,18 @@ fn populate_jwt_cookie(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<
     Ok(())
 }
 
+/// TODO: Improve error handling
 #[tauri::command]
 pub fn logout(token: String) -> Result<(), &'static str> {
-    JwtToken::delete_spec_col::<JwtToken>(
+    let res = JwtTokenRepository::delete_spec_col(
         driver().lock().unwrap().deref_mut(),
         String::from("token"),
         token,
     );
 
-    Ok(())
+    if let Ok(()) = res {
+        Ok(())
+    } else {
+        Err("Logout failed!")
+    }
 }

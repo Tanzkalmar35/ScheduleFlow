@@ -1,7 +1,5 @@
 use uuid::Uuid;
 
-use super::model::Model;
-
 #[derive(Debug, Clone)]
 pub struct User {
     uuid: Uuid,
@@ -59,5 +57,3 @@ impl User {
         self.email = email;
     }
 }
-
-impl Model for User {}

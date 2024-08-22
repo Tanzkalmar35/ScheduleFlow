@@ -1,7 +1,5 @@
 use uuid::Uuid;
 
-use super::model::Model;
-
 pub struct Property {
     uuid: Uuid,
     key: String,

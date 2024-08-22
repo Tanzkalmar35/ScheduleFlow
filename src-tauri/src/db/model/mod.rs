@@ -1,7 +1,10 @@
 pub(crate) mod calendar;
+pub(crate) mod calendar_component_combination;
+pub(crate) mod calendar_property_combination;
 pub(crate) mod component;
+pub(crate) mod component_property_combination;
 pub(crate) mod jwt_token;
 pub(crate) mod model;
 pub(crate) mod property;
-pub(crate) mod table_combination;
 pub(crate) mod user;
+pub(crate) mod user_jwt_token_combination;

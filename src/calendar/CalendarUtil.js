@@ -1,3 +1,6 @@
+import { invoke } from "@tauri-apps/api/tauri";
+import { createErrorToast } from "../Toast.js";
+
 // script.js
 const calendarContainer = document.querySelector('.calendar-container');
 const monthYearElement = document.getElementById('month-year');
@@ -7,6 +10,15 @@ const navigateToPrevMonthBtn = document.getElementById('prev-month-btn');
 
 // Get current date
 let currentDate = new Date();
+
+let calendar;
+
+await invoke("get_calendar_of_current_user")
+    .then(cal => calendar = cal)
+    .catch(e => createErrorToast(e))
+
+console.log("Retrieved calendar: " + calendar);
+console.log("Mapped Calendar: " + Calendar.map(calendar))
 
 /**
 *   Renders the calendar to the home page
@@ -43,6 +55,8 @@ function renderCalendar(date) {
 
     // Update month and year
     monthYearElement.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
+
+
 }
 
 // Render calendar for current date

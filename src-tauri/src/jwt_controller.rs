@@ -3,15 +3,16 @@ use std::env;
 use std::ops::DerefMut;
 
 use crate::db::db_actions::DbActions;
+use crate::db::model::jwt_token::JwtToken;
+use crate::db::repository::jwt_token_repository::JwtTokenRepository;
+use crate::db::repository::user_repository::UserRepository;
 use crate::errors::error_messages::{BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET};
-use crate::runtime_objects::driver;
+use crate::runtime_objects::{driver, set_current_user};
 use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::db::model::jwt_token::JwtToken;
-use crate::db::repository::jwt_token_repository::JwtTokenRepository;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -23,19 +24,29 @@ pub fn is_valid_session(token: String) -> bool {
     let token_data = decode_jwt(&token);
     let mut token_obj: JwtToken = JwtToken::empty();
     let mut user_tokens: Vec<JwtToken> = vec![];
+    let mut user_uuid;
 
     if let Ok(data) = token_data {
-        let user_uuid = data.claims.user_uuid;
+        user_uuid = data.claims.user_uuid;
         token_obj = JwtToken { token, user_uuid };
-        let condition_user_matches = format!("user_uuid = '{}'", user_uuid);
+        let user_matches = format!("user_uuid = '{}'", &user_uuid);
 
-        user_tokens = JwtTokenRepository::retrieve(
-            driver().lock().unwrap().deref_mut(),
-            Some(condition_user_matches),
-        );
+        user_tokens =
+            JwtTokenRepository::retrieve(driver().lock().unwrap().deref_mut(), Some(user_matches));
+    } else {
+        user_uuid = Uuid::default();
     }
 
-    user_tokens.contains(&token_obj)
+    if user_tokens.contains(&token_obj) {
+        if let Ok(user) =
+            UserRepository::get_by_uuid(driver().lock().unwrap().deref_mut(), user_uuid)
+        {
+            set_current_user(user);
+        }
+        true
+    } else {
+        false
+    }
 }
 
 pub fn generate_jwt(user_uuid: Uuid) -> JwtToken {

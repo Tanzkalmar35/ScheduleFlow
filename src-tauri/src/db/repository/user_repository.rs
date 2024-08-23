@@ -1,3 +1,5 @@
+use uuid::Uuid;
+
 use crate::db::pg_driver::PgDriver;
 use crate::db::{
     db_actions::{DbActions, Table},
@@ -24,6 +26,15 @@ impl UserRepository {
 
     pub(crate) fn get_by_email(driver: &mut PgDriver, email: String) -> Result<User, &'static str> {
         let condition = format!("email = '{}'", email);
+        Self::get(driver, condition)
+    }
+
+    pub(crate) fn get_by_uuid(driver: &mut PgDriver, uuid: Uuid) -> Result<User, &'static str> {
+        let condition = format!("uuid = '{}'", uuid);
+        Self::get(driver, condition)
+    }
+
+    pub(crate) fn get(driver: &mut PgDriver, condition: String) -> Result<User, &'static str> {
         let user_opt = UserRepository::retrieve(driver, Some(condition))
             .get(0)
             .cloned();

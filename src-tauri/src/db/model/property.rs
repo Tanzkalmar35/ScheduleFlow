@@ -39,5 +39,3 @@ impl Property {
         self.val = val;
     }
 }
-
-impl Model for Property {}

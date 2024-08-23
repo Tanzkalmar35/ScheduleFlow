@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use postgres::Row;
 use uuid::Uuid;
 
@@ -62,10 +63,14 @@ pub trait DbActions<M, R: Table<M>> {
     /// * `condition` - The condition to query. Optional.
     fn read(driver: &mut PgDriver, table: &str, condition: Option<String>) -> Vec<Row> {
         let rows = match condition {
-            Some(condition) => driver
-                .exec(&format!("SELECT * FROM {} WHERE {}", table, condition))
-                // Should not happen!
-                .expect("Query with condition failed"),
+            Some(condition) => {
+                let query = &format!("SELECT * FROM {} WHERE {}", table, condition);
+                println!("Query: {}", query);
+                driver
+                    .exec(query)
+                    // Should not happen!
+                    .expect("Query with condition failed")
+            }
             None => driver
                 .exec(&format!("SELECT * FROM {}", table))
                 // Should not happen!
@@ -143,6 +148,10 @@ pub trait DbActions<M, R: Table<M>> {
             // Should not happen!
             .expect("Deletion failed.");
         Ok(())
+    }
+
+    fn query(driver: &mut PgDriver, stmt: String) -> anyhow::Result<Vec<Row>> {
+        driver.exec(&stmt)
     }
 
     /// The table specific implementation for adding a new entry.

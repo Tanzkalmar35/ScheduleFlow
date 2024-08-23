@@ -10,6 +10,7 @@ use crate::db::model::calendar::Calendar;
 use crate::db::model::user::User;
 use crate::db::pg_driver::PgDriver;
 use crate::db::repository::calendar_repository::CalendarRepository;
+use crate::db::repository::user_calendar_combination_repository::UserCalendarCombinationRepository;
 use crate::runtime_objects::{driver, get_current_user};
 
 #[derive(Debug)]
@@ -63,70 +64,24 @@ impl ICalendarUtil {
     /// }
     /// ```
     pub fn get_user_calendars(user: &User) -> Vec<Calendar> {
-        let mut calendars = vec![];
-        let condition = format!("user_uuid = {}", user.get_uuid());
+        let res: Vec<Calendar> = vec![];
+        let user_uuid_matches = format!("user_uuid = '{}'", user.get_uuid());
+        let matching_user_calendar_combinations = UserCalendarCombinationRepository::retrieve(
+            driver().lock().unwrap().deref_mut(),
+            Some(user_uuid_matches),
+        );
 
-        let calendar_dao_list =
-            CalendarRepository::retrieve(driver().lock().unwrap().deref_mut(), Some(condition));
-
-        calendars
+        for combination in matching_user_calendar_combinations {
+            let calendar_uuid_matches = format!("");
+            CalendarRepository::retrieve(
+                driver().lock().unwrap().deref_mut(),
+                Some(calendar_uuid_matches),
+            )
+        }
     }
 }
 
 #[tauri::command]
 pub fn get_calendar_of_current_user() -> Vec<Calendar> {
-    let calendars =
-        ICalendarUtil::get_user_calendars(get_current_user().lock().unwrap().as_ref().unwrap());
-
-    calendars
+    ICalendarUtil::get_user_calendars(get_current_user().lock().unwrap().as_ref().unwrap())
 }
-
-// #[derive(Serialize, Deserialize)]
-// pub struct SimpleSerializableCalendar {
-//     properties: Vec<SimpleSerializableProperty>,
-//     components: Vec<SimpleSerializableComponent>,
-// }
-//
-// #[derive(Serialize, Deserialize)]
-// struct SimpleSerializableProperty {
-//     name: String,
-//     value: String,
-// }
-//
-// #[derive(Serialize, Deserialize)]
-// struct SimpleSerializableComponent {
-//     pub properties: BTreeMap<String, SimpleSerializableProperty>,
-// }
-//
-// impl SimpleSerializableCalendar {
-//     pub fn default() -> Self {
-//         Self {
-//             properties: vec![],
-//             components: vec![],
-//         }
-//     }
-//
-//     pub fn from(calendar: Calendar) -> Self {
-//         let res = SimpleSerializableCalendar::default();
-//
-//         for component in calendar.components {
-//             let name = component.name;
-//             let properties = component.properties;
-//             // res.components.push(component);
-//         }
-//
-//         res
-//     }
-// }
-//
-// impl SimpleSerializableProperty {
-//     pub fn new(name: String, value: String) -> Self {
-//         Self { name, value }
-//     }
-// }
-//
-// impl SimpleSerializableComponent {
-//     pub fn new(properties: Vec<SimpleSerializableProperty>) -> Self {
-//         Self { properties }
-//     }
-// }

@@ -1,3 +1,9 @@
+/**
+ *  The frontend representation of the calendar in simple manner.
+ *  
+ *  This means, that this object is only a data holder, 
+ *  it does not offer any of the functionality the backend offers.
+ */
 class Calendar {
 
     /**
@@ -27,35 +33,45 @@ class Calendar {
     }
 
     /**
-     *  Map icalendar::Calendar from the backend to this Calendar,
+     *  Map Calendar from the backend to this Calendar,
      *  which we can use in the frontend to render the calendar.
      *
-     *  @param {object} iCalendar an object containing the icalendar's data.
+     *  @param {object} calendar an object containing the backend's calendar data.
      */
-    map(iCalendar) {
+    static map(calendar) {
         let result;
         let components = [];
         let properties = [];
 
         // Map all components
-        for (let iComponent in iCalendar.components) {
+        for (let component in calendar.components) {
             let type;
 
-            switch (iComponent.type) {
+            console.log("Found component " + component);
+
+            switch (component.type) {
                 case "Event": type = ComponentType.Event;
-                // TODO: Handle all types of components.
+                case "Todo": type = ComponentType.Todo;
+                case "Venue": type = ComponentType.Venue;
+                case "Other": type = ComponentType.Other;
             }
 
-            let component = new Component(iComponent.properties, type);
-            components.push(component);
+            components.push(new Component(component.properties, type));
         }
+
+        console.log("Resulting in component list: " + components);
 
         // Map all properties
-        for (let iProperty in iCalendar.properties) {
-            properties.push(iProperty);
+        for (let property in calendar.properties) {
+            properties.push(property);
+            console.log("Found Property: " + property);
         }
 
+        console.log("Resulting in property list: " + properties)
+
         result = new Calendar(components, properties);
+
+        console.log("Resulting in calendar: " + calendar);
 
         return result;
     }
@@ -92,6 +108,9 @@ class Component {
 // A Javascript enum for component types, each name is a color in hex format assigned.
 const ComponentType = {
     Event: '#111111',
+    Todo: '',
+    Venue: '',
+    Other: ''
 }
 
 Object.freeze(ComponentType);

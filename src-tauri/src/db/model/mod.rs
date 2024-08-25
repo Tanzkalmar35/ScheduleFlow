@@ -5,6 +5,7 @@ pub(crate) mod component;
 pub(crate) mod component_property_combination;
 pub(crate) mod jwt_token;
 pub(crate) mod property;
+pub(crate) mod simple;
 pub(crate) mod user;
 pub(crate) mod user_calendar_combination;
 pub(crate) mod user_jwt_token_combination;

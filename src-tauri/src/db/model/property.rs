@@ -39,3 +39,8 @@ impl Property {
         self.val = val;
     }
 }
+
+pub enum OwnerType {
+    Calendar,
+    Component,
+}

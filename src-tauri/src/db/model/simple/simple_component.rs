@@ -4,7 +4,7 @@ use crate::db::{
     db_actions::DbActions,
     model::{
         calendar::Calendar,
-        component::ComponentType,
+        component::{Component, ComponentType},
         property::{OwnerType, Property},
     },
     pg_driver::PgDriver,
@@ -17,9 +17,13 @@ pub(crate) struct SimpleComponent {
 }
 
 impl SimpleComponent {
+    pub(crate) fn new(c_type: ComponentType, properties: Vec<Property>) {
+        Self { c_type, properties }
+    }
+
     pub(crate) fn build_by_calendar(driver: &mut PgDriver, calendar: &Calendar) -> Vec<Self> {
-        let mut components;
-        let mut properties;
+        let mut properties: Vec<Property>;
+        let mut simple_components: Vec<Self>;
         let stmt = sqlx::query(
             r#"
             select c.c_type, p.key, p.value 
@@ -35,15 +39,18 @@ impl SimpleComponent {
         .sql();
 
         let res = driver.exec(stmt);
+
         if let Err(e) = res {
             println!("{}", e)
         }
+
         for row in res.unwrap() {
-            row.get("c_type")
+            let c_type = row.get("c_type");
+            let property_key = row.get("key");
+            let property_val = row.get("value");
+
+            properties.push(Property::new(property_key, property_val));
+            simple_components.push(Self::new(c_type, properties));
         }
     }
-}
-
-fn sqlx(arg: &str, uuid: uuid::Uuid, component: OwnerType) -> _ {
-    todo!()
 }

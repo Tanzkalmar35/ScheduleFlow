@@ -39,7 +39,7 @@ fn main() {
         .expect("error while running tauri application");
 }
 
-fn init() {
+pub fn init() {
     dotenv().ok();
     let error_queue = ErrorQueue::new();
     set_error_queue(error_queue);

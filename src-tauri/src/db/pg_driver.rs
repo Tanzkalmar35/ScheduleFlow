@@ -37,7 +37,11 @@ impl PgDriver {
     }
 
     /// Initializes the database connection client.
-    pub fn connect(&mut self) -> anyhow::Result<&mut Self> {
+    ///
+    /// # Errors
+    /// If an error occurs during executing this function, like if there's no db connection, it
+    /// gets automatically handled by the error queue.
+    pub fn connect(&mut self) -> &mut Self {
         let conn = Client::connect(&self.url, NoTls);
 
         if let Ok(client) = conn {
@@ -47,7 +51,7 @@ impl PgDriver {
             get_error_queue().enqueue(err);
         }
 
-        Ok(self)
+        self
     }
 
     /// Executes a query on the database.

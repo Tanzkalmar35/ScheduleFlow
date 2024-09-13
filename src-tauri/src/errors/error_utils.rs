@@ -1,6 +1,6 @@
+use crate::runtime_objects::get_current_window;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::runtime_objects::get_current_window;
 
 pub enum ErrorCode {
     ONE = 1,
@@ -19,7 +19,6 @@ pub enum ErrorCode {
 /// # Important
 /// The condition always needs to grant the action performed by the handler!!!
 pub trait Error {
-
     fn error_code(&self) -> u32;
     fn message(&self) -> &String;
     fn timeout(&self) -> Duration;
@@ -49,14 +48,24 @@ pub trait Error {
 pub struct ErrorHandler;
 
 impl ErrorHandler {
-
     /// Handles the error by populating a toast message.
     ///
     /// # Params
-    /// * `error` - The custom error implementation.
-    pub(crate) fn populate_toast(message: String) -> Box<dyn Fn() + Send + 'static> {
+    /// * `message` - The error message to be displayed on the toast message.
+    pub(crate) fn populate_toast(message: &'static str) -> Box<dyn Fn() + Send + 'static> {
         Box::new(move || {
-            get_current_window().unwrap().emit("createToast", ("error", message.clone()));
+            get_current_window()
+                .unwrap()
+                .emit("createToast", ("error", message));
         })
+    }
+
+    /// Handles the error by not handling it. Does a intentional app crash.
+    /// This error should not occur. If it does, its 99.99% my fault. (It can be due to cosmic rays though)
+    ///
+    /// # Params
+    /// * `message` - The message the app will show in the logs after crashed.
+    pub(crate) fn panic(message: &'static str) -> Box<dyn Fn() + Send + 'static> {
+        Box::new(move || panic!("{}", message))
     }
 }

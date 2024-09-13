@@ -71,13 +71,14 @@ impl ICalendarUtil {
             Some(user_uuid_matches),
         );
 
-        for combination in matching_user_calendar_combinations {
-            let calendar_uuid_matches = format!("");
-            CalendarRepository::retrieve(
-                driver().lock().unwrap().deref_mut(),
-                Some(calendar_uuid_matches),
-            )
-        }
+        //for combination in matching_user_calendar_combinations {
+        //    let calendar_uuid_matches = format!("");
+        //    CalendarRepository::retrieve(
+        //        driver().lock().unwrap().deref_mut(),
+        //        Some(calendar_uuid_matches),
+        //    )
+        //}
+        todo!()
     }
 }
 

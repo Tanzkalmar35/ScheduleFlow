@@ -10,8 +10,10 @@ use crate::db::{
     repository::component_repository::ComponentRepository,
 };
 
+use super::simple_component::SimpleComponent;
+
 pub struct SimpleCalendar {
-    components: Vec<Component>,
+    components: Vec<SimpleComponent>,
     properties: Vec<Property>,
 }
 
@@ -20,15 +22,15 @@ impl SimpleCalendar {
      *
      */
     pub(crate) fn build(driver: &mut PgDriver, calendar: Calendar) -> Self {
-        let mut components;
-        let mut properties;
         let calendar_uuid_matches = format!("calendar_uuid = {}", calendar.uuid);
         let owned_by_calendar = format!(
-            "owner_type = {} and owner_uuid = {}",
-            OwnerType::Calendar,
+            "owner_type = {:?} and owner_uuid = {}",
+            OwnerType::CALENDAR,
             calendar.uuid
         );
 
-        components = ComponentRepository::retrieve(driver, Some(calendar_uuid_matches))
+        let components = SimpleComponent::build_by_calendar(driver, &calendar);
+
+        todo!()
     }
 }

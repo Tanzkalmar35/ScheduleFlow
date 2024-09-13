@@ -1,10 +1,10 @@
-use crate::errors::error_messages::NO_DB_CONNECTION_ERR;
-use crate::errors::error_utils::{Error, ErrorCode, ErrorHandler};
-use crate::runtime_objects::get_current_window;
+use crate::errors::{
+    error_messages::QUERY_FAILED_ERR,
+    error_utils::{Error, ErrorHandler},
+};
 use std::time::Duration;
 
-/// Indicates that the database connection could not be established.
-pub struct NoDatabaseConnectionError {
+pub struct DatabaseOperationFailedError {
     error_code: u32,
     message: String,
     timeout: Duration,
@@ -12,27 +12,27 @@ pub struct NoDatabaseConnectionError {
     handler: Box<dyn Fn() + Send>,
 }
 
-impl NoDatabaseConnectionError {
+impl DatabaseOperationFailedError {
     /// Initializes a new NoDatabaseConnectionError with its default params.
     ///
     /// # Default params
     /// * `error_code` - 1, database related errors.
-    /// * `message` - error_messages::NO_DB_CONNECTION_ERR.
+    /// * `message` - error_messages::DB_OPERATION_FAILED.
     /// * `timeout` - 0 seconds, no default delay before population.
-    /// * `condition` - get_current_window().is_some(), the current window needs to be set.
-    /// * `handler` - ErrorHandler::populate_toast(), populates a toast in the frontend indicating the error.
+    /// * `condition` - None, gets handled no matter what.
+    /// * `handler` - ErrorHandler::
     pub fn new() -> Self {
-        NoDatabaseConnectionError {
+        Self {
             error_code: 1,
-            message: NO_DB_CONNECTION_ERR.to_string(),
+            message: QUERY_FAILED_ERR.to_string(),
             timeout: Duration::from_secs(0),
-            condition: Some(Box::new(|| get_current_window().is_some())),
-            handler: ErrorHandler::populate_toast(NO_DB_CONNECTION_ERR),
+            condition: None,
+            handler: ErrorHandler::panic(QUERY_FAILED_ERR),
         }
     }
 }
 
-impl Error for NoDatabaseConnectionError {
+impl Error for DatabaseOperationFailedError {
     fn error_code(&self) -> u32 {
         self.error_code
     }

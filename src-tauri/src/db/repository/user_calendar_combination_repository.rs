@@ -12,9 +12,10 @@ pub struct UserCalendarCombinationRepository;
 impl UserCalendarCombinationRepository {
     pub fn get_calendars_of_user(driver: &mut PgDriver, user: &User) -> Vec<Calendar> {
         let stmt = format!("");
-        if let Ok(res) = Self::query(driver, stmt) {
-           CalendarRepository::retrieve, condition) 
-        }
+        //if let Ok(res) = Self::query(driver, stmt) {
+        //   CalendarRepository::retrieve, condition)
+        //}
+        todo!()
     }
 }
 

@@ -1,6 +1,7 @@
+use sqlx::prelude::Type;
 use uuid::Uuid;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Type, PartialEq)]
 pub enum ComponentType {
     EVENT,
     TODO,

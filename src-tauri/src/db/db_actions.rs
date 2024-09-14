@@ -64,10 +64,10 @@ pub trait DbActions<M, R: Table<M>> {
     fn read(driver: &mut PgDriver, table: &str, condition: Option<String>) -> Vec<Row> {
         let rows = match condition {
             Some(condition) => {
-                let query = &format!("SELECT * FROM {} WHERE {}", table, condition);
+                let query = format!("SELECT * FROM {} WHERE {}", table, condition);
                 println!("Query: {}", query);
                 driver
-                    .exec(query)
+                    .exec(&query)
                     // Should not happen!
                     .expect("Query with condition failed")
             }

@@ -1,24 +1,33 @@
 import { invoke } from "@tauri-apps/api/tauri";
 import { createErrorToast } from "../Toast.js";
+import { Calendar } from "./Calendar.js";
 
 // script.js
-const calendarContainer = document.querySelector('.calendar-container');
 const monthYearElement = document.getElementById('month-year');
 const calendarDatesElement = document.getElementById('calendar-dates');
 const navigateToNextMonthBtn = document.getElementById('next-month-btn');
 const navigateToPrevMonthBtn = document.getElementById('prev-month-btn');
+const selectCalendarDropdown = document.getElementById('select-calendar');
 
 // Get current date
 let currentDate = new Date();
 
-let calendar;
+let calendars = [];
 
-await invoke("get_calendar_of_current_user")
-    .then(cal => calendar = cal)
-    .catch(e => createErrorToast(e))
+export async function loadUserCalendarData() {
+    await invoke("get_calendar_of_current_user")
+        .then(cal => {
+            calendars = Calendar.map(cal);
+        })
+        .catch(e => createErrorToast(e));
 
-console.log("Retrieved calendar: " + calendar);
-console.log("Mapped Calendar: " + Calendar.map(calendar))
+    for (const calendar of calendars) {
+        const option = document.createElement("option");
+        option.setAttribute("value", calendar.name);
+        option.textContent = calendar.name;
+        selectCalendarDropdown.appendChild(option);
+    }
+}
 
 /**
 *   Renders the calendar to the home page

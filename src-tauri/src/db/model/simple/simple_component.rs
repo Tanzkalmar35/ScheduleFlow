@@ -1,3 +1,4 @@
+use serde::Serialize;
 use sqlx::Execute;
 use uuid::Uuid;
 
@@ -12,11 +13,14 @@ use crate::{
         pg_driver::PgDriver,
         repository::component_repository::ComponentRepository,
     },
-    errors::error_impl::database_operation_failed_error::DatabaseOperationFailedError,
+    errors::{
+        error_impl::database_operation_failed_error::DatabaseOperationFailedError,
+        error_utils::Error,
+    },
     runtime_objects::get_error_queue,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub(crate) struct SimpleComponent {
     c_type: ComponentType,
     properties: Vec<Property>,
@@ -56,8 +60,8 @@ impl SimpleComponent {
         let res = driver.exec(&stmt);
 
         if let Err(e) = res {
-            println!("{}", e);
-            let err = DatabaseOperationFailedError::new();
+            let mut err = DatabaseOperationFailedError::new();
+            err.set_message(format!("Could not build new SimpleComponent: {}", e));
             get_error_queue().enqueue(err);
             return vec![];
         }

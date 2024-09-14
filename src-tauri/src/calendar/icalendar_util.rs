@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::db::db_actions::DbActions;
 use crate::db::model::calendar::Calendar;
+use crate::db::model::simple::simple_calendar::SimpleCalendar;
 use crate::db::model::user::User;
+use crate::db::model::user_calendar_combination::UserCalendarCombination;
 use crate::db::pg_driver::PgDriver;
 use crate::db::repository::calendar_repository::CalendarRepository;
 use crate::db::repository::user_calendar_combination_repository::UserCalendarCombinationRepository;
@@ -30,10 +32,10 @@ impl ICalendarUtil {
     }
 
     /// Initializes a new ICalendarUtil.
-    pub fn init() -> Self {
+    pub fn init(calendar_name: String) -> Self {
         Self {
             is_new: true,
-            calendar: Calendar::new(),
+            calendar: Calendar::new(calendar_name),
         }
     }
 
@@ -63,26 +65,25 @@ impl ICalendarUtil {
     ///     println!("Calendar: {}", calendar);
     /// }
     /// ```
-    pub fn get_user_calendars(user: &User) -> Vec<Calendar> {
+    pub fn get_user_calendars(user: &User) -> Vec<SimpleCalendar> {
         let res: Vec<Calendar> = vec![];
-        let user_uuid_matches = format!("user_uuid = '{}'", user.get_uuid());
-        let matching_user_calendar_combinations = UserCalendarCombinationRepository::retrieve(
-            driver().lock().unwrap().deref_mut(),
-            Some(user_uuid_matches),
+        let mut simple_user_calendars: Vec<SimpleCalendar> = vec![];
+        let mut driver_binding = driver().lock().unwrap();
+
+        let calendars = UserCalendarCombinationRepository::get_calendars_of_user(
+            driver_binding.deref_mut(),
+            user,
         );
 
-        //for combination in matching_user_calendar_combinations {
-        //    let calendar_uuid_matches = format!("");
-        //    CalendarRepository::retrieve(
-        //        driver().lock().unwrap().deref_mut(),
-        //        Some(calendar_uuid_matches),
-        //    )
-        //}
-        todo!()
+        for calendar in calendars {
+            simple_user_calendars.push(SimpleCalendar::build(driver_binding.deref_mut(), calendar));
+        }
+
+        simple_user_calendars
     }
 }
 
 #[tauri::command]
-pub fn get_calendar_of_current_user() -> Vec<Calendar> {
+pub fn get_calendar_of_current_user() -> Vec<SimpleCalendar> {
     ICalendarUtil::get_user_calendars(get_current_user().lock().unwrap().as_ref().unwrap())
 }

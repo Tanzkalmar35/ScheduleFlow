@@ -1,21 +1,53 @@
 use postgres::Row;
+use sqlx::query;
 
-use crate::db::{
-    db_actions::{DbActions, Table},
-    model::{calendar::Calendar, user::User, user_calendar_combination::UserCalendarCombination},
-    pg_driver::PgDriver,
-    repository::{calendar_repository::CalendarRepository, user_repository::UserRepository},
+use crate::{
+    db::{
+        db_actions::{DbActions, Table},
+        model::{
+            calendar::Calendar, user::User, user_calendar_combination::UserCalendarCombination,
+        },
+        pg_driver::PgDriver,
+        repository::{calendar_repository::CalendarRepository, user_repository::UserRepository},
+    },
+    errors::{
+        error_impl::database_operation_failed_error::DatabaseOperationFailedError,
+        error_messages::QUERY_FAILED_ERR, error_utils::Error,
+    },
+    runtime_objects::get_error_queue,
 };
 
 pub struct UserCalendarCombinationRepository;
 
 impl UserCalendarCombinationRepository {
     pub fn get_calendars_of_user(driver: &mut PgDriver, user: &User) -> Vec<Calendar> {
-        let stmt = format!("");
-        //if let Ok(res) = Self::query(driver, stmt) {
-        //   CalendarRepository::retrieve, condition)
-        //}
-        todo!()
+        let mut res: Vec<Calendar> = vec![];
+        let stmt = format!(
+            r#"
+            select c.uuid, c.name from users_calendars uc 
+            INNER JOIN calendars c 
+            ON uc.calendar_uuid = c.uuid 
+            where uc.user_uuid = '{}'
+            "#,
+            user.get_uuid()
+        );
+        let query_res = Self::query(driver, stmt);
+
+        if let Err(e) = query_res {
+            let mut err = DatabaseOperationFailedError::new();
+            err.set_message(format!("Could not retrieve calendars of user: {}", e));
+            get_error_queue().enqueue(err);
+            return vec![];
+        }
+
+        for calendar_row in query_res.unwrap() {
+            res.push(Calendar::from(
+                calendar_row.get("uuid"),
+                calendar_row.get("name"),
+            ));
+        }
+
+        res
     }
 }
 

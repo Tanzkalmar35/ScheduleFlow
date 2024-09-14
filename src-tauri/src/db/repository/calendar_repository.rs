@@ -1,12 +1,10 @@
 use crate::db::{
     db_actions::{DbActions, Table},
-    model::calendar::Calendar,
+    model::{calendar::Calendar, user::User},
     pg_driver::PgDriver,
 };
 
 pub struct CalendarRepository;
-
-impl CalendarRepository {}
 
 impl Table<Calendar> for CalendarRepository {
     fn get_name() -> String {
@@ -18,19 +16,19 @@ impl Table<Calendar> for CalendarRepository {
     }
 
     fn get_fmt_cols() -> String {
-        String::from("uuid")
+        String::from("uuid, name")
     }
 
     fn get_fmt_cols_no_id() -> String {
-        String::from("")
+        String::from("name")
     }
 
     fn get_fmt_vals(calendar: &Calendar) -> String {
-        format!("'{}'", calendar.uuid)
+        format!("'{}', '{}'", calendar.uuid, calendar.name)
     }
 
     fn get_fmt_vals_no_id(calendar: &Calendar) -> String {
-        "".to_string()
+        format!("'{}'", calendar.name)
     }
 }
 
@@ -55,7 +53,8 @@ impl DbActions<Calendar, Self> for CalendarRepository {
 
         for row in rows {
             let uuid = row.get("uuid");
-            res.push(Calendar::from(uuid))
+            let name = row.get("name");
+            res.push(Calendar::from(uuid, name));
         }
 
         res

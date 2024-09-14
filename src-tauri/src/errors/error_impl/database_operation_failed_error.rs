@@ -20,7 +20,7 @@ impl DatabaseOperationFailedError {
     /// * `message` - error_messages::DB_OPERATION_FAILED.
     /// * `timeout` - 0 seconds, no default delay before population.
     /// * `condition` - None, gets handled no matter what.
-    /// * `handler` - ErrorHandler::
+    /// * `handler` - ErrorHandler::QUERY_FAILED_ERR.
     pub fn new() -> Self {
         Self {
             error_code: 1,

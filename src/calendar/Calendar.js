@@ -4,7 +4,14 @@
  *  This means, that this object is only a data holder, 
  *  it does not offer any of the functionality the backend offers.
  */
-class Calendar {
+export class Calendar {
+
+    /**
+     * The title or alias assigned to a calendar to identify it in the gui.
+     *
+     *  @type {string}
+     */
+    name;
 
     /**
     *   A list of components that belong to this calendar.
@@ -27,7 +34,8 @@ class Calendar {
     *   @param {Component[][]} components belong to this calendar.
     *   @param {string[]} properties describe the calendar's characteristics.
     */
-    constructor(components, properties) {
+    constructor(name, components, properties) {
+        this.name = name;
         this.components = components;
         this.properties = properties;
     }
@@ -36,42 +44,35 @@ class Calendar {
      *  Map Calendar from the backend to this Calendar,
      *  which we can use in the frontend to render the calendar.
      *
-     *  @param {object} calendar an object containing the backend's calendar data.
+     *  @param {object} calendars an object containing the backend's calendar data.
      */
-    static map(calendar) {
-        let result;
+    static map(calendars) {
+        let result = [];
         let components = [];
         let properties = [];
 
         // Map all components
-        for (let component in calendar.components) {
-            let type;
+        for (const calendar of calendars) {
+            for (let component of calendar.components) {
+                let type;
 
-            console.log("Found component " + component);
+                switch (component.type) {
+                    case "Event": type = ComponentType.Event;
+                    case "Todo": type = ComponentType.Todo;
+                    case "Venue": type = ComponentType.Venue;
+                    case "Other": type = ComponentType.Other;
+                }
 
-            switch (component.type) {
-                case "Event": type = ComponentType.Event;
-                case "Todo": type = ComponentType.Todo;
-                case "Venue": type = ComponentType.Venue;
-                case "Other": type = ComponentType.Other;
+                components.push(new Component(component.properties, type));
             }
 
-            components.push(new Component(component.properties, type));
+            // Map all properties
+            for (const property of calendar.properties) {
+                properties.push(property);
+            }
+
+            result.push(new Calendar(calendar.name, components, properties));
         }
-
-        console.log("Resulting in component list: " + components);
-
-        // Map all properties
-        for (let property in calendar.properties) {
-            properties.push(property);
-            console.log("Found Property: " + property);
-        }
-
-        console.log("Resulting in property list: " + properties)
-
-        result = new Calendar(components, properties);
-
-        console.log("Resulting in calendar: " + calendar);
 
         return result;
     }

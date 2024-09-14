@@ -1,7 +1,8 @@
+use serde::Serialize;
 use sqlx::prelude::Type;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Type, PartialEq)]
+#[derive(Debug, Clone, Type, PartialEq, Serialize)]
 pub enum ComponentType {
     EVENT,
     TODO,

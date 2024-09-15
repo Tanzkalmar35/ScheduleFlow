@@ -56,11 +56,11 @@ export class Calendar {
         // Loop calendars
         while (i < amount_of_calendars) {
             const calendar = calendars[i];
-            const amount_of_components = calendar.components.length;
+            const amountOfComponents = calendar.components.length;
             let j = 0;
 
             // Loop components
-            while (j < amount_of_components) {
+            while (j < amountOfComponents) {
                 const component = calendar.components[j];
                 let type;
                 switch (component.type) {

@@ -17,14 +17,14 @@ export class Calendar {
     *   A list of components that belong to this calendar.
     *   Each component is essentially just a list of properties too.
     *
-    *   @type {Component[][]}
+    *   @type {Component[]}
     */
     components;
 
     /**
     *   A list of properties describing the calendar's characteristics.
     *
-    *   @type {string[]}
+    *   @type {Record<string, string>[]}
     */
     properties;
 
@@ -44,34 +44,35 @@ export class Calendar {
      *  Map Calendar from the backend to this Calendar,
      *  which we can use in the frontend to render the calendar.
      *
-     *  @param {object} calendars an object containing the backend's calendar data.
+     *  @param {Calendar[]} calendars an object containing the backend's calendar data.
      */
     static map(calendars) {
         let result = [];
         let components = [];
-        let properties = [];
+        let i = 0;
 
-        // Map all components
-        for (const calendar of calendars) {
-            for (let component of calendar.components) {
+        const amount_of_calendars = calendars.length;
+
+        // Loop calendars
+        while (i < amount_of_calendars) {
+            const calendar = calendars[i];
+            const amount_of_components = calendar.components.length;
+            let j = 0;
+
+            // Loop components
+            while (j < amount_of_components) {
+                const component = calendar.components[j];
                 let type;
-
                 switch (component.type) {
                     case "Event": type = ComponentType.Event;
                     case "Todo": type = ComponentType.Todo;
                     case "Venue": type = ComponentType.Venue;
-                    case "Other": type = ComponentType.Other;
-                }
-
+                    default: type = ComponentType.Other;
+                };
                 components.push(new Component(component.properties, type));
             }
 
-            // Map all properties
-            for (const property of calendar.properties) {
-                properties.push(property);
-            }
-
-            result.push(new Calendar(calendar.name, components, properties));
+            result.push(new Calendar(calendar.name, components, calendar.properties));
         }
 
         return result;
@@ -83,7 +84,7 @@ class Component {
     /**
     *   A list of properties describing the component's characteristics.
     *
-    *   @type {string[]}
+    *   @type {Record<string, string>[]}
     */
     properties;
 

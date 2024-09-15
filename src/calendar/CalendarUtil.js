@@ -12,6 +12,9 @@ const selectCalendarDropdown = document.getElementById('select-calendar');
 // Get current date
 let currentDate = new Date();
 
+/** 
+ * @type{Calendar[]} 
+ */
 let calendars = [];
 
 export async function loadUserCalendarData() {
@@ -21,6 +24,7 @@ export async function loadUserCalendarData() {
         })
         .catch(e => createErrorToast(e));
 
+    // Add calendar names to dropdown menu
     for (const calendar of calendars) {
         const option = document.createElement("option");
         option.setAttribute("value", calendar.name);
@@ -58,6 +62,7 @@ function renderCalendar(date) {
     for (let i = 1; i <= daysInMonth; i++) {
         const dateElement = document.createElement('div');
         dateElement.classList.add('date');
+        dateElement.value = i;
         dateElement.textContent = i;
         calendarDatesElement.appendChild(dateElement);
     }
@@ -65,7 +70,51 @@ function renderCalendar(date) {
     // Update month and year
     monthYearElement.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
 
+    appendUserDataToCalendar();
+}
 
+// Appends data of the currently selected calendar into the calendar gui.
+function appendUserDataToCalendar() {
+    const selectedCalendarName = selectCalendarDropdown.value;
+    const calendarDateElements = calendarDatesElement.children;
+
+    // No calendar selected
+    if (selectedCalendarName == "") {
+        return;
+    }
+
+    const selectedCalendar = calendars.find(cal => cal.name === selectedCalendarName);
+
+    if (!selectedCalendar) {
+        console.error("Invalid calendar selected: " + selectedCalendar);
+        return;
+    }
+
+    const amountOfComponents = selectedCalendar.components.length;
+    let i = 0;
+
+    while (i < amountOfComponents) {
+        let startDate = "";
+        let endDate = "";
+        const component = selectedCalendar.components[i];
+        const amountOfProperties = component.properties.length;
+        let k = 0;
+
+        while (k < amountOfProperties) {
+            const property = component.properties[k];
+
+            // Set startDate and endDate
+
+            // TODO: Refactor properties to Map<string, string>
+
+            // if (property)
+
+            // We have what we wanted, no need to loop the rest
+            if (startDate !== "" && endDate !== "") {
+                break;
+            }
+        }
+    }
 }
 
 // Render calendar for current date

@@ -3,26 +3,26 @@ import { createErrorToast } from "../Toast.js";
 import { Calendar } from "./Calendar.js";
 
 // script.js
-const monthYearElement = document.getElementById('month-year');
-const calendarDatesElement = document.getElementById('calendar-dates');
-const navigateToNextMonthBtn = document.getElementById('next-month-btn');
-const navigateToPrevMonthBtn = document.getElementById('prev-month-btn');
-const selectCalendarDropdown = document.getElementById('select-calendar');
+const monthYearElement = document.getElementById("month-year");
+const calendarDatesElement = document.getElementById("calendar-dates");
+const navigateToNextMonthBtn = document.getElementById("next-month-btn");
+const navigateToPrevMonthBtn = document.getElementById("prev-month-btn");
+const selectCalendarDropdown = document.getElementById("select-calendar");
 
 // Get current date
 let currentDate = new Date();
 
-/** 
- * @type{Calendar[]} 
+/**
+ * @type{Calendar[]}
  */
 let calendars = [];
 
 export async function loadUserCalendarData() {
     await invoke("get_calendar_of_current_user")
-        .then(cal => {
+        .then((cal) => {
             calendars = Calendar.map(cal);
         })
-        .catch(e => createErrorToast(e));
+        .catch((e) => createErrorToast(e));
 
     // Add calendar names to dropdown menu
     for (const calendar of calendars) {
@@ -34,10 +34,10 @@ export async function loadUserCalendarData() {
 }
 
 /**
-*   Renders the calendar to the home page
-*
-*   @param {Date} date - The current date
-*/
+ *   Renders the calendar to the home page
+ *
+ *   @param {Date} date - The current date
+ */
 function renderCalendar(date) {
     const month = date.getMonth();
     const year = date.getFullYear();
@@ -48,29 +48,29 @@ function renderCalendar(date) {
     const firstDayOfWeek = firstDayOfMonth.getDay();
 
     // Clear previous dates
-    calendarDatesElement.innerHTML = '';
+    calendarDatesElement.innerHTML = "";
 
     // Render blank cells for days before the first day of the month
     for (let i = 0; i < firstDayOfWeek; i++) {
-        const blankCell = document.createElement('div');
-        blankCell.classList.add('date');
-        blankCell.classList.add('blank');
+        const blankCell = document.createElement("div");
+        blankCell.classList.add("date");
+        blankCell.classList.add("blank");
         calendarDatesElement.appendChild(blankCell);
     }
 
     // Render dates
     for (let i = 1; i <= daysInMonth; i++) {
-        const dateElement = document.createElement('div');
-        dateElement.classList.add('date');
+        const dateElement = document.createElement("div");
+        dateElement.classList.add("date");
         dateElement.value = i;
         dateElement.textContent = i;
         calendarDatesElement.appendChild(dateElement);
     }
 
     // Update month and year
-    monthYearElement.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
+    monthYearElement.textContent = `${date.toLocaleString("default", { month: "long" })} ${year}`;
 
-    appendUserDataToCalendar();
+    // appendUserDataToCalendar();
 }
 
 // Appends data of the currently selected calendar into the calendar gui.
@@ -83,7 +83,9 @@ function appendUserDataToCalendar() {
         return;
     }
 
-    const selectedCalendar = calendars.find(cal => cal.name === selectedCalendarName);
+    const selectedCalendar = calendars.find(
+        (cal) => cal.name === selectedCalendarName,
+    );
 
     if (!selectedCalendar) {
         console.error("Invalid calendar selected: " + selectedCalendar);
@@ -121,13 +123,19 @@ function appendUserDataToCalendar() {
 renderCalendar(currentDate);
 
 // Render next month
-navigateToNextMonthBtn.addEventListener("click", function() {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
+navigateToNextMonthBtn.addEventListener("click", function () {
+    currentDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+    );
     renderCalendar(currentDate);
 });
 
 // Render previous month
-navigateToPrevMonthBtn.addEventListener("click", function() {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
+navigateToPrevMonthBtn.addEventListener("click", function () {
+    currentDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - 1,
+    );
     renderCalendar(currentDate);
 });

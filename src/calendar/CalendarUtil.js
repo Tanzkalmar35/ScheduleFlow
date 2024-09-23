@@ -25,12 +25,17 @@ export async function loadUserCalendarData() {
         .catch((e) => createErrorToast(e));
 
     // Add calendar names to dropdown menu
-    for (const calendar of calendars) {
+    let i = 0;
+    while (i < calendars.length) {
+        const calendar = calendars[i];
         const option = document.createElement("option");
         option.setAttribute("value", calendar.name);
         option.textContent = calendar.name;
         selectCalendarDropdown.appendChild(option);
+        i++;
     }
+
+    appendUserDataToCalendar();
 }
 
 /**
@@ -69,17 +74,17 @@ function renderCalendar(date) {
 
     // Update month and year
     monthYearElement.textContent = `${date.toLocaleString("default", { month: "long" })} ${year}`;
-
-    // appendUserDataToCalendar();
 }
 
 // Appends data of the currently selected calendar into the calendar gui.
 function appendUserDataToCalendar() {
     const selectedCalendarName = selectCalendarDropdown.value;
-    const calendarDateElements = calendarDatesElement.children;
+    //const calendarDateElements = calendarDatesElement.children;
+
+    console.log("SELECTED CALENDAR: " + selectedCalendarName)
 
     // No calendar selected
-    if (selectedCalendarName == "") {
+    if (selectedCalendarName === "") {
         return;
     }
 
@@ -99,23 +104,28 @@ function appendUserDataToCalendar() {
         let startDate = "";
         let endDate = "";
         const component = selectedCalendar.components[i];
-        const amountOfProperties = component.properties.length;
-        let k = 0;
+        const entries = component.properties.entries();
+        let iterator = entries.next();
 
-        while (k < amountOfProperties) {
-            const property = component.properties[k];
+        while (!iterator.done) {
+            console.log(iterator)
+            const [key, value] = iterator.value;
 
-            // Set startDate and endDate
+            if (key === "START_DATE") {
+                startDate = value;
+                console.log(startDate);
+            } else if (key === "END_DATE") {
+                endDate = value;
+                console.log(endDate);
+            }
 
-            // TODO: Refactor properties to Map<string, string>
-
-            // if (property)
-
-            // We have what we wanted, no need to loop the rest
             if (startDate !== "" && endDate !== "") {
                 break;
             }
+
+            iterator = entries.next();
         }
+        i++;
     }
 }
 
@@ -139,3 +149,5 @@ navigateToPrevMonthBtn.addEventListener("click", function () {
     );
     renderCalendar(currentDate);
 });
+
+selectCalendarDropdown.addEventListener("change", () => appendUserDataToCalendar())

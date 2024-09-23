@@ -75,9 +75,13 @@ impl ICalendarUtil {
             user,
         );
 
+        println!("{:?}", calendars);
+
         for calendar in calendars {
             simple_user_calendars.push(SimpleCalendar::build(driver_binding.deref_mut(), calendar));
         }
+
+        println!("{:?}", simple_user_calendars);
 
         simple_user_calendars
     }

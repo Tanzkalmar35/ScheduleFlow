@@ -30,8 +30,9 @@ export class Calendar {
     /**
      *   Initializes a new Calendar object.
      *
-     *   @param {Component[][]} components belong to this calendar.
-     *   @param {string[]} properties describe the calendar's characteristics.
+     *   @param name the name of the calendar.
+     *   @param {Component[]} components belong to this calendar.
+     *   @param {Map<string, string>} properties describe the calendar's characteristics.
      */
     constructor(name, components, properties) {
         this.name = name;
@@ -49,7 +50,6 @@ export class Calendar {
         let result = [];
         let components = [];
         let i = 0;
-
         const amount_of_calendars = calendars.length;
 
         // Loop calendars
@@ -108,6 +108,8 @@ export class Calendar {
             i++;
         }
 
+        console.log(result)
+
         return result;
     }
 }
@@ -130,7 +132,7 @@ class Component {
     /**
      *   Initializes a new Component.
      *
-     *   @param {string[]} properties describe the characteristics of the component.
+     *   @param {Map<string, string>} properties describe the characteristics of the component.
      *   @param {ComponentType} type defines the type of Component.
      */
     constructor(properties, type) {

@@ -15,7 +15,7 @@ use crate::db::{
     },
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct SimpleCalendar {
     name: String,
     components: Vec<SimpleComponent>,

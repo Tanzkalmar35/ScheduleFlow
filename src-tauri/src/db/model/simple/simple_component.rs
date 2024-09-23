@@ -46,11 +46,11 @@ impl SimpleComponent {
         let mut simple_components: Vec<Self> = vec![];
         let stmt = format!(
             r#"
-            select c.uuid, c.c_type, p.key, p.value 
-            from components c 
-            inner join properties p 
-            on c.uuid = p.owner_uuid 
-            where c.calendar_uuid = '{}' 
+            select c.uuid, c.c_type, p.key, p.value
+            from components c
+            inner join properties p
+            on c.uuid = p.owner_uuid
+            where c.calendar_uuid = '{}'
             and p.owner_type = '{}'
         "#,
             calendar.uuid,
@@ -74,6 +74,10 @@ impl SimpleComponent {
             let property_key: String = row.get("key");
             let property_val: String = row.get("value");
 
+            println!("Uuid before was '{}' while new one is '{}'", component_uuid_before, component_uuid.to_string());
+            println!("Prop key is '{}' while prop val = '{}'", property_key, property_val);
+            println!("So the current component is '{:?}'", current_component);
+
             if component_uuid_before.eq(&component_uuid.to_string()) {
                 // same component as before, so we just add the new property
                 current_component
@@ -93,6 +97,8 @@ impl SimpleComponent {
                 component_uuid_before = component_uuid.to_string();
             }
         }
+
+        println!("{:?}", simple_components);
 
         simple_components
     }

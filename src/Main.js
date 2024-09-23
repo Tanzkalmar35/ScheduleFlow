@@ -11,9 +11,11 @@ async function init() {
     invoke("set_current_window")
         .catch(e => console.log("Error updating the current window: ", e));
 
-    loadUserCalendarData();
+    await loadUserCalendarData();
+
+    console.log("Calendar data Loaded")
 }
 
 await init()
-    .then(_ => console.log("Initialized successfully"))
+    .then(() => console.log("Initialized successfully"))
     .catch(e => console.log("Initialization failed: " + e))

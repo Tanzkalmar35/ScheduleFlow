@@ -81,7 +81,7 @@ function appendUserDataToCalendar() {
     const selectedCalendarName = selectCalendarDropdown.value;
     //const calendarDateElements = calendarDatesElement.children;
 
-    console.log("SELECTED CALENDAR: " + selectedCalendarName)
+    console.log("SELECTED CALENDAR: " + selectedCalendarName);
 
     // No calendar selected
     if (selectedCalendarName === "") {
@@ -108,7 +108,7 @@ function appendUserDataToCalendar() {
         let iterator = entries.next();
 
         while (!iterator.done) {
-            console.log(iterator)
+            console.log(iterator);
             const [key, value] = iterator.value;
 
             if (key === "START_DATE") {
@@ -125,6 +125,13 @@ function appendUserDataToCalendar() {
 
             iterator = entries.next();
         }
+
+        // Get a list of all dates included in the event's duration, append the event to the calendar date fields.
+        calendarDatesElement.children().find((dateElement) => {
+            // if the day is the same, append the element to the calendar
+            // return dateElement.value === startDate.getDay();
+        });
+
         i++;
     }
 }
@@ -150,4 +157,6 @@ navigateToPrevMonthBtn.addEventListener("click", function () {
     renderCalendar(currentDate);
 });
 
-selectCalendarDropdown.addEventListener("change", () => appendUserDataToCalendar())
+selectCalendarDropdown.addEventListener("change", () =>
+    appendUserDataToCalendar(),
+);

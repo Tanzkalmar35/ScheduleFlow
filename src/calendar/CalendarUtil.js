@@ -35,7 +35,7 @@ export async function loadUserCalendarData() {
         i++;
     }
 
-    appendUserDataToCalendar();
+    validateCalendarAndAppendUserData();
 }
 
 /**
@@ -77,7 +77,7 @@ function renderCalendar(date) {
 }
 
 // Appends data of the currently selected calendar into the calendar gui.
-function appendUserDataToCalendar() {
+function validateCalendarAndAppendUserData() {
     const selectedCalendarName = selectCalendarDropdown.value;
     //const calendarDateElements = calendarDatesElement.children;
 
@@ -97,6 +97,15 @@ function appendUserDataToCalendar() {
         return;
     }
 
+    appendUserDataToCalendar(selectedCalendar);
+}
+
+/**
+ * Does the actual data appending to the calendar.
+ *
+ * @param {Calendar} selectedCalendar - The selected calendar
+ */
+function appendUserDataToCalendar(selectedCalendar) {
     const amountOfComponents = selectedCalendar.components.length;
     let i = 0;
 
@@ -126,11 +135,35 @@ function appendUserDataToCalendar() {
             iterator = entries.next();
         }
 
-        // Get a list of all dates included in the event's duration, append the event to the calendar date fields.
-        calendarDatesElement.children().find((dateElement) => {
-            // if the day is the same, append the element to the calendar
-            // return dateElement.value === startDate.getDay();
-        });
+        // Converting plain string dates into Date objects
+        startDate = new Date(startDate);
+        endDate = new Date(endDate);
+
+        let dateSpan = new Set();
+        let tempDate = startDate;
+
+        while (tempDate <= endDate) {
+            dateSpan.push(tempDate);
+            tempDate.setDate(tempDate.getDate() + 1);
+        }
+
+        // Get html elements where the date matches here
+        const calendarDateElements = calendarDatesElement.children;
+        const amountOfCalendarDateElements = calendarDateElements.length;
+        let j = 0;
+        // let affectedCalendarDateElements = new Set();
+
+        while (j < amountOfCalendarDateElements) {
+            const element = calendarDateElements[j];
+            const day = parseInt(element.textContent);
+
+            if (dateSpan.has(day)) {
+                element.textContent = "This is inside of a date span!";
+                // affectedCalendarDateElements.push(element);
+            }
+
+            j++;
+        }
 
         i++;
     }
@@ -158,5 +191,5 @@ navigateToPrevMonthBtn.addEventListener("click", function () {
 });
 
 selectCalendarDropdown.addEventListener("change", () =>
-    appendUserDataToCalendar(),
+    validateCalendarAndAppendUserData(),
 );

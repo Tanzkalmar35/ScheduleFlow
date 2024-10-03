@@ -1,5 +1,5 @@
 use std::collections::VecDeque;
-use std::sync::{Arc, mpsc, Mutex};
+use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
@@ -16,24 +16,22 @@ impl ErrorQueue {
         let (tx, rx) = mpsc::channel();
         let queue = Arc::new(Mutex::new(VecDeque::<Box<dyn Error + Send>>::new()));
         let queue_clone = Arc::clone(&queue);
-        let handle = thread::spawn(move || {
-            loop {
-                rx.recv().unwrap();
-                let mut queue = queue_clone.lock().unwrap();
-                while let Some(mut err) = queue.pop_front() {
-                    thread::sleep(err.timeout());
+        let handle = thread::spawn(move || loop {
+            rx.recv().unwrap();
+            let mut queue = queue_clone.lock().unwrap();
+            while let Some(mut err) = queue.pop_front() {
+                thread::sleep(err.timeout());
 
-                    if (err.condition().is_some()) {
-                        if err.condition().as_ref().unwrap()() {
-                            println!("An error occured: {}", err.message());
-                            err.handler()();
-                        } else {
-                            err.set_timeout(Duration::from_secs(1));
-                            queue.push_back(err);
-                        }
-                    } else {
+                if (err.condition().is_some()) {
+                    if err.condition().as_ref().unwrap()() {
+                        println!("An error occured: {}", err.message());
                         err.handler()();
+                    } else {
+                        err.set_timeout(Duration::from_secs(1));
+                        queue.push_back(err);
                     }
+                } else {
+                    err.handler()();
                 }
             }
         });

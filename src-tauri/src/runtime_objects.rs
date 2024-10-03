@@ -1,19 +1,19 @@
 use std::error::Error;
 use std::sync::{Mutex, MutexGuard, OnceLock};
 
-use lazy_static::lazy_static;
-use once_cell::sync::OnceCell;
-use tauri::Window;
 use crate::db::model::user::User;
 use crate::db::pg_driver::PgDriver;
 use crate::errors::error_messages::ERROR_QUEUE_NOT_INITIALIZED_ERR;
 use crate::errors::error_queue::ErrorQueue;
+use lazy_static::lazy_static;
+use once_cell::sync::OnceCell;
+use tauri::{AppHandle, Window};
 
 pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
 pub static ERROR_QUEUE: OnceCell<Mutex<Option<ErrorQueue>>> = OnceCell::new();
 
 lazy_static! {
-    pub static ref CURRENT_WINDOW: Mutex<Option<Window>> = Mutex::new(None);
+    pub static ref APP_HANDLE: Mutex<Option<AppHandle>> = Mutex::new(None);
 }
 
 pub fn driver() -> &'static Mutex<PgDriver> {
@@ -57,7 +57,8 @@ pub fn get_error_queue() -> ErrorQueue {
     //     // }
     //     mutex.lock().unwrap()
     // })
-    ERROR_QUEUE.get()
+    ERROR_QUEUE
+        .get()
         .and_then(|mutex| mutex.lock().ok())
         .and_then(|guard| guard.as_ref().cloned())
         .expect(ERROR_QUEUE_NOT_INITIALIZED_ERR)
@@ -73,11 +74,10 @@ pub fn reset_error_queue() {
 }
 
 #[tauri::command]
-pub fn set_current_window(window: Window) {
-    *CURRENT_WINDOW.lock().unwrap() = Some(window);
+pub fn set_app_handle(app_handle: AppHandle) {
+    *APP_HANDLE.lock().unwrap() = Some(app_handle);
 }
 
-pub fn get_current_window() -> Option<Window> {
-    let current_window = CURRENT_WINDOW.lock().unwrap();
-    current_window.clone()
+pub fn get_app_handle() -> Option<AppHandle> {
+    APP_HANDLE.lock().unwrap().clone()
 }

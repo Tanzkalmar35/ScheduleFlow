@@ -74,8 +74,15 @@ impl SimpleComponent {
             let property_key: String = row.get("key");
             let property_val: String = row.get("value");
 
-            println!("Uuid before was '{}' while new one is '{}'", component_uuid_before, component_uuid.to_string());
-            println!("Prop key is '{}' while prop val = '{}'", property_key, property_val);
+            println!(
+                "Uuid before was '{}' while new one is '{}'",
+                component_uuid_before,
+                component_uuid.to_string()
+            );
+            println!(
+                "Prop key is '{}' while prop val = '{}'",
+                property_key, property_val
+            );
             println!("So the current component is '{:?}'", current_component);
 
             if component_uuid_before.eq(&component_uuid.to_string()) {

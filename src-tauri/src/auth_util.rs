@@ -5,7 +5,7 @@ use std::ops::DerefMut;
 use std::sync::MutexGuard;
 
 use bcrypt::{hash, verify, DEFAULT_COST};
-use tauri::Window;
+use tauri::{AppHandle, Emitter};
 
 use crate::db::db_actions::DbActions;
 use crate::db::model::jwt_token::JwtToken;
@@ -17,16 +17,16 @@ use crate::errors::error_messages::{
     BCRYPT_DECODING_ERR, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
 };
 use crate::jwt_controller::generate_jwt;
-use crate::runtime_objects::{driver, get_current_window, set_current_user, set_current_window};
+use crate::runtime_objects::{driver, get_app_handle, set_app_handle, set_current_user};
 
 #[tauri::command]
 pub fn attempt_login(
-    window: Window,
+    app_handle: AppHandle,
     email: String,
     password: String,
     remember: bool,
 ) -> Result<(), &'static str> {
-    set_current_window(window);
+    set_app_handle(app_handle);
 
     let mut driver = driver().lock().unwrap();
     let user_exists = UserRepository::is_existing(driver.deref_mut(), &email);
@@ -52,13 +52,13 @@ pub fn attempt_login(
 
 #[tauri::command]
 pub fn attempt_signup(
-    window: Window,
+    app_handle: AppHandle,
     username: String,
     email: String,
     password: String,
     remember: bool,
 ) -> Result<(), &'static str> {
-    set_current_window(window);
+    set_app_handle(app_handle);
 
     let hashed_password = hash(password, DEFAULT_COST).unwrap();
     let user = User::new(username, (&*email).into(), hashed_password);
@@ -82,7 +82,7 @@ fn populate_jwt_cookie(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<
     let token = generate_jwt(user.get_uuid());
     JwtTokenRepository::store(driver.deref_mut(), &token);
 
-    get_current_window()
+    get_app_handle()
         .unwrap()
         .emit("setJwtCookie", token.token)
         .map_err(|_| JWT_COOKIE_ERR)?;

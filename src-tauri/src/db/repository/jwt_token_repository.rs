@@ -1,9 +1,9 @@
+use crate::db::model::jwt_token::JwtToken;
 use crate::db::{
     db_actions::{DbActions, Table},
     pg_driver::PgDriver,
 };
 use jsonwebtoken::TokenData;
-use crate::db::model::jwt_token::JwtToken;
 
 pub(crate) struct JwtTokenRepository;
 

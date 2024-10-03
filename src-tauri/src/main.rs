@@ -13,7 +13,7 @@ use crate::auth_util::{attempt_login, attempt_signup, logout};
 use crate::calendar::icalendar_util::get_calendar_of_current_user;
 use crate::errors::error_queue::ErrorQueue;
 use crate::jwt_controller::is_valid_session;
-use crate::runtime_objects::{driver, set_current_window, set_error_queue};
+use crate::runtime_objects::{driver, set_app_handle, set_error_queue};
 
 mod calendar;
 mod db;
@@ -27,12 +27,13 @@ fn main() {
     init();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             attempt_signup,
             attempt_login,
             logout,
             is_valid_session,
-            set_current_window,
+            set_app_handle,
             get_calendar_of_current_user,
         ])
         .run(tauri::generate_context!())

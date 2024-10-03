@@ -1,6 +1,6 @@
 use crate::errors::error_messages::NO_DB_CONNECTION_ERR;
 use crate::errors::error_utils::{Error, ErrorCode, ErrorHandler};
-use crate::runtime_objects::get_current_window;
+use crate::runtime_objects::get_app_handle;
 use std::time::Duration;
 
 /// Indicates that the database connection could not be established.
@@ -26,7 +26,7 @@ impl NoDatabaseConnectionError {
             error_code: 1,
             message: NO_DB_CONNECTION_ERR.to_string(),
             timeout: Duration::from_secs(0),
-            condition: Some(Box::new(|| get_current_window().is_some())),
+            condition: Some(Box::new(|| get_app_handle().is_some())),
             handler: ErrorHandler::populate_toast(NO_DB_CONNECTION_ERR),
         }
     }

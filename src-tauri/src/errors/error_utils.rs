@@ -1,4 +1,6 @@
-use crate::runtime_objects::get_current_window;
+use tauri::{Emitter, Manager};
+
+use crate::runtime_objects::get_app_handle;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -54,8 +56,9 @@ impl ErrorHandler {
     /// * `message` - The error message to be displayed on the toast message.
     pub(crate) fn populate_toast(message: &'static str) -> Box<dyn Fn() + Send + 'static> {
         Box::new(move || {
-            get_current_window()
+            get_app_handle()
                 .unwrap()
+                .app_handle()
                 .emit("createToast", ("error", message));
         })
     }

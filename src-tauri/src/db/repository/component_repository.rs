@@ -62,4 +62,3 @@ impl DbActions<Component, Self> for ComponentRepository {
         matches
     }
 }
-

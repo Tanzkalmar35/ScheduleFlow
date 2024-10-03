@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import { createErrorToast } from "../Toast.js";
 import { Calendar } from "./Calendar.js";
 
@@ -34,8 +34,6 @@ export async function loadUserCalendarData() {
         selectCalendarDropdown.appendChild(option);
         i++;
     }
-
-    validateCalendarAndAppendUserData();
 }
 
 /**

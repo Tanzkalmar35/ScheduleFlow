@@ -20,7 +20,7 @@ use crate::{
     runtime_objects::get_error_queue,
 };
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, Default, PartialEq, Serialize)]
 pub(crate) struct SimpleComponent {
     c_type: ComponentType,
     properties: Vec<Property>,
@@ -57,43 +57,41 @@ impl SimpleComponent {
             OwnerType::COMPONENT.to_string()
         );
 
-        let res = driver.exec(&stmt);
-
-        if let Err(e) = res {
-            let mut err = DatabaseOperationFailedError::new();
-            err.set_message(format!("Could not build new SimpleComponent: {}", e));
-            get_error_queue().enqueue(err);
-            return vec![];
-        }
+        let res = match driver.exec(&stmt) {
+            Ok(r) => r,
+            Err(e) => {
+                let mut err = DatabaseOperationFailedError::new();
+                err.set_message(format!("Could not retrieve components of calendar: {}", e));
+                get_error_queue().enqueue(err);
+                return vec![];
+            }
+        };
 
         let mut component_uuid_before: String = String::default();
         let mut current_component: SimpleComponent = SimpleComponent::empty();
 
-        for row in &res.unwrap() {
+        let mut idx = 0;
+        let a = res.len();
+
+        for row in &res {
+            idx = idx + 1;
             let component_uuid: Uuid = row.get("uuid");
             let property_key: String = row.get("key");
             let property_val: String = row.get("value");
 
-            println!(
-                "Uuid before was '{}' while new one is '{}'",
-                component_uuid_before,
-                component_uuid.to_string()
-            );
-            println!(
-                "Prop key is '{}' while prop val = '{}'",
-                property_key, property_val
-            );
-            println!("So the current component is '{:?}'", current_component);
-
             if component_uuid_before.eq(&component_uuid.to_string()) {
                 // same component as before, so we just add the new property
-                current_component
+                &current_component
                     .properties
-                    .push(Property::hold(property_key, property_val))
+                    .push(Property::hold(property_key, property_val));
+
+                if idx == a {
+                    simple_components.push(std::mem::take(&mut current_component));
+                }
             } else {
                 // new component, add the old one to the result
                 if current_component != SimpleComponent::empty() {
-                    simple_components.push(current_component);
+                    simple_components.push(std::mem::take(&mut current_component));
                 }
 
                 let c_type: String = row.get("c_type");

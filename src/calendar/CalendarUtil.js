@@ -104,6 +104,7 @@ function validateCalendarAndAppendUserData() {
  * @param {Calendar} selectedCalendar - The selected calendar
  */
 function appendUserDataToCalendar(selectedCalendar) {
+    console.log(selectedCalendar);
     const amountOfComponents = selectedCalendar.components.length;
     let i = 0;
 
@@ -112,18 +113,18 @@ function appendUserDataToCalendar(selectedCalendar) {
         let endDate = "";
         const component = selectedCalendar.components[i];
         const entries = component.properties.entries();
+        console.log(component.properties.entries());
         let iterator = entries.next();
 
         while (!iterator.done) {
-            console.log(iterator);
             const [key, value] = iterator.value;
+
+            console.log("Key: " + key + " Value: " + value);
 
             if (key === "START_DATE") {
                 startDate = value;
-                console.log(startDate);
             } else if (key === "END_DATE") {
                 endDate = value;
-                console.log(endDate);
             }
 
             if (startDate !== "" && endDate !== "") {
@@ -134,16 +135,44 @@ function appendUserDataToCalendar(selectedCalendar) {
         }
 
         // Converting plain string dates into Date objects
-        startDate = new Date(startDate);
-        endDate = new Date(endDate);
+        console.log(startDate);
+        let split_start_date = startDate.split(" ");
+        let start_date_date = split_start_date[0].split("-");
+        let start_date_time = split_start_date[1].split(".")[0].split(":");
+        startDate = new Date(
+            start_date_date[0],
+            start_date_date[1],
+            start_date_date[2],
+            start_date_time[0],
+            start_date_time[1],
+            start_date_time[2],
+            0,
+        );
+
+        let split_end_date = endDate.split(" ");
+        let end_date_date = split_end_date[0].split("-");
+        let end_date_time = split_end_date[1].split(":");
+        endDate = new Date(
+            end_date_date[0],
+            end_date_date[1],
+            end_date_date[2],
+            end_date_time[0],
+            end_date_time[1],
+            end_date_time[2],
+            0,
+        );
 
         let dateSpan = new Set();
         let tempDate = startDate;
 
+        console.log(startDate);
+
         while (tempDate <= endDate) {
-            dateSpan.push(tempDate);
+            dateSpan.add(tempDate.getDate());
             tempDate.setDate(tempDate.getDate() + 1);
         }
+
+        console.log(dateSpan);
 
         // Get html elements where the date matches here
         const calendarDateElements = calendarDatesElement.children;
@@ -156,6 +185,7 @@ function appendUserDataToCalendar(selectedCalendar) {
             const day = parseInt(element.textContent);
 
             if (dateSpan.has(day)) {
+                console.log("Day " + day + " is inside of a date span!");
                 element.textContent = "This is inside of a date span!";
                 // affectedCalendarDateElements.push(element);
             }

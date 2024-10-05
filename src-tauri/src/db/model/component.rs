@@ -10,6 +10,12 @@ pub enum ComponentType {
     OTHER,
 }
 
+impl Default for ComponentType {
+    fn default() -> Self {
+        Self::OTHER
+    }
+}
+
 impl ComponentType {
     pub fn parse(c_type: &str) -> Self {
         match c_type.to_lowercase().as_str() {

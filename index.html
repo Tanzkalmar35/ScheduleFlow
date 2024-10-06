@@ -41,7 +41,17 @@
             <select id="select-calendar">
                 <option value="">Please select...</option>
             </select>
+            <button id="create-calendar-btn">New Calendar</button>
         </div>
+        <!-- The Modal -->
+        <div id="create-calendar-modal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <p>Modal content</p>
+            </div>
+        </div>
+
         <script type="module">
             import { invoke } from "@tauri-apps/api/core";
             import { createErrorToast } from "./src/Toast.js";

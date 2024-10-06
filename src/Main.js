@@ -14,7 +14,19 @@ async function init() {
 
     await loadUserCalendarData();
 
-    console.log("Calendar data Loaded");
+    // Give all close modal buttons their functionality.
+    var closeButtons = document.getElementsByClassName("close-btn");
+    for (var i = 0; i < closeButtons.length; i++) {
+        closeButtons[i].addEventListener("click", function () {
+            var modal = this.parentNode.parentNode;
+            modal.style.display = "none";
+        });
+    }
+
+    document.getElementById("create-calendar-btn").onclick = () => {
+        document.getElementById("create-calendar-modal").style.display =
+            "block";
+    };
 }
 
 await init()

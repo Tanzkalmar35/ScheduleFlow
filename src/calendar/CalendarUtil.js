@@ -104,7 +104,6 @@ function validateCalendarAndAppendUserData() {
  * @param {Calendar} selectedCalendar - The selected calendar
  */
 function appendUserDataToCalendar(selectedCalendar) {
-    console.log(selectedCalendar);
     const amountOfComponents = selectedCalendar.components.length;
     let i = 0;
 
@@ -113,13 +112,10 @@ function appendUserDataToCalendar(selectedCalendar) {
         let endDate = "";
         const component = selectedCalendar.components[i];
         const entries = component.properties.entries();
-        console.log(component.properties.entries());
         let iterator = entries.next();
 
         while (!iterator.done) {
             const [key, value] = iterator.value;
-
-            console.log("Key: " + key + " Value: " + value);
 
             if (key === "START_DATE") {
                 startDate = value;
@@ -135,7 +131,6 @@ function appendUserDataToCalendar(selectedCalendar) {
         }
 
         // Converting plain string dates into Date objects
-        console.log(startDate);
         let split_start_date = startDate.split(" ");
         let start_date_date = split_start_date[0].split("-");
         let start_date_time = split_start_date[1].split(".")[0].split(":");
@@ -165,14 +160,10 @@ function appendUserDataToCalendar(selectedCalendar) {
         let dateSpan = new Set();
         let tempDate = startDate;
 
-        console.log(startDate);
-
         while (tempDate <= endDate) {
             dateSpan.add(tempDate.getDate());
             tempDate.setDate(tempDate.getDate() + 1);
         }
-
-        console.log(dateSpan);
 
         // Get html elements where the date matches here
         const calendarDateElements = calendarDatesElement.children;
@@ -189,10 +180,8 @@ function appendUserDataToCalendar(selectedCalendar) {
                 element.textContent = "This is inside of a date span!";
                 // affectedCalendarDateElements.push(element);
             }
-
             j++;
         }
-
         i++;
     }
 }

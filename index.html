@@ -50,8 +50,16 @@
                 <span class="close-btn">&times;</span>
                 <h1>Create a new calendar</h1>
                 <form id="create-calendar-form" onsubmit="createNewCalendar()">
-                    <label for="new-calendar-name">Calendar name</label>
-                    <input id="new-calendar-name" type="text" placeholder="Gustav" value="Gustav"/>
+                    <div>
+                        <div>
+                            <label for="new-calendar-name">Calendar name</label>
+                            <input
+                                id="new-calendar-name"
+                                type="text"
+                                placeholder="Gustav"
+                            />
+                        </div>
+                    </div>
                     <button type="submit">Create</button>
                 </form>
             </div>
@@ -78,7 +86,7 @@
 
                 await invoke("create-calendar", {
                     name,
-                })
+                });
             }
         </script>
     </body>

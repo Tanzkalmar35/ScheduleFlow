@@ -71,7 +71,7 @@ impl SimpleComponent {
         let mut current_component: SimpleComponent = SimpleComponent::empty();
 
         let mut idx = 0;
-        let a = res.len();
+        let res_len = res.len();
 
         for row in &res {
             idx = idx + 1;
@@ -85,7 +85,7 @@ impl SimpleComponent {
                     .properties
                     .push(Property::hold(property_key, property_val));
 
-                if idx == a {
+                if idx == res_len {
                     simple_components.push(std::mem::take(&mut current_component));
                 }
             } else {
@@ -102,8 +102,6 @@ impl SimpleComponent {
                 component_uuid_before = component_uuid.to_string();
             }
         }
-
-        println!("{:?}", simple_components);
 
         simple_components
     }

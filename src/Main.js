@@ -18,7 +18,7 @@ async function init() {
     var closeButtons = document.getElementsByClassName("close-btn");
     for (var i = 0; i < closeButtons.length; i++) {
         closeButtons[i].addEventListener("click", function () {
-            var modal = this.parentNode.parentNode;
+            var modal = this.parentNode.parentNode.parentNode;
             modal.style.display = "none";
         });
     }

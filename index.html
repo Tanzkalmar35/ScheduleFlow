@@ -1,93 +1,119 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="/src/styles/main.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Tauri App</title>
-        <script type="module" src="/src/Main.js" defer></script>
-        <script
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/src/styles/main.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tauri App</title>
+    <script type="module" src="/src/Main.js" defer></script>
+    <script
             type="module"
             src="/src/calendar/CalendarUtil.js"
             defer
-        ></script>
-    </head>
+    ></script>
+</head>
 
-    <body class="poppins-regular">
-        <div class="notifications"></div>
-        <div class="calendar-container">
-            <div class="calendar-header">
-                <h2 id="month-year"></h2>
-            </div>
-            <div class="calendar-body">
-                <div class="month-nav">
-                    <button id="prev-month-btn" class="prev-month">Prev</button>
-                    <button id="next-month-btn">Next</button>
-                </div>
-                <div class="day-of-week">
-                    <div>Mon</div>
-                    <div>Tue</div>
-                    <div>Wed</div>
-                    <div>Thu</div>
-                    <div>Fri</div>
-                    <div>Sat</div>
-                    <div>Sun</div>
-                </div>
-                <div id="calendar-dates"></div>
-            </div>
+<body class="poppins-regular">
+<div class="notifications"></div>
+<div class="calendar-container">
+    <div class="calendar-header">
+        <h2 id="month-year"></h2>
+    </div>
+    <div class="calendar-body">
+        <div class="month-nav">
+            <button id="prev-month-btn" class="prev-month">Prev</button>
+            <button id="next-month-btn">Next</button>
         </div>
-        <div>
-            <button id="logout-btn">Log out</button>
-            <select id="select-calendar">
-                <option value="">Please select...</option>
-            </select>
-            <button id="create-calendar-btn">New Calendar</button>
+        <div class="day-of-week">
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+            <div>Sun</div>
         </div>
-        <!-- The Modal -->
-        <div id="create-calendar-modal" class="modal">
-            <!-- Modal content -->
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h1>Create a new calendar</h1>
-                <form id="create-calendar-form" onsubmit="createNewCalendar()">
-                    <div>
-                        <div>
-                            <label for="new-calendar-name">Calendar name</label>
-                            <input
-                                id="new-calendar-name"
-                                type="text"
-                                placeholder="Gustav"
-                            />
-                        </div>
+        <div id="calendar-dates"></div>
+    </div>
+</div>
+<div>
+    <button id="logout-btn">Log out</button>
+    <select id="select-calendar">
+        <option value="">Please select...</option>
+    </select>
+    <button id="create-calendar-btn">New Calendar</button>
+</div>
+<!-- The Modal -->
+<div id="create-calendar-modal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="">
+            <span class="close-btn">&times;</span>
+            <h2>Create a new calendar</h2>
+        </div>
+        <form id="create-calendar-form" onsubmit="createNewCalendar()">
+            <div>
+                <label id="label-new-calendar-name" for="new-calendar-name">Calendar name</label>
+                <input
+                        id="new-calendar-name"
+                        type="text"
+                        placeholder="Gustav"
+                />
+            </div>
+            <div>
+                <div class="flex">
+                    <h3>Users</h3>
+                    <button onclick="addUserToCalendar()">Add user</button>
+                </div>
+                <div id="calendar-users">
+                    <div id="calendar-user-1">
+                        <!-- (Profile pic) -->
+                        <!-- (User name) -->
+                        <p>Example user</p>
+                        <!-- (Remove icon) -->
                     </div>
-                    <button type="submit">Create</button>
-                </form>
+                </div>
             </div>
-        </div>
+            <button type="submit">Create</button>
+        </form>
+    </div>
+</div>
 
-        <script type="module">
-            import { invoke } from "@tauri-apps/api/core";
-            import { createErrorToast } from "./src/Toast.js";
-            import { invalidateJwtCookie } from "./src/controller/AuthController.js";
+<script type="module">
+    import {invoke} from "@tauri-apps/api/core";
+    import {createErrorToast} from "./src/Toast.js";
+    import {invalidateJwtCookie} from "./src/controller/AuthController.js";
 
-            document.getElementById("logout-btn").onclick = logout;
+    document.getElementById("logout-btn").onclick = logout;
 
-            async function logout() {
-                await invoke("logout", {
-                    token: document.cookie.split("=")[1],
-                }).catch((e) => createErrorToast(e));
+    async function logout() {
+        await invoke("logout", {
+            token: document.cookie.split("=")[1],
+        }).catch((e) => createErrorToast(e));
 
-                invalidateJwtCookie();
-                window.location.reload();
-            }
+        invalidateJwtCookie();
+        window.location.reload();
+    }
 
-            async function createNewCalendar() {
-                const name = document.getElementById("new-calendar-name").value;
+    async function createNewCalendar() {
+        const name = document.getElementById("new-calendar-name").value;
+        const usersElements = document.getElementById("calendar-users").children;
+        const users = [];
+        let i = 0;
+        while (i < usersElements.length) {
+            const userElement = usersElements[i];
+            users.push(userElement.children[1].getText());
+        }
 
-                await invoke("create-calendar", {
-                    name,
-                });
-            }
-        </script>
-    </body>
+        await invoke("create-calendar", {
+            name,
+            users
+        });
+    }
+
+    async function addUserToCalendar() {
+        // Todo
+    }
+</script>
+</body>
 </html>

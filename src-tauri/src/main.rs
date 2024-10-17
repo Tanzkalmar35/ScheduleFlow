@@ -6,22 +6,18 @@ use std::env;
 use std::ops::DerefMut;
 use std::thread;
 
+use crate::api::auth_api_controller::{attempt_login, attempt_signup, is_valid_session, logout};
+use crate::api::calendar_api_controller::get_calendar_of_current_user;
+use crate::errors::error_queue::ErrorQueue;
+use crate::runtime_objects::{driver, set_app_handle, set_error_queue};
 use dotenv::dotenv;
 use tauri::{Manager, Runtime};
 
-use crate::auth_util::{attempt_login, attempt_signup, logout};
-use crate::calendar::icalendar_util::get_calendar_of_current_user;
-use crate::errors::error_queue::ErrorQueue;
-use crate::jwt_controller::is_valid_session;
-use crate::runtime_objects::{driver, set_app_handle, set_error_queue};
-
-mod calendar;
 mod db;
 mod errors;
-
 mod auth_util;
-mod jwt_controller;
 mod runtime_objects;
+mod api;
 
 fn main() {
     init();

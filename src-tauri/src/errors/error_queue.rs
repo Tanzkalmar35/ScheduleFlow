@@ -22,7 +22,7 @@ impl ErrorQueue {
             while let Some(mut err) = queue.pop_front() {
                 thread::sleep(err.timeout());
 
-                if (err.condition().is_some()) {
+                if err.condition().is_some() {
                     if err.condition().as_ref().unwrap()() {
                         println!("An error occured: {}", err.message());
                         err.handler()();

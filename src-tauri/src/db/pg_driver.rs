@@ -1,9 +1,7 @@
 use postgres::{Client, NoTls, Row};
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::errors::error_impl::no_database_connection_error;
 use crate::errors::error_impl::no_database_connection_error::NoDatabaseConnectionError;
-use crate::errors::error_messages::{ENV_VAR_NOT_SET, ERROR_QUEUE_NOT_INITIALIZED_ERR};
 use crate::runtime_objects::get_error_queue;
 
 /// The database driver for PostgreSQL.

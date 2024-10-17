@@ -1,7 +1,6 @@
 use crate::db::db_actions::{DbActions, Table};
 use crate::db::model::property::Property;
 use crate::db::pg_driver::PgDriver;
-use serde_json::json;
 
 pub(crate) struct PropertyRepository;
 

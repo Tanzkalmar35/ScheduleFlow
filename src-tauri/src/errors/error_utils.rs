@@ -1,7 +1,6 @@
 use tauri::{Emitter, Manager};
 
 use crate::runtime_objects::get_app_handle;
-use std::sync::Arc;
 use std::time::Duration;
 
 pub enum ErrorCode {
@@ -59,7 +58,7 @@ impl ErrorHandler {
             get_app_handle()
                 .unwrap()
                 .app_handle()
-                .emit("createToast", ("error", message));
+                .emit("createToast", ("error", message)).expect("Could not create toast notification");
         })
     }
 

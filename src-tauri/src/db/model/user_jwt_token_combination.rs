@@ -1,7 +1,5 @@
 use uuid::Uuid;
 
-use crate::db::repository::jwt_token_repository;
-
 pub struct UserJwtTokenCombination {
     pub(crate) user_uuid: Uuid,
     pub(crate) jwt_token_uuid: Uuid,

@@ -1,5 +1,5 @@
 use crate::errors::error_messages::NO_DB_CONNECTION_ERR;
-use crate::errors::error_utils::{Error, ErrorCode, ErrorHandler};
+use crate::errors::error_utils::{Error, ErrorHandler};
 use crate::runtime_objects::get_app_handle;
 use std::time::Duration;
 

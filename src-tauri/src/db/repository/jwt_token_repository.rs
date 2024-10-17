@@ -3,7 +3,6 @@ use crate::db::{
     db_actions::{DbActions, Table},
     pg_driver::PgDriver,
 };
-use jsonwebtoken::TokenData;
 
 pub(crate) struct JwtTokenRepository;
 
@@ -40,7 +39,7 @@ impl DbActions<JwtToken, Self> for JwtTokenRepository {
         Self::insert(driver, token)
     }
 
-    fn update(driver: &mut PgDriver, token: &JwtToken) -> anyhow::Result<()> {
+    fn update(_driver: &mut PgDriver, _token: &JwtToken) -> anyhow::Result<()> {
         unimplemented!("JWT's are not supposed to be updated")
     }
 

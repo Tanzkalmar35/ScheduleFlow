@@ -1,5 +1,3 @@
-use std::path::Component;
-
 use serde::Serialize;
 
 use crate::db::{
@@ -10,9 +8,7 @@ use crate::db::{
         simple::simple_component::SimpleComponent,
     },
     pg_driver::PgDriver,
-    repository::{
-        component_repository::ComponentRepository, property_repository::PropertyRepository,
-    },
+    repository::property_repository::PropertyRepository,
 };
 
 #[derive(Serialize, Debug)]

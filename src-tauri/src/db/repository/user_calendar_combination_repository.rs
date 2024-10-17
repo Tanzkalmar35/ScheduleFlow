@@ -1,5 +1,4 @@
 use postgres::Row;
-use sqlx::query;
 
 use crate::{
     db::{
@@ -11,8 +10,8 @@ use crate::{
         repository::{calendar_repository::CalendarRepository, user_repository::UserRepository},
     },
     errors::{
-        error_impl::database_operation_failed_error::DatabaseOperationFailedError,
-        error_messages::QUERY_FAILED_ERR, error_utils::Error,
+        error_impl::database_operation_failed_error::DatabaseOperationFailedError
+        , error_utils::Error,
     },
     runtime_objects::get_error_queue,
 };
@@ -80,7 +79,7 @@ impl Table<UserCalendarCombination> for UserCalendarCombinationRepository {
         format!("'{}', '{}'", model.user_uuid, model.calendar_uuid)
     }
 
-    fn get_fmt_vals_no_id(model: &UserCalendarCombination) -> String {
+    fn get_fmt_vals_no_id(_model: &UserCalendarCombination) -> String {
         "".to_string()
     }
 }
@@ -108,10 +107,10 @@ impl DbActions<UserCalendarCombination, Self> for UserCalendarCombinationReposit
         let rows: Vec<Row> = Self::read(driver, Self::get_name().as_str(), condition);
 
         for row in rows {
-            let calendar_uuid: String = row.get(UserRepository::get_fk_uuid_name().as_str());
+            let user_uuid: String = row.get(UserRepository::get_fk_uuid_name().as_str());
             let calendar_uuid: String = row.get(CalendarRepository::get_fk_uuid_name().as_str());
             res.push(UserCalendarCombination::new(
-                calendar_uuid.parse().unwrap(),
+                user_uuid.parse().unwrap(),
                 calendar_uuid.parse().unwrap(),
             ))
         }

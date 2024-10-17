@@ -38,7 +38,7 @@ impl Table<UserJwtTokenCombination> for UserJwtTokenCombinationRepository {
         format!("'{}', '{}'", model.user_uuid, model.jwt_token_uuid)
     }
 
-    fn get_fmt_vals_no_id(model: &UserJwtTokenCombination) -> String {
+    fn get_fmt_vals_no_id(_model: &UserJwtTokenCombination) -> String {
         "".to_string()
     }
 }

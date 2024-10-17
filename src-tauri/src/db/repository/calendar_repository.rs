@@ -1,6 +1,6 @@
 use crate::db::{
     db_actions::{DbActions, Table},
-    model::{calendar::Calendar, user::User},
+    model::calendar::Calendar,
     pg_driver::PgDriver,
 };
 
@@ -38,7 +38,7 @@ impl DbActions<Calendar, Self> for CalendarRepository {
     }
 
     /// As a calendar db entry only has an uuid, it should have no reason to change.
-    fn update(_driver: &mut PgDriver, model: &Calendar) -> anyhow::Result<()> {
+    fn update(_driver: &mut PgDriver, _model: &Calendar) -> anyhow::Result<()> {
         unimplemented!("You can't update a calendar db entry, as it does only consist of an uuid.")
     }
 

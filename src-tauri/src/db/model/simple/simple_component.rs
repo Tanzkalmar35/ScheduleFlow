@@ -1,17 +1,15 @@
 use serde::Serialize;
-use sqlx::Execute;
 use uuid::Uuid;
 
 use crate::{
     db::{
-        db_actions::DbActions,
         model::{
             calendar::Calendar,
-            component::{Component, ComponentType},
+            component::ComponentType,
             property::{OwnerType, Property},
         },
-        pg_driver::PgDriver,
-        repository::component_repository::ComponentRepository,
+        pg_driver::PgDriver
+        ,
     },
     errors::{
         error_impl::database_operation_failed_error::DatabaseOperationFailedError,
@@ -81,7 +79,7 @@ impl SimpleComponent {
 
             if component_uuid_before.eq(&component_uuid.to_string()) {
                 // same component as before, so we just add the new property
-                &current_component
+                current_component
                     .properties
                     .push(Property::hold(property_key, property_val));
 

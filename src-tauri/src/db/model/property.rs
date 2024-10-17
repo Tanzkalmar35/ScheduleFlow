@@ -62,7 +62,6 @@ impl OwnerType {
         match self {
             OwnerType::CALENDAR => String::from("Calendar"),
             OwnerType::COMPONENT => String::from("Component"),
-            _ => String::default(),
         }
     }
 }

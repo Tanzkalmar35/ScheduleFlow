@@ -1,5 +1,4 @@
-use std::error::Error;
-use std::sync::{Mutex, MutexGuard, OnceLock};
+use std::sync::{Mutex, OnceLock};
 
 use crate::db::model::user::User;
 use crate::db::pg_driver::PgDriver;
@@ -7,7 +6,7 @@ use crate::errors::error_messages::ERROR_QUEUE_NOT_INITIALIZED_ERR;
 use crate::errors::error_queue::ErrorQueue;
 use lazy_static::lazy_static;
 use once_cell::sync::OnceCell;
-use tauri::{AppHandle, Window};
+use tauri::AppHandle;
 
 pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
 pub static ERROR_QUEUE: OnceCell<Mutex<Option<ErrorQueue>>> = OnceCell::new();

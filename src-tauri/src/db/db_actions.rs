@@ -1,4 +1,3 @@
-use anyhow::anyhow;
 use postgres::Row;
 use uuid::Uuid;
 

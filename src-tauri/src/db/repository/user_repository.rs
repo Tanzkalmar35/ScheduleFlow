@@ -14,14 +14,18 @@ impl UserRepository {
     ///
     /// # Returns
     /// True, if there is a user with the given email, otherwise false.
-    ///
-    /// TODO: refactor to using EXISTS() for performance
     pub(crate) fn is_existing(driver: &mut PgDriver, email: &str) -> bool {
-        let condition = format!("email = '{}'", email);
+        let stmt = format!(
+            "SELECT EXISTS(SELECT 1 FROM users WHERE email = '{}') as exists",
+            email
+        );
 
-        let res = Self::retrieve(driver, Some(condition));
+        let res = Self::query(driver, stmt);
 
-        !res.is_empty()
+        match res {
+            Err(e) => panic!("{}", e), // Should not happen
+            Ok(res) => return res.get(0).unwrap().get("exists"),
+        }
     }
 
     pub(crate) fn get_by_email(driver: &mut PgDriver, email: String) -> Result<User, &'static str> {

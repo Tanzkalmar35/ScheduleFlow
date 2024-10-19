@@ -1,5 +1,8 @@
+use std::ops::DerefMut;
 use crate::auth_util::AuthUtil;
 use tauri::AppHandle;
+use crate::db::repository::user_repository::UserRepository;
+use crate::runtime_objects::driver;
 
 #[tauri::command]
 pub(crate) fn attempt_login(
@@ -20,6 +23,12 @@ pub(crate) fn attempt_signup(
     remember: bool,
 ) -> Result<(), &'static str> {
     AuthUtil::attempt_signup(app_handle, username, email, password, remember)
+}
+
+#[tauri::command]
+pub(crate) fn user_exists(email: &str) -> bool {
+    println!("Email: {}", email);
+    UserRepository::is_existing(driver().lock().unwrap().deref_mut(), email)
 }
 
 #[tauri::command]

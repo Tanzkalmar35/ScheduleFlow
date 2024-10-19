@@ -1,7 +1,6 @@
 import {listen} from "@tauri-apps/api/event";
 
 let notifications = document.querySelector('.notifications');
-let loginForm = document.getElementById("login-btn");
 
 function createToast(type, icon, title, text) {
     let newToast = document.createElement('div')
@@ -12,7 +11,7 @@ function createToast(type, icon, title, text) {
                     <div class="title">${title}</div>
                     <span>${text}</span>
                 </div>
-                <i class="fa-solid fa-xmark" onclick="(this.parentElement).remove()"></i>
+                <i id="notification-${notifications.children.length}" class="fa-solid fa-xmark" onclick="(this.parentElement).remove()"></i>
             </div>`
     notifications.appendChild(newToast)
     newToast.timeOut = setTimeout(() => newToast.remove(), 5000)
@@ -49,8 +48,6 @@ export function createInfoToast(text) {
 }
 
 listen("createToast", (payload) => {
-    console.log("CREATING TOAST IN JS")
-    console.log("Type: ", payload.payload[0], payload.payload[1])
     switch (payload.payload[0]) {
         case "success":
             createSuccessToast(payload.payload[1]);

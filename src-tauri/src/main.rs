@@ -6,7 +6,7 @@ use std::env;
 use std::ops::DerefMut;
 use std::thread;
 
-use crate::api::auth_api_controller::{attempt_login, attempt_signup, is_valid_session, logout};
+use crate::api::auth_api_controller::{attempt_login, attempt_signup, is_valid_session, logout, user_exists};
 use crate::api::calendar_api_controller::get_calendar_of_current_user;
 use crate::errors::error_queue::ErrorQueue;
 use crate::runtime_objects::{driver, set_app_handle, set_error_queue};
@@ -31,6 +31,7 @@ fn main() {
             is_valid_session,
             set_app_handle,
             get_calendar_of_current_user,
+            user_exists,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

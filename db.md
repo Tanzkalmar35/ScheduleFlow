@@ -10,6 +10,7 @@ You need a .env file that includes the accessors to your db. The .env file needs
 - PSQL_USER: The username for the db
 - PSQL_PASS: The password for the db
 - PSQL_IP: The ip address that points to your db
+- SCHEDULEFLOW_JWT_SECRET: The secret the jwt sessions are generated with
 
 Make sure to not put that .env file anywhere except your pc, so the credentials to your db don't get exposed!
 
@@ -18,41 +19,90 @@ Make sure to not put that .env file anywhere except your pc, so the credentials 
 As for the tables, you can use this schema:
 
 ```sql
-CREATE TABLE users (
-                       uuid uuid PRIMARY key unique,
-                       email VARCHAR(255),
-                       password VARCHAR(255),
-                       username VARCHAR(255)
+-- public.calendars definition
+
+-- Drop table
+
+-- DROP TABLE public.calendars;
+
+CREATE TABLE public.calendars (
+                                  "uuid" uuid NOT NULL,
+                                  "name" varchar NULL,
+                                  CONSTRAINT calendars_pkey PRIMARY KEY (uuid)
 );
 
-CREATE TABLE calendars (
-                           uuid uuid PRIMARY key unique
+
+-- public.properties definition
+
+-- Drop table
+
+-- DROP TABLE public.properties;
+
+CREATE TABLE public.properties (
+                                   "uuid" uuid NOT NULL,
+                                   "key" varchar NOT NULL,
+                                   value varchar NOT NULL,
+                                   owner_uuid uuid NOT NULL,
+                                   owner_type varchar NOT NULL,
+                                   CONSTRAINT properties_pkey PRIMARY KEY (uuid)
 );
 
-CREATE TABLE properties (
-                            uuid uuid PRIMARY key unique,
-                            key VARCHAR(255),
-                            value VARCHAR(255)
+
+-- public.users definition
+
+-- Drop table
+
+-- DROP TABLE public.users;
+
+CREATE TABLE public.users (
+                              "uuid" uuid NOT NULL,
+                              email varchar(255) NULL,
+                              "password" varchar(255) NULL,
+                              username varchar(255) NULL,
+                              CONSTRAINT users_pkey PRIMARY KEY (uuid)
 );
 
-CREATE TABLE calendars_properties (
-                                      calendar_id uuid,
-                                      property_id uuid,
-                                      PRIMARY KEY (calendar_id, property_id),
-                                      FOREIGN KEY (calendar_id) REFERENCES calendars (uuid),
-                                      FOREIGN KEY (property_id) REFERENCES properties (uuid)
+
+-- public.components definition
+
+-- Drop table
+
+-- DROP TABLE public.components;
+
+CREATE TABLE public.components (
+                                   "uuid" uuid NOT NULL,
+                                   c_type varchar(255) NULL,
+                                   calendar_uuid uuid NULL,
+                                   CONSTRAINT components_pkey PRIMARY KEY (uuid),
+                                   CONSTRAINT components_calendar_uuid_fkey FOREIGN KEY (calendar_uuid) REFERENCES public.calendars("uuid")
 );
 
-CREATE TABLE components (
-                            uuid uuid PRIMARY key unique,
-                            type VARCHAR(255)
+
+-- public.user_jwt_tokens definition
+
+-- Drop table
+
+-- DROP TABLE public.user_jwt_tokens;
+
+CREATE TABLE public.user_jwt_tokens (
+                                        "token" varchar NOT NULL,
+                                        user_uuid uuid NOT NULL,
+                                        CONSTRAINT user_jwt_tokens_pkey PRIMARY KEY (token),
+                                        CONSTRAINT user_uuid_fkey FOREIGN KEY (user_uuid) REFERENCES public.users("uuid")
 );
 
-CREATE TABLE calendars_components (
-                                      calendar_id uuid,
-                                      component_id uuid,
-                                      PRIMARY KEY (calendar_id, component_id),
-                                      FOREIGN KEY (calendar_id) REFERENCES calendars (uuid),
-                                      FOREIGN KEY (component_id) REFERENCES components (uuid)
+
+-- public.users_calendars definition
+
+-- Drop table
+
+-- DROP TABLE public.users_calendars;
+
+CREATE TABLE public.users_calendars (
+                                        calendar_uuid uuid NOT NULL,
+                                        user_uuid uuid NOT NULL,
+                                        CONSTRAINT calendar_users_pkey PRIMARY KEY (calendar_uuid, user_uuid),
+                                        CONSTRAINT calendar_users_calendar_uuid_fkey FOREIGN KEY (calendar_uuid) REFERENCES public.calendars("uuid"),
+                                        CONSTRAINT calendar_users_user_uuid_fkey FOREIGN KEY (user_uuid) REFERENCES public.users("uuid")
 );
 ```

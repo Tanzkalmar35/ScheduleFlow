@@ -1,16 +1,21 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="/src/styles/main.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <link rel="stylesheet" href="/src/styles/main.css"/>
+    <link rel="stylesheet" href="./src/styles/toast.css">
+
     <title>Tauri App</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
     <script type="module" src="/src/Main.js" defer></script>
-    <script
-            type="module"
-            src="/src/calendar/CalendarUtil.js"
-            defer
-    ></script>
+    <script type="module" src="/src/calendar/CalendarUtil.js" defer></script>
 </head>
 
 <body class="poppins-regular">
@@ -54,16 +59,15 @@
         <form id="create-calendar-form" onsubmit="createNewCalendar()">
             <div>
                 <label id="label-new-calendar-name" for="new-calendar-name">Calendar name</label>
-                <input
-                        id="new-calendar-name"
-                        type="text"
-                        placeholder="Gustav"
-                />
+                <input id="new-calendar-name" type="text" placeholder="Gustav"/>
             </div>
             <div>
                 <div class="flex">
                     <h3>Users</h3>
-                    <button onclick="addUserToCalendar()">Add user</button>
+                    <form id="add-users-form">
+                        <button id="add-new-user-btn" type="submit">Add user</button>
+                        <input id="add-new-calendar-user" type="text" placeholder="User email"/>
+                    </form>
                 </div>
                 <div id="calendar-users">
                     <div id="calendar-user-1">
@@ -81,7 +85,7 @@
 
 <script type="module">
     import {invoke} from "@tauri-apps/api/core";
-    import {createErrorToast} from "./src/Toast.js";
+    import {createErrorToast, createInfoToast} from "./src/Toast.js";
     import {invalidateJwtCookie} from "./src/controller/AuthController.js";
 
     document.getElementById("logout-btn").onclick = logout;
@@ -98,12 +102,7 @@
     async function createNewCalendar() {
         const name = document.getElementById("new-calendar-name").value;
         const usersElements = document.getElementById("calendar-users").children;
-        const users = [];
-        let i = 0;
-        while (i < usersElements.length) {
-            const userElement = usersElements[i];
-            users.push(userElement.children[1].getText());
-        }
+        const users = getEmailsOfCalendarUsers(usersElements);
 
         await invoke("create-calendar", {
             name,
@@ -111,9 +110,50 @@
         });
     }
 
-    async function addUserToCalendar() {
-        // Todo
+    document.getElementById("add-new-user-btn").onclick = async function (event) {
+        event.preventDefault();
+        const calendarUserList = document.getElementById("calendar-users");
+        const userEmail = document.getElementById("add-new-calendar-user").value;
+
+        if (getEmailsOfCalendarUsers(calendarUserList.children).includes(userEmail)) {
+            return;
+        }
+
+        let userExists = false;
+
+        await invoke("user_exists", {email: userEmail})
+            .then((res) => {
+                userExists = res;
+            })
+            .catch((err) => {
+                createErrorToast(err);
+            });
+
+        if (!userExists) {
+            return;
+        }
+
+        const calendarUserCount = calendarUserList.children.length;
+        const newUserElement = document.createElement("div");
+        const htmlParagraphElement = document.createElement("p");
+        htmlParagraphElement.textContent = userEmail;
+        newUserElement.setAttribute("id", "calendar-user-" + calendarUserCount + 1);
+        newUserElement.setAttribute("class", "calendar-user");
+        newUserElement.appendChild(htmlParagraphElement);
+        calendarUserList.appendChild(newUserElement);
+    };
+
+    function getEmailsOfCalendarUsers(calendarUserList) {
+        const users = [];
+        let i = 0;
+        while (i < calendarUserList.length) {
+            const userElement = calendarUserList[i];
+            users.push(userElement.children[0].textContent);
+            i++;
+        }
+        return users;
     }
 </script>
+<script type="module" src="/src/Toast.js" defer></script>
 </body>
 </html>

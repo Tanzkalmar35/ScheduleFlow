@@ -56,7 +56,7 @@
             <span class="close-btn">&times;</span>
             <h2>Create a new calendar</h2>
         </div>
-        <form id="create-calendar-form" onsubmit="createNewCalendar()">
+        <form id="create-calendar-form">
             <div>
                 <label id="label-new-calendar-name" for="new-calendar-name">Calendar name</label>
                 <input id="new-calendar-name" type="text" placeholder="Gustav"/>
@@ -70,15 +70,9 @@
                     </form>
                 </div>
                 <div id="calendar-users">
-                    <div id="calendar-user-1">
-                        <!-- (Profile pic) -->
-                        <!-- (User name) -->
-                        <p>Example user</p>
-                        <!-- (Remove icon) -->
-                    </div>
                 </div>
             </div>
-            <button type="submit">Create</button>
+            <button id="store-new-calendar-btn" type="submit">Create</button>
         </form>
     </div>
 </div>
@@ -99,15 +93,20 @@
         window.location.reload();
     }
 
-    async function createNewCalendar() {
+    document.getElementById("store-new-calendar-btn").onclick = async function(event) {
+        event.preventDefault();
         const name = document.getElementById("new-calendar-name").value;
         const usersElements = document.getElementById("calendar-users").children;
         const users = getEmailsOfCalendarUsers(usersElements);
 
-        await invoke("create-calendar", {
-            name,
-            users
+        await invoke("store_new_calendar", {
+            calendarName: name,
+            usersEmails: users,
         });
+
+        document.getElementById("create-calendar-modal").style.display = "none";
+
+        await loadUserCalendarData()
     }
 
     document.getElementById("add-new-user-btn").onclick = async function (event) {

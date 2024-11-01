@@ -83,6 +83,7 @@
     import {invalidateJwtCookie} from "./src/controller/AuthController.js";
 
     document.getElementById("logout-btn").onclick = logout;
+    const calendarUserList = document.getElementById("calendar-users");
 
     async function logout() {
         await invoke("logout", {
@@ -111,7 +112,6 @@
 
     document.getElementById("add-new-user-btn").onclick = async function (event) {
         event.preventDefault();
-        const calendarUserList = document.getElementById("calendar-users");
         const userEmail = document.getElementById("add-new-calendar-user").value;
 
         if (getEmailsOfCalendarUsers(calendarUserList.children).includes(userEmail)) {
@@ -132,15 +132,19 @@
             return;
         }
 
+        appendUserToList(userEmail);
+    };
+
+    function appendUserToList(email) {
         const calendarUserCount = calendarUserList.children.length;
         const newUserElement = document.createElement("div");
         const htmlParagraphElement = document.createElement("p");
-        htmlParagraphElement.textContent = userEmail;
+        htmlParagraphElement.textContent = email;
         newUserElement.setAttribute("id", "calendar-user-" + calendarUserCount + 1);
         newUserElement.setAttribute("class", "calendar-user");
         newUserElement.appendChild(htmlParagraphElement);
         calendarUserList.appendChild(newUserElement);
-    };
+    }
 
     function getEmailsOfCalendarUsers(calendarUserList) {
         const users = [];

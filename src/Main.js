@@ -27,6 +27,11 @@ async function init() {
         document.getElementById("create-calendar-modal").style.display =
             "block";
     };
+
+    document.getElementById("edit-calendar-btn").onclick = () => {
+        document.getElementById("edit-calendar-modal").style.display =
+            "block";
+    };
 }
 
 await init()

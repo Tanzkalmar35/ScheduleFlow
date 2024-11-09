@@ -47,6 +47,7 @@
         <option value="">Please select...</option>
     </select>
     <button id="create-calendar-btn">New Calendar</button>
+    <button id="edit-calendar-btn">Edit Calendar</button>
 </div>
 <!-- The Modal -->
 <div id="create-calendar-modal" class="modal">
@@ -73,6 +74,35 @@
                 </div>
             </div>
             <button id="store-new-calendar-btn" type="submit">Create</button>
+        </form>
+    </div>
+</div>
+
+<!-- The Edit Modal -->
+<div id="edit-calendar-modal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="">
+            <span class="close-btn">&times;</span>
+            <h2>Edit calendar</h2>
+        </div>
+        <form id="edit-calendar-form">
+            <div>
+                <label id="label-calendar-name" for="edit-calendar-name">Calendar name</label>
+                <input id="edit-calendar-name" type="text" placeholder="Gustav"/>
+            </div>
+            <div>
+                <div class="flex">
+                    <h3>Users</h3>
+                    <form id="edit-add-users-form">
+                        <button id="edit-add-new-user-btn" type="submit">Add user</button>
+                        <input id="edit-add-new-calendar-user" type="text" placeholder="User email"/>
+                    </form>
+                </div>
+                <div id="edit-calendar-users">
+                </div>
+            </div>
+            <button id="store-edited-calendar-btn" type="submit">Create</button>
         </form>
     </div>
 </div>

@@ -1,6 +1,6 @@
 use serde::Serialize;
 use uuid::Uuid;
-
+use pg_driver::PgDriver;
 use crate::{
     db::{
         model::{
@@ -8,8 +8,6 @@ use crate::{
             component::ComponentType,
             property::{OwnerType, Property},
         },
-        pg_driver::PgDriver
-        ,
     },
     errors::{
         error_impl::database_operation_failed_error::DatabaseOperationFailedError,

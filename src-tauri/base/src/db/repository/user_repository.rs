@@ -1,6 +1,5 @@
 use uuid::Uuid;
-
-use crate::db::pg_driver::PgDriver;
+use pg_driver::PgDriver;
 use crate::db::{
     db_actions::{DbActions, Table},
     model::user::User,

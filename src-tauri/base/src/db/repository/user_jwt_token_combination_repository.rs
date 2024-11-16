@@ -1,9 +1,8 @@
 use postgres::Row;
-
+use pg_driver::PgDriver;
 use crate::db::{
     db_actions::{DbActions, Table},
     model::user_jwt_token_combination::UserJwtTokenCombination,
-    pg_driver::PgDriver,
     repository::{jwt_token_repository::JwtTokenRepository, user_repository::UserRepository},
 };
 

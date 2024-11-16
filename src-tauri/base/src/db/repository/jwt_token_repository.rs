@@ -1,7 +1,7 @@
+use pg_driver::PgDriver;
 use crate::db::model::jwt_token::JwtToken;
 use crate::db::{
     db_actions::{DbActions, Table},
-    pg_driver::PgDriver,
 };
 
 pub(crate) struct JwtTokenRepository;

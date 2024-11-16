@@ -1,5 +1,5 @@
 use serde::Serialize;
-
+use pg_driver::PgDriver;
 use crate::db::{
     db_actions::DbActions,
     model::{
@@ -7,7 +7,6 @@ use crate::db::{
         property::{OwnerType, Property},
         simple::simple_component::SimpleComponent,
     },
-    pg_driver::PgDriver,
     repository::property_repository::PropertyRepository,
 };
 

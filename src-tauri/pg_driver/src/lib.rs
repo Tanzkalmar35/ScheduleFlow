@@ -1,8 +1,7 @@
 use postgres::{Client, NoTls, Row};
-use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::errors::error_impl::no_database_connection_error::NoDatabaseConnectionError;
-use crate::runtime_objects::get_error_queue;
+// use crate::errors::error_impl::no_database_connection_error::NoDatabaseConnectionError;
+// use crate::runtime_objects::get_error_queue;
 
 /// The database driver for PostgreSQL.
 #[derive(Default)]
@@ -45,8 +44,9 @@ impl PgDriver {
         if let Ok(client) = conn {
             self.client = Some(client);
         } else {
-            let err = NoDatabaseConnectionError::new();
-            get_error_queue().enqueue(err);
+            // Handle that...
+            // let err = NoDatabaseConnectionError::new();
+            // get_error_queue().enqueue(err);
         }
 
         self
@@ -63,20 +63,11 @@ impl PgDriver {
                 rows = client.query(query, &[])?;
             }
             None => {
-                let err = NoDatabaseConnectionError::new();
-                get_error_queue().enqueue(err);
+                // Handle that...
+                // let err = NoDatabaseConnectionError::new();
+                // get_error_queue().enqueue(err);
             }
         }
         Ok(rows)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::runtime_objects::driver;
-
-    #[test]
-    pub fn test_db_connection() {
-        assert!(driver().lock().is_ok())
     }
 }

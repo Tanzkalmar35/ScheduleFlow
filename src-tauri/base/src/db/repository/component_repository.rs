@@ -1,6 +1,6 @@
+use pg_driver::PgDriver;
 use crate::db::db_actions::{DbActions, Table};
 use crate::db::model::component::{Component, ComponentType};
-use crate::db::pg_driver::PgDriver;
 
 pub(crate) struct ComponentRepository;
 

@@ -1,0 +1,9 @@
+[package]
+name = "pg_driver"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+postgres = "0.19.9"
+serde = "1.0.215"
+anyhow = "1.0.93"

@@ -9,7 +9,6 @@ use std::sync::MutexGuard;
 use crate::db::db_actions::DbActions;
 use crate::db::model::jwt_token::JwtToken;
 use crate::db::model::user::User;
-use crate::db::pg_driver::PgDriver;
 use crate::db::repository::jwt_token_repository::JwtTokenRepository;
 use crate::db::repository::user_repository::UserRepository;
 use crate::errors::error_messages::{BCRYPT_DECODING_ERR, BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
@@ -19,7 +18,7 @@ use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter};
 use uuid::Uuid;
-
+use pg_driver::PgDriver;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {

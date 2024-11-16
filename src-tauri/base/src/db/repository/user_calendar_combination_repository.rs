@@ -1,12 +1,11 @@
 use postgres::Row;
-
+use pg_driver::PgDriver;
 use crate::{
     db::{
         db_actions::{DbActions, Table},
         model::{
             calendar::Calendar, user::User, user_calendar_combination::UserCalendarCombination,
         },
-        pg_driver::PgDriver,
         repository::{calendar_repository::CalendarRepository, user_repository::UserRepository},
     },
     errors::{

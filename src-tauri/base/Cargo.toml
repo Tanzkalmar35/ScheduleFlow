@@ -29,6 +29,7 @@ tauri-plugin-shell = "2"
 
 # Own dependencies
 pg_driver = { path = "../pg_driver" }
+simple_query = { path = "../simple_query" }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

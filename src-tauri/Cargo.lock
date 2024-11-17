@@ -3271,6 +3271,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "simple_query",
  "sqlx",
  "tauri",
  "tauri-build",
@@ -3557,6 +3558,10 @@ dependencies = [
 [[package]]
 name = "simple_query"
 version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.87",
+]
 
 [[package]]
 name = "siphasher"

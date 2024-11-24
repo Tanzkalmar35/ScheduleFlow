@@ -11,14 +11,17 @@ use crate::db::model::jwt_token::JwtToken;
 use crate::db::model::user::User;
 use crate::db::repository::jwt_token_repository::JwtTokenRepository;
 use crate::db::repository::user_repository::UserRepository;
-use crate::errors::error_messages::{BCRYPT_DECODING_ERR, BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET, JWT_COOKIE_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR};
+use crate::errors::error_messages::{
+    BCRYPT_DECODING_ERR, BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET, JWT_COOKIE_ERR,
+    USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
+};
 use crate::runtime_objects::{driver, get_app_handle, set_app_handle, set_current_user};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
+use pg_driver::PgDriver;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter};
 use uuid::Uuid;
-use pg_driver::PgDriver;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -163,15 +166,18 @@ impl AuthUtil {
             token_obj = JwtToken { token, user_uuid };
             let user_matches = format!("user_uuid = '{}'", &user_uuid);
 
-            user_tokens =
-                JwtTokenRepository::retrieve(driver().lock().unwrap().deref_mut(), Some(user_matches));
+            user_tokens = JwtTokenRepository::retrieve(
+                driver().lock().unwrap().deref_mut(),
+                Some(user_matches),
+            );
         } else {
             user_uuid = Uuid::default();
         }
 
         if user_tokens.contains(&token_obj) {
             if let Ok(user) =
-                UserRepository::get_by_uuid(driver().lock().unwrap().deref_mut(), user_uuid) {
+                UserRepository::get_by_uuid(driver().lock().unwrap().deref_mut(), user_uuid)
+            {
                 set_current_user(user);
             }
             true
@@ -193,7 +199,10 @@ impl AuthUtil {
     /// The user is prompted to try again.
     ///
     /// ## If something fails, the user sees it via a toast notification.
-    fn create_persistent_session(user: &User, mut driver: MutexGuard<PgDriver>) -> Result<(), &'static str> {
+    fn create_persistent_session(
+        user: &User,
+        mut driver: MutexGuard<PgDriver>,
+    ) -> Result<(), &'static str> {
         let token = Self::generate_jwt(user.get_uuid());
         JwtTokenRepository::store(driver.deref_mut(), &token);
 
@@ -203,7 +212,11 @@ impl AuthUtil {
             .map_err(|_| JWT_COOKIE_ERR);
 
         if let Err(_) = res {
-            JwtTokenRepository::delete_spec_col(driver.deref_mut(), String::from("token"), token.token);
+            JwtTokenRepository::delete_spec_col(
+                driver.deref_mut(),
+                String::from("token"),
+                token.token,
+            );
             return res;
         }
 

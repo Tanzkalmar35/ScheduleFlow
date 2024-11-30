@@ -10,19 +10,6 @@ pub fn log_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let block = &input.block;
 
     // Check if the first parameter is actually the PgDriver
-    let tks = check_function_params(&input);
-
-    let _expanded = quote! {
-        #fn_vis fn #fn_name() {
-            println!("Function {} is called", stringify!(#fn_name));
-            #block
-        }
-    };
-
-    TokenStream::from(tks)
-}
-
-fn check_function_params(input: &ItemFn) -> TokenStream {
     if let Some(FnArg::Typed(PatType { ty, .. })) = input.sig.inputs.iter().next() {
         if let Type::Path(type_path) = &**ty {
             // Error at compiletime if the first arg is not 'PgDriver'
@@ -42,6 +29,12 @@ fn check_function_params(input: &ItemFn) -> TokenStream {
         });
     }
 
-    TokenStream::new()
-}
+    let expanded = quote! {
+        #fn_vis fn #fn_name() {
+            println!("Function {} is called", stringify!(#fn_name));
+            #block
+        }
+    };
 
+    TokenStream::from(expanded)
+}

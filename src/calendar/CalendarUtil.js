@@ -79,8 +79,6 @@ function validateCalendarAndAppendUserData() {
     const selectedCalendarName = selectCalendarDropdown.value;
     //const calendarDateElements = calendarDatesElement.children;
 
-    console.log("SELECTED CALENDAR: " + selectedCalendarName);
-
     // No calendar selected
     if (selectedCalendarName === "") {
         return;
@@ -190,7 +188,7 @@ function appendUserDataToCalendar(selectedCalendar) {
 renderCalendar(currentDate);
 
 // Render next month
-navigateToNextMonthBtn.addEventListener("click", function () {
+navigateToNextMonthBtn.addEventListener("click", function() {
     currentDate = new Date(
         currentDate.getFullYear(),
         currentDate.getMonth() + 1,
@@ -199,7 +197,7 @@ navigateToNextMonthBtn.addEventListener("click", function () {
 });
 
 // Render previous month
-navigateToPrevMonthBtn.addEventListener("click", function () {
+navigateToPrevMonthBtn.addEventListener("click", function() {
     currentDate = new Date(
         currentDate.getFullYear(),
         currentDate.getMonth() - 1,
@@ -207,6 +205,6 @@ navigateToPrevMonthBtn.addEventListener("click", function () {
     renderCalendar(currentDate);
 });
 
-selectCalendarDropdown.addEventListener("change", () =>
-    validateCalendarAndAppendUserData(),
-);
+selectCalendarDropdown.addEventListener("change", () => {
+    validateCalendarAndAppendUserData()
+});

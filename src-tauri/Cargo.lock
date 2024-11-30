@@ -4314,6 +4314,7 @@ dependencies = [
 name = "test_query"
 version = "0.1.0"
 dependencies = [
+ "pg_driver",
  "simple_query",
 ]
 

@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 simple_query = { path = "../simple_query" }
+pg_driver = { path = "../pg_driver" }

@@ -1,7 +1,7 @@
 use simple_query::log_fn;
 
 #[log_fn]
-fn hello() {
+fn hello(pg_driver: &PgDriver) {
     println!("Hello, world!");
 }
 

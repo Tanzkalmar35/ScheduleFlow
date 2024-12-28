@@ -6,16 +6,11 @@ use std::env;
 use std::ops::DerefMut;
 use std::thread;
 
-use crate::api::auth_api_controller::{
-    attempt_login, attempt_signup, is_valid_session, logout, user_exists,
-};
-use crate::api::calendar_api_controller::{get_calendar_of_current_user, store_new_calendar};
 use crate::errors::error_queue::ErrorQueue;
 use crate::runtime_objects::{driver, set_app_handle, set_error_queue};
 use dotenv::dotenv;
 use tauri::{Manager, Runtime};
 
-mod api;
 mod auth_util;
 mod db;
 mod errors;
@@ -26,16 +21,7 @@ fn main() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![
-            attempt_signup,
-            attempt_login,
-            logout,
-            is_valid_session,
-            set_app_handle,
-            get_calendar_of_current_user,
-            user_exists,
-            store_new_calendar,
-        ])
+        .invoke_handler(tauri::generate_handler![set_app_handle,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

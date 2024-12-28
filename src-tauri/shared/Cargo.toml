@@ -1,5 +1,5 @@
 [package]
-name = "scheduleflow"
+name = "shared"
 version = "0.0.0"
 description = "A Tauri App"
 authors = ["Fabian Holler"]
@@ -30,8 +30,6 @@ tauri-plugin-shell = "2"
 # Own dependencies
 pg_driver = { path = "../pg_driver" }
 simple_query = { path = "../simple_query" }
-
-shared = { path = "../shared" }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

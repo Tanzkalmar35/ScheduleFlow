@@ -3,4 +3,4 @@ members = [
     "base",
     "pg_driver",
     "simple_query"
-, "test_query"]
+, "shared"]

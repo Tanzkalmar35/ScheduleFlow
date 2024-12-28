@@ -1,0 +1,38 @@
+{
+  "build": {
+    "beforeDevCommand": "yarn dev",
+    "beforeBuildCommand": "yarn build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+  "productName": "scheduleflow",
+  "mainBinaryName": "scheduleflow",
+  "version": "0.0.0",
+  "identifier": "com.tauri.dev",
+  "plugins": {},
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "scheduleflow",
+        "width": 800,
+        "height": 600,
+        "maximized": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  }
+}

@@ -1,3 +1,3 @@
-pub(crate) struct UserService;
+pub struct UserService;
 
 impl UserService {}

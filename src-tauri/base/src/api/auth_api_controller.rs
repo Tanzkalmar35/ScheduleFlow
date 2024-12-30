@@ -1,10 +1,8 @@
+use shared::{
+    auth_util::AuthUtil, db::repository::user_repository::UserRepository, runtime_objects::driver,
+};
 use std::ops::{Deref, DerefMut};
-use crate::auth_util::AuthUtil;
 use tauri::AppHandle;
-use crate::db::model::user::User;
-use crate::db::repository::user_repository::UserRepository;
-use crate::runtime_objects;
-use crate::runtime_objects::driver;
 
 #[tauri::command]
 pub(crate) fn attempt_login(
@@ -42,3 +40,4 @@ pub(crate) fn logout(token: String) -> Result<(), &'static str> {
 pub(crate) fn is_valid_session(token: String) -> bool {
     AuthUtil::is_valid_session(token)
 }
+

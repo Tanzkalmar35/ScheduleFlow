@@ -6,20 +6,20 @@ use std::env;
 use std::ops::DerefMut;
 use std::thread;
 
-use crate::api::auth_api_controller::{
-    attempt_login, attempt_signup, is_valid_session, logout, user_exists,
+use api::{
+    auth_api_controller::{attempt_login, attempt_signup, is_valid_session, logout, user_exists},
+    calendar_api_controller::{get_calendar_of_current_user, store_new_calendar},
 };
-use crate::api::calendar_api_controller::{get_calendar_of_current_user, store_new_calendar};
-use crate::errors::error_queue::ErrorQueue;
-use crate::runtime_objects::{driver, set_app_handle, set_error_queue};
+use shared::{
+    auth_util,
+    errors::error_queue::ErrorQueue,
+    runtime_objects::{driver, set_app_handle as set_shared_app_handle, set_error_queue},
+};
+
 use dotenv::dotenv;
-use tauri::{Manager, Runtime};
+use tauri::{AppHandle, Manager, Runtime};
 
 mod api;
-mod auth_util;
-mod db;
-mod errors;
-mod runtime_objects;
 
 fn main() {
     init();
@@ -48,4 +48,9 @@ pub fn init() {
     thread::spawn(move || {
         let driver = driver();
     });
+}
+
+#[tauri::command]
+fn set_app_handle(app_handle: AppHandle) {
+    set_shared_app_handle(app_handle);
 }

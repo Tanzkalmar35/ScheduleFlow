@@ -5,8 +5,8 @@ use crate::errors::error_messages::ERROR_QUEUE_NOT_INITIALIZED_ERR;
 use crate::errors::error_queue::ErrorQueue;
 use lazy_static::lazy_static;
 use once_cell::sync::OnceCell;
-use tauri::AppHandle;
 use pg_driver::PgDriver;
+use tauri::AppHandle;
 
 pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
 pub static ERROR_QUEUE: OnceCell<Mutex<Option<ErrorQueue>>> = OnceCell::new();
@@ -72,7 +72,6 @@ pub fn reset_error_queue() {
     }
 }
 
-#[tauri::command]
 pub fn set_app_handle(app_handle: AppHandle) {
     *APP_HANDLE.lock().unwrap() = Some(app_handle);
 }

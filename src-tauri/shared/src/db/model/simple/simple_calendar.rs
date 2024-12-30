@@ -1,5 +1,3 @@
-use serde::Serialize;
-use pg_driver::PgDriver;
 use crate::db::{
     db_actions::DbActions,
     model::{
@@ -9,6 +7,8 @@ use crate::db::{
     },
     repository::property_repository::PropertyRepository,
 };
+use pg_driver::PgDriver;
+use serde::Serialize;
 
 #[derive(Serialize, Debug)]
 pub struct SimpleCalendar {
@@ -18,11 +18,7 @@ pub struct SimpleCalendar {
 }
 
 impl SimpleCalendar {
-    pub(crate) fn new(
-        name: String,
-        components: Vec<SimpleComponent>,
-        properties: Vec<Property>,
-    ) -> Self {
+    pub fn new(name: String, components: Vec<SimpleComponent>, properties: Vec<Property>) -> Self {
         Self {
             name,
             components,
@@ -34,7 +30,7 @@ impl SimpleCalendar {
      * Creates a new SimpleCalendar representing an model::Calendar.
      * Assembless all dependencies of that model::Calendar to one data holder object.
      */
-    pub(crate) fn build(driver: &mut PgDriver, calendar: Calendar) -> Self {
+    pub fn build(driver: &mut PgDriver, calendar: Calendar) -> Self {
         let owned_by_calendar = format!(
             "owner_type = '{}' and owner_uuid = '{}'",
             OwnerType::CALENDAR.to_string(),

@@ -1,5 +1,3 @@
-use postgres::Row;
-use pg_driver::PgDriver;
 use crate::{
     db::{
         db_actions::{DbActions, Table},
@@ -9,11 +7,13 @@ use crate::{
         repository::{calendar_repository::CalendarRepository, user_repository::UserRepository},
     },
     errors::{
-        error_impl::database_operation_failed_error::DatabaseOperationFailedError
-        , error_utils::Error,
+        error_impl::database_operation_failed_error::DatabaseOperationFailedError,
+        error_utils::Error,
     },
     runtime_objects::get_error_queue,
 };
+use pg_driver::PgDriver;
+use postgres::Row;
 
 pub struct UserCalendarCombinationRepository;
 

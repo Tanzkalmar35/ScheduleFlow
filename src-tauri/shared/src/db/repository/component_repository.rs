@@ -1,8 +1,8 @@
-use pg_driver::PgDriver;
 use crate::db::db_actions::{DbActions, Table};
 use crate::db::model::component::{Component, ComponentType};
+use pg_driver::PgDriver;
 
-pub(crate) struct ComponentRepository;
+pub struct ComponentRepository;
 
 impl ComponentRepository {
     pub fn retrieve_single(driver: &mut PgDriver, condition: Option<String>) -> Component {

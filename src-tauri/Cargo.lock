@@ -3260,24 +3260,15 @@ name = "scheduleflow"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "bcrypt",
  "chrono",
  "dotenv",
- "jsonwebtoken",
- "lazy_static",
- "once_cell",
  "pg_driver",
- "postgres",
- "rand 0.8.5",
  "serde",
  "serde_json",
  "shared",
- "simple_query",
- "sqlx",
  "tauri",
  "tauri-build",
  "tauri-plugin-shell",
- "uuid",
 ]
 
 [[package]]

@@ -1,8 +1,8 @@
 use uuid::Uuid;
 
 pub struct UserCalendarCombination {
-    pub(crate) user_uuid: Uuid,
-    pub(crate) calendar_uuid: Uuid,
+    pub user_uuid: Uuid,
+    pub calendar_uuid: Uuid,
 }
 
 impl UserCalendarCombination {

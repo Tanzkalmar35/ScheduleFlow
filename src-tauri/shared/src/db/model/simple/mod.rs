@@ -1,2 +1,2 @@
-pub(crate) mod simple_calendar;
-pub(crate) mod simple_component;
+pub mod simple_calendar;
+pub mod simple_component;

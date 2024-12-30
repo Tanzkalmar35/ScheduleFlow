@@ -10,7 +10,7 @@ pub struct Property {
 }
 
 impl Property {
-    pub(crate) fn new(key: String, val: String) -> Self {
+    pub fn new(key: String, val: String) -> Self {
         Self {
             uuid: Uuid::new_v4(),
             key,
@@ -18,31 +18,31 @@ impl Property {
         }
     }
 
-    pub(crate) fn from(uuid: Uuid, key: String, val: String) -> Self {
+    pub fn from(uuid: Uuid, key: String, val: String) -> Self {
         Self { uuid, key, val }
     }
 
-    pub(crate) fn get_uuid(&self) -> Uuid {
+    pub fn get_uuid(&self) -> Uuid {
         self.uuid
     }
 
-    pub(crate) fn get_key(&self) -> &String {
+    pub fn get_key(&self) -> &String {
         &self.key
     }
 
-    pub(crate) fn set_key(&mut self, key: String) {
+    pub fn set_key(&mut self, key: String) {
         self.key = key;
     }
 
-    pub(crate) fn get_val(&self) -> &String {
+    pub fn get_val(&self) -> &String {
         &self.val
     }
 
-    pub(crate) fn set_val(&mut self, val: String) {
+    pub fn set_val(&mut self, val: String) {
         self.val = val;
     }
 
-    pub(crate) fn hold(key: String, val: String) -> Self {
+    pub fn hold(key: String, val: String) -> Self {
         Self {
             uuid: Uuid::nil(),
             key,

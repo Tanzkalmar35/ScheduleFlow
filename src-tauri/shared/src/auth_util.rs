@@ -25,10 +25,10 @@ use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub(crate) user_uuid: Uuid,
+    pub user_uuid: Uuid,
 }
 
-pub(crate) struct AuthUtil;
+pub struct AuthUtil;
 
 impl AuthUtil {
     /// Attempts logging in to the system with the given credentials.

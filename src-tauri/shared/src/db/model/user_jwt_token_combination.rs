@@ -1,8 +1,8 @@
 use uuid::Uuid;
 
 pub struct UserJwtTokenCombination {
-    pub(crate) user_uuid: Uuid,
-    pub(crate) jwt_token_uuid: Uuid,
+    pub user_uuid: Uuid,
+    pub jwt_token_uuid: Uuid,
 }
 
 impl UserJwtTokenCombination {

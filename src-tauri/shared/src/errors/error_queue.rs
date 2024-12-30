@@ -12,7 +12,7 @@ pub struct ErrorQueue {
 }
 
 impl ErrorQueue {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         let (tx, rx) = mpsc::channel();
         let queue = Arc::new(Mutex::new(VecDeque::<Box<dyn Error + Send>>::new()));
         let queue_clone = Arc::clone(&queue);
@@ -39,7 +39,7 @@ impl ErrorQueue {
         ErrorQueue { queue, tx }
     }
 
-    pub(crate) fn enqueue(&self, err: impl Error + Send + 'static) {
+    pub fn enqueue(&self, err: impl Error + Send + 'static) {
         self.queue.lock().unwrap().push_back(Box::new(err));
         self.tx.send(()).unwrap(); // Send a dummy message to the receiver to wake the thread up
     }

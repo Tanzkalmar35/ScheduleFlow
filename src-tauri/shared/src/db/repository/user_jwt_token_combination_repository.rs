@@ -1,10 +1,10 @@
-use postgres::Row;
-use pg_driver::PgDriver;
 use crate::db::{
     db_actions::{DbActions, Table},
     model::user_jwt_token_combination::UserJwtTokenCombination,
     repository::{jwt_token_repository::JwtTokenRepository, user_repository::UserRepository},
 };
+use pg_driver::PgDriver;
+use postgres::Row;
 
 pub struct UserJwtTokenCombinationRepository;
 

@@ -1,6 +1,6 @@
+use pg_driver::PgDriver;
 use postgres::Row;
 use uuid::Uuid;
-use pg_driver::PgDriver;
 
 pub trait Table<M> {
     fn get_name() -> String;

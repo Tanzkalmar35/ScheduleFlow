@@ -3,8 +3,8 @@ use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Calendar {
-    pub(crate) uuid: Uuid,
-    pub(crate) name: String,
+    pub uuid: Uuid,
+    pub name: String,
 }
 
 impl Calendar {

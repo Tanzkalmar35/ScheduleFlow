@@ -1,10 +1,8 @@
-use pg_driver::PgDriver;
+use crate::db::db_actions::{DbActions, Table};
 use crate::db::model::jwt_token::JwtToken;
-use crate::db::{
-    db_actions::{DbActions, Table},
-};
+use pg_driver::PgDriver;
 
-pub(crate) struct JwtTokenRepository;
+pub struct JwtTokenRepository;
 
 impl JwtTokenRepository {}
 

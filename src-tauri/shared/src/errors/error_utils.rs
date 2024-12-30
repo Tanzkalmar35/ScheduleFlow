@@ -53,12 +53,13 @@ impl ErrorHandler {
     ///
     /// # Params
     /// * `message` - The error message to be displayed on the toast message.
-    pub(crate) fn populate_toast(message: &'static str) -> Box<dyn Fn() + Send + 'static> {
+    pub fn populate_toast(message: &'static str) -> Box<dyn Fn() + Send + 'static> {
         Box::new(move || {
             get_app_handle()
                 .unwrap()
                 .app_handle()
-                .emit("createToast", ("error", message)).expect("Could not create toast notification");
+                .emit("createToast", ("error", message))
+                .expect("Could not create toast notification");
         })
     }
 
@@ -67,7 +68,7 @@ impl ErrorHandler {
     ///
     /// # Params
     /// * `message` - The message the app will show in the logs after crashed.
-    pub(crate) fn panic(message: &'static str) -> Box<dyn Fn() + Send + 'static> {
+    pub fn panic(message: &'static str) -> Box<dyn Fn() + Send + 'static> {
         Box::new(move || panic!("{}", message))
     }
 }

@@ -1,8 +1,8 @@
-use pg_driver::PgDriver;
 use crate::db::{
     db_actions::{DbActions, Table},
     model::calendar::Calendar,
 };
+use pg_driver::PgDriver;
 
 pub struct CalendarRepository;
 

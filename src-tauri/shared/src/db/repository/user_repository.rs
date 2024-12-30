@@ -1,19 +1,19 @@
-use uuid::Uuid;
-use pg_driver::PgDriver;
 use crate::db::{
     db_actions::{DbActions, Table},
     model::user::User,
 };
 use crate::errors::error_messages::USER_NOT_FOUND_ERR;
+use pg_driver::PgDriver;
+use uuid::Uuid;
 
-pub(crate) struct UserRepository;
+pub struct UserRepository;
 
 impl UserRepository {
     /// Checks if a user with a given email already exists.
     ///
     /// # Returns
     /// True, if there is a user with the given email, otherwise false.
-    pub(crate) fn is_existing(driver: &mut PgDriver, email: &str) -> bool {
+    pub fn is_existing(driver: &mut PgDriver, email: &str) -> bool {
         let stmt = format!(
             "SELECT EXISTS(SELECT 1 FROM users WHERE email = '{}') as exists",
             email
@@ -27,17 +27,17 @@ impl UserRepository {
         }
     }
 
-    pub(crate) fn get_by_email(driver: &mut PgDriver, email: String) -> Result<User, &'static str> {
+    pub fn get_by_email(driver: &mut PgDriver, email: String) -> Result<User, &'static str> {
         let condition = format!("email = '{}'", email);
         Self::get(driver, condition)
     }
 
-    pub(crate) fn get_by_uuid(driver: &mut PgDriver, uuid: Uuid) -> Result<User, &'static str> {
+    pub fn get_by_uuid(driver: &mut PgDriver, uuid: Uuid) -> Result<User, &'static str> {
         let condition = format!("uuid = '{}'", uuid);
         Self::get(driver, condition)
     }
 
-    pub(crate) fn get(driver: &mut PgDriver, condition: String) -> Result<User, &'static str> {
+    pub fn get(driver: &mut PgDriver, condition: String) -> Result<User, &'static str> {
         let user_opt = UserRepository::retrieve(driver, Some(condition))
             .get(0)
             .cloned();

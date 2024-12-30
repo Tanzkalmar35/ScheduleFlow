@@ -1,13 +1,8 @@
-use serde::Serialize;
-use uuid::Uuid;
-use pg_driver::PgDriver;
 use crate::{
-    db::{
-        model::{
-            calendar::Calendar,
-            component::ComponentType,
-            property::{OwnerType, Property},
-        },
+    db::model::{
+        calendar::Calendar,
+        component::ComponentType,
+        property::{OwnerType, Property},
     },
     errors::{
         error_impl::database_operation_failed_error::DatabaseOperationFailedError,
@@ -15,30 +10,33 @@ use crate::{
     },
     runtime_objects::get_error_queue,
 };
+use pg_driver::PgDriver;
+use serde::Serialize;
+use uuid::Uuid;
 
 #[derive(Debug, Default, PartialEq, Serialize)]
-pub(crate) struct SimpleComponent {
+pub struct SimpleComponent {
     c_type: ComponentType,
     properties: Vec<Property>,
 }
 
 impl SimpleComponent {
-    pub(crate) fn new(c_type: ComponentType, properties: Vec<Property>) -> Self {
+    pub fn new(c_type: ComponentType, properties: Vec<Property>) -> Self {
         Self { c_type, properties }
     }
 
-    pub(crate) fn empty() -> Self {
+    pub fn empty() -> Self {
         Self {
             c_type: ComponentType::OTHER,
             properties: vec![],
         }
     }
 
-    pub(crate) fn add_property(&mut self, property: Property) {
+    pub fn add_property(&mut self, property: Property) {
         self.properties.push(property);
     }
 
-    pub(crate) fn build_by_calendar(driver: &mut PgDriver, calendar: &Calendar) -> Vec<Self> {
+    pub fn build_by_calendar(driver: &mut PgDriver, calendar: &Calendar) -> Vec<Self> {
         let mut simple_components: Vec<Self> = vec![];
         let stmt = format!(
             r#"

@@ -29,8 +29,8 @@ impl ComponentType {
 
 #[derive(Clone)]
 pub struct Component {
-    pub(crate) uuid: Uuid,
-    pub(crate) c_type: ComponentType,
+    pub uuid: Uuid,
+    pub c_type: ComponentType,
 }
 
 impl Component {

@@ -2,9 +2,9 @@ use serde::Serialize;
 use uuid::Uuid;
 
 #[derive(Serialize, Clone, PartialEq)]
-pub(crate) struct JwtToken {
-    pub(crate) token: String,
-    pub(crate) user_uuid: Uuid,
+pub struct JwtToken {
+    pub token: String,
+    pub user_uuid: Uuid,
 }
 
 impl JwtToken {

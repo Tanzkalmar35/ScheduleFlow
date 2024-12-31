@@ -2,5 +2,7 @@
 members = [
     "base",
     "pg_driver",
-    "simple_query"
-, "shared"]
+    "simple_query", 
+    "shared",
+    "tui",
+]

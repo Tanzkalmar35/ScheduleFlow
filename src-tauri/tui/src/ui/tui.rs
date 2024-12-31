@@ -42,7 +42,7 @@ impl Tui {
         let backend = CrosstermBackend::new(stdout);
         let mut terminal = Terminal::new(backend)?;
 
-        let mut tui = Tui::new();
+        let tui = Tui::new();
 
         loop {
             terminal.draw(|f| tui.render(f))?;
@@ -51,9 +51,9 @@ impl Tui {
             if event::poll(std::time::Duration::from_millis(100))? {
                 if let event::Event::Key(KeyEvent { code, .. }) = event::read()? {
                     match code {
-                        KeyCode::Char('l') => tui.state = AppState::LoginScreen,
-                        KeyCode::Char('s') => tui.state = AppState::SignupScreen,
-                        KeyCode::Char('h') => tui.state = AppState::HomePageScreen,
+                        //KeyCode::Char('l') => tui.state = AppState::LoginScreen,
+                        //KeyCode::Char('s') => tui.state = AppState::SignupScreen,
+                        //KeyCode::Char('h') => tui.state = AppState::HomePageScreen,
                         KeyCode::Char('q') => break, // Quit the application
                         _ => {}
                     }
@@ -80,7 +80,7 @@ impl Tui {
         frame.render_widget(block, frame.area());
 
         let bounds = Rect::new(2, 1, frame.area().width - 4, frame.area().height - 2);
-        LoginScreen::render(frame, bounds);
+        LoginScreen::new().render(frame, bounds);
     }
 
     fn render_signup_screen(&self, frame: &mut Frame) {

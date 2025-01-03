@@ -1,47 +1,87 @@
-use ratatui::prelude::{Buffer, Rect};
-use ratatui::style::Style;
-use ratatui::widgets::Widget;
+use std::fmt::Debug;
 
-pub(crate) struct InputField {
-    value: String,
+use crossterm::event::KeyCode;
+use ratatui::{
+    style::{Color, Style},
+    text::{Span, Text},
+    widgets::{Block, Borders, Paragraph},
+};
+
+#[derive(Clone)]
+pub(crate) struct InputWidget {
+    title: String,
+    input: String,
+    pub(crate) cursor_position: usize,
+    pub(crate) key: char, // Key to focus this input
+    focused: bool,        // Whether this input is focused
 }
 
-impl InputField {
-    pub(crate) fn new() -> Self {
+impl InputWidget {
+    pub(crate) fn new(title: String, key: char) -> Self {
         Self {
-            value: String::new(),
+            title: " ".to_owned() + &title + " - " + &key.to_string() + " ",
+            input: String::new(),
+            cursor_position: 0,
+            key,
+            focused: false,
         }
     }
 
-    pub(crate) fn set_value(&mut self, value: String) {
-        self.value = value;
+    pub(crate) fn set_focus(&mut self, focus: bool) {
+        self.focused = focus;
     }
 
-    pub(crate) fn get_value(&self) -> &str {
-        &self.value
+    pub(crate) fn is_focused(&self) -> bool {
+        return self.focused;
     }
-}
 
-impl Widget for InputField {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        // Draw the border of the input field
-        //let border_style = Style::default(); // You can customize the style here
+    pub(crate) fn handle_input(&mut self, key: KeyCode) {
+        if self.focused {
+            match key {
+                KeyCode::Char(c) => {
+                    self.input.insert(self.cursor_position, c);
+                    self.cursor_position += 1;
+                }
+                KeyCode::Backspace => {
+                    if self.cursor_position > 0 {
+                        self.input.remove(self.cursor_position - 1);
+                        self.cursor_position -= 1;
+                    }
+                }
+                KeyCode::Left => {
+                    if self.cursor_position > 0 {
+                        self.cursor_position -= 1;
+                    }
+                }
+                KeyCode::Right => {
+                    if self.cursor_position < self.input.len() {
+                        self.cursor_position += 1;
+                    }
+                }
+                KeyCode::Enter => {
+                    // Handle Enter key if needed (e.g., submit input)
+                }
+                _ => {}
+            }
+        }
+    }
 
-        // Draw the input value inside the field
-        let input_area = Rect {
-            x: area.x + 1,
-            y: area.y + 1,
-            width: area.width - 2,
-            height: area.height - 2,
-        };
+    pub(crate) fn render(&self, frame: &mut ratatui::Frame, area: ratatui::layout::Rect) {
+        let input_paragraph = Paragraph::new(Text::from(Span::raw(&self.input)))
+            .style(if self.focused {
+                Style::default().fg(Color::Yellow) // Change color if focused
+            } else {
+                Style::default().fg(Color::White)
+            })
+            .block(Block::default().title(&*self.title).borders(Borders::ALL));
 
-        // Draw the text inside the input area
-        buf.set_stringn(
-            input_area.x,
-            input_area.y,
-            &self.value,
-            input_area.width as usize,
-            Style::default(),
-        );
+        frame.render_widget(input_paragraph, area);
+
+        // Set cursor position
+        if self.is_focused() {
+            let cursor_x = area.x + self.cursor_position as u16 + 1; // +1 for the border
+            let cursor_y = area.y + 1; // +1 for the border
+            frame.set_cursor(cursor_x, cursor_y);
+        }
     }
 }

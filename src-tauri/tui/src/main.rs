@@ -1,5 +1,6 @@
 use ui::tui::Tui;
 
+mod constants;
 mod ui;
 
 fn main() {

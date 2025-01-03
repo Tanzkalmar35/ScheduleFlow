@@ -6,10 +6,6 @@ use postgres::{Client, NoTls, Row};
 /// The database driver for PostgreSQL.
 #[derive(Default)]
 pub struct PgDriver {
-    user: String,
-    pass: String,
-    name: String,
-    address: String,
     url: String,
     /// The postgres client.
     client: Option<Client>,
@@ -23,14 +19,7 @@ impl PgDriver {
         let pass = std::env::var("PSQL_PASS").expect("PSQL PASS NOT SET");
         let address = std::env::var("PSQL_IP").expect("PSQL ADDRESS NOT SET");
         let url = format!("postgres://{}:{}@{}/{}", user, pass, address, name);
-        Self {
-            user,
-            pass,
-            name,
-            address,
-            url,
-            client: None,
-        }
+        Self { url, client: None }
     }
 
     /// Initializes the database connection client.
@@ -71,3 +60,4 @@ impl PgDriver {
         Ok(rows)
     }
 }
+

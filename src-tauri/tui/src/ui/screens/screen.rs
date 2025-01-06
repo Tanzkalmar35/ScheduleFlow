@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use color_eyre::eyre::Result;
 use crossterm::event::KeyCode;
 use ratatui::{layout::Rect, Frame};

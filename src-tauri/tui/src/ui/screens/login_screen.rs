@@ -6,10 +6,13 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
     Frame,
 };
+use shared::auth_util::AuthUtil;
 
 use crate::ui::tui::Cmd;
 
-use super::{super::widgets::input_field::InputWidget, screen::Screen};
+use super::{
+    super::widgets::input_field::InputWidget, home_page_screen::HomePageScreen, screen::Screen,
+};
 
 #[derive(Clone)]
 pub(crate) struct LoginScreen {
@@ -67,7 +70,21 @@ impl Screen for LoginScreen {
             self.email.set_focus(false);
             self.password.set_focus(false);
             return Cmd::ChangeMode;
+        } else if key == KeyCode::Enter {
+            let login_attempt = AuthUtil::attempt_login(
+                None,
+                self.email.input().to_string(),
+                self.password.input().to_string(),
+                true,
+            );
+            if let Ok(()) = login_attempt {
+                return Cmd::NavigateTo(Box::new(HomePageScreen::new()));
+            } else if let Err(e) = login_attempt {
+                panic!("{}", e)
+            }
+            return Cmd::None;
         }
+
         if self.email.is_focused() {
             self.email.handle_input(key);
         } else if self.password.is_focused() {

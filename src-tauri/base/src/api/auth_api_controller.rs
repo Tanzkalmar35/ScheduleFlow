@@ -11,7 +11,7 @@ pub(crate) fn attempt_login(
     password: String,
     remember: bool,
 ) -> Result<(), &'static str> {
-    AuthUtil::attempt_login(app_handle, email, password, remember)
+    AuthUtil::attempt_login(Some(app_handle), email, password, remember)
 }
 
 #[tauri::command]
@@ -40,4 +40,3 @@ pub(crate) fn logout(token: String) -> Result<(), &'static str> {
 pub(crate) fn is_valid_session(token: String) -> bool {
     AuthUtil::is_valid_session(token)
 }
-

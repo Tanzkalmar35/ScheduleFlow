@@ -8,11 +8,14 @@ use crossterm::{
 use ratatui::{
     backend::CrosstermBackend,
     layout::{Alignment, Rect},
-    text::{Line, Span, Text},
-    widgets::{Block, Borders, Paragraph},
+    text::{Line, Text},
+    widgets::Paragraph,
     Frame, Terminal,
 };
-use std::io;
+use std::{
+    any::{Any, TypeId},
+    io,
+};
 
 use crate::constants;
 
@@ -33,10 +36,23 @@ enum Mode {
     NORMAL,
 }
 
-#[derive(PartialEq)]
 pub(crate) enum Cmd {
     ChangeMode,
+    NavigateTo(Box<dyn Screen>),
     None,
+}
+
+impl PartialEq for Cmd {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Cmd::ChangeMode, Cmd::ChangeMode) => true,
+            (Cmd::None, Cmd::None) => true,
+            (Cmd::NavigateTo(_screen_a), Cmd::NavigateTo(_screen_b)) => {
+                todo!("At this point of time, I don't think I need this. If I'm wrong, sorry future me :-C")
+            }
+            _ => false,
+        }
+    }
 }
 
 pub(crate) struct Tui {
@@ -76,22 +92,17 @@ impl Tui {
                 let bounds = Rect::new(2, 1, f.area().width - 4, f.area().height - 2);
 
                 tui.render_login_screen(f, bounds);
-
-                //if let Some(ref s) = screen {
-                //    let _ = s.render(f, bounds);
-                //} else {
-                //    screen = Some(tui.render(f, bounds));
-                //}
             })?;
 
             // Handle user input
             if let event::Event::Key(KeyEvent { code, .. }) = event::read()? {
                 match tui.current_mode {
-                    Mode::EDIT => {
-                        if tui.login_screen.handle_input(code) == Cmd::ChangeMode {
-                            tui.change_mode();
-                        };
-                    }
+                    Mode::EDIT => match tui.login_screen.handle_input(code) {
+                        Cmd::ChangeMode => tui.change_mode(),
+                        Cmd::NavigateTo(screen) => tui.navigate_to(screen),
+                        Cmd::None => {}
+                        _ => {}
+                    },
                     Mode::NORMAL => {
                         match code {
                             KeyCode::Char('q') => break, // Quit the application
@@ -163,6 +174,16 @@ impl Tui {
             self.current_mode = Mode::EDIT;
         } else if self.current_mode == Mode::EDIT {
             self.current_mode = Mode::NORMAL;
+        }
+    }
+
+    fn navigate_to(&mut self, screen: Box<dyn Screen>) {
+        if screen.type_id() == TypeId::of::<LoginScreen>() {
+            self.state = AppState::LoginScreen;
+        } else if screen.type_id() == TypeId::of::<SignupScreen>() {
+            self.state = AppState::SignupScreen;
+        } else if screen.type_id() == TypeId::of::<HomePageScreen>() {
+            self.state = AppState::HomePageScreen;
         }
     }
 }

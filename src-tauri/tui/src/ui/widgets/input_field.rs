@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use crossterm::event::KeyCode;
 use ratatui::{
     style::{Color, Style},
@@ -10,7 +8,7 @@ use ratatui::{
 #[derive(Clone)]
 pub(crate) struct InputWidget {
     title: String,
-    input: String,
+    pub(crate) input: String,
     pub(crate) cursor_position: usize,
     pub(crate) key: char, // Key to focus this input
     focused: bool,        // Whether this input is focused
@@ -58,9 +56,9 @@ impl InputWidget {
                         self.cursor_position += 1;
                     }
                 }
-                KeyCode::Enter => {
-                    // Handle Enter key if needed (e.g., submit input)
-                }
+                //KeyCode::Enter => {
+                //    // Handle Enter key if needed (e.g., submit input)
+                //}
                 _ => {}
             }
         }
@@ -83,5 +81,9 @@ impl InputWidget {
             let cursor_y = area.y + 1; // +1 for the border
             frame.set_cursor(cursor_x, cursor_y);
         }
+    }
+
+    pub(crate) fn input(&self) -> &str {
+        &self.input
     }
 }

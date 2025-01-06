@@ -48,12 +48,14 @@ impl AuthUtil {
     ///
     /// ## If something fails, the user sees it via a toast notification.
     pub fn attempt_login(
-        app_handle: AppHandle,
+        app_handle: Option<AppHandle>,
         email: String,
         password: String,
         remember: bool,
     ) -> Result<(), &'static str> {
-        set_app_handle(app_handle);
+        if let Some(handle) = app_handle {
+            set_app_handle(handle);
+        }
         let mut driver = driver().lock().unwrap();
         let user_exists = UserRepository::is_existing(driver.deref_mut(), &email);
         let user = UserRepository::get_by_email(driver.deref_mut(), email)?;

@@ -18,7 +18,7 @@ impl Table<UserJwtTokenCombination> for UserJwtTokenCombinationRepository {
     }
 
     fn get_fk_uuid_name() -> String {
-        "".to_string()
+        unimplemented!()
     }
 
     fn get_fmt_cols() -> String {
@@ -30,7 +30,7 @@ impl Table<UserJwtTokenCombination> for UserJwtTokenCombinationRepository {
     }
 
     fn get_fmt_cols_no_id() -> String {
-        "".to_string()
+        unimplemented!()
     }
 
     fn get_fmt_vals(model: &UserJwtTokenCombination) -> String {
@@ -38,7 +38,7 @@ impl Table<UserJwtTokenCombination> for UserJwtTokenCombinationRepository {
     }
 
     fn get_fmt_vals_no_id(_model: &UserJwtTokenCombination) -> String {
-        "".to_string()
+        unimplemented!()
     }
 }
 
@@ -65,11 +65,11 @@ impl DbActions<UserJwtTokenCombination, Self> for UserJwtTokenCombinationReposit
         let rows: Vec<Row> = Self::read(driver, Self::get_name().as_str(), condition);
 
         for row in rows {
-            let calendar_uuid: String = row.get(UserRepository::get_fk_uuid_name().as_str());
-            let property_uuid: String = row.get(JwtTokenRepository::get_fk_uuid_name().as_str());
+            let user_uuid: String = row.get(UserRepository::get_fk_uuid_name().as_str());
+            let jwt_token_uuid: String = row.get(JwtTokenRepository::get_fk_uuid_name().as_str());
             res.push(UserJwtTokenCombination::new(
-                calendar_uuid.parse().unwrap(),
-                property_uuid.parse().unwrap(),
+                user_uuid.parse().unwrap(),
+                jwt_token_uuid.parse().unwrap(),
             ))
         }
 

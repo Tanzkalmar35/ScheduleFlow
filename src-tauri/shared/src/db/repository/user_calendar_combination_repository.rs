@@ -59,7 +59,7 @@ impl Table<UserCalendarCombination> for UserCalendarCombinationRepository {
     }
 
     fn get_fk_uuid_name() -> String {
-        "".to_string()
+        unimplemented!()
     }
 
     fn get_fmt_cols() -> String {
@@ -71,7 +71,7 @@ impl Table<UserCalendarCombination> for UserCalendarCombinationRepository {
     }
 
     fn get_fmt_cols_no_id() -> String {
-        "".to_string()
+        unimplemented!()
     }
 
     fn get_fmt_vals(model: &UserCalendarCombination) -> String {
@@ -79,7 +79,7 @@ impl Table<UserCalendarCombination> for UserCalendarCombinationRepository {
     }
 
     fn get_fmt_vals_no_id(_model: &UserCalendarCombination) -> String {
-        "".to_string()
+        unimplemented!()
     }
 }
 

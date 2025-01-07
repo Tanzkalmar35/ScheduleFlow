@@ -19,24 +19,11 @@ Make sure to not put that .env file anywhere except your pc, so the credentials 
 As for the tables, you can use this schema:
 
 ```sql
--- public.calendars definition
-
--- Drop table
-
--- DROP TABLE public.calendars;
-
 CREATE TABLE public.calendars (
                                   "uuid" uuid NOT NULL,
                                   "name" varchar NULL,
                                   CONSTRAINT calendars_pkey PRIMARY KEY (uuid)
 );
-
-
--- public.properties definition
-
--- Drop table
-
--- DROP TABLE public.properties;
 
 CREATE TABLE public.properties (
                                    "uuid" uuid NOT NULL,
@@ -47,13 +34,6 @@ CREATE TABLE public.properties (
                                    CONSTRAINT properties_pkey PRIMARY KEY (uuid)
 );
 
-
--- public.users definition
-
--- Drop table
-
--- DROP TABLE public.users;
-
 CREATE TABLE public.users (
                               "uuid" uuid NOT NULL,
                               email varchar(255) NULL,
@@ -61,13 +41,6 @@ CREATE TABLE public.users (
                               username varchar(255) NULL,
                               CONSTRAINT users_pkey PRIMARY KEY (uuid)
 );
-
-
--- public.components definition
-
--- Drop table
-
--- DROP TABLE public.components;
 
 CREATE TABLE public.components (
                                    "uuid" uuid NOT NULL,
@@ -77,13 +50,6 @@ CREATE TABLE public.components (
                                    CONSTRAINT components_calendar_uuid_fkey FOREIGN KEY (calendar_uuid) REFERENCES public.calendars("uuid")
 );
 
-
--- public.user_jwt_tokens definition
-
--- Drop table
-
--- DROP TABLE public.user_jwt_tokens;
-
 CREATE TABLE public.user_jwt_tokens (
                                         "token" varchar NOT NULL,
                                         user_uuid uuid NOT NULL,
@@ -91,18 +57,25 @@ CREATE TABLE public.user_jwt_tokens (
                                         CONSTRAINT user_uuid_fkey FOREIGN KEY (user_uuid) REFERENCES public.users("uuid")
 );
 
-
--- public.users_calendars definition
-
--- Drop table
-
--- DROP TABLE public.users_calendars;
-
 CREATE TABLE public.users_calendars (
                                         calendar_uuid uuid NOT NULL,
                                         user_uuid uuid NOT NULL,
                                         CONSTRAINT calendar_users_pkey PRIMARY KEY (calendar_uuid, user_uuid),
                                         CONSTRAINT calendar_users_calendar_uuid_fkey FOREIGN KEY (calendar_uuid) REFERENCES public.calendars("uuid"),
                                         CONSTRAINT calendar_users_user_uuid_fkey FOREIGN KEY (user_uuid) REFERENCES public.users("uuid")
+);
+
+CREATE TABLE public.users_clients (
+	user_uuid uuid NOT NULL,
+	client_uuid uuid NOT NULL,
+	CONSTRAINT users_clients_pkey PRIMARY KEY (client_uuid, user_uuid),
+	CONSTRAINT users_clients_clients_fk FOREIGN KEY (client_uuid) REFERENCES public.clients("uuid"),
+	CONSTRAINT users_clients_users_fk FOREIGN KEY (user_uuid) REFERENCES public.users("uuid")
+);
+
+CREATE TABLE public.clients (
+	"uuid" uuid NOT NULL,
+	"name" varchar NOT NULL,
+	CONSTRAINT clients_pk PRIMARY KEY (uuid)
 );
 ```

@@ -1,6 +1,8 @@
+use std::{boxed::Box, io};
+
 use color_eyre::Result;
 use crossterm::{
-    event::{self, KeyCode, KeyEvent},
+    event::{self, KeyCode, KeyEventKind},
     execute,
     terminal::{self, ClearType},
     ExecutableCommand,
@@ -11,10 +13,6 @@ use ratatui::{
     text::{Line, Text},
     widgets::Paragraph,
     Frame, Terminal,
-};
-use std::{
-    any::{Any, TypeId},
-    io,
 };
 
 use crate::constants;
@@ -85,35 +83,36 @@ impl Tui {
         let mut terminal = Terminal::new(backend)?;
 
         let mut tui = Tui::new();
-        //let mut screen: Option<Box<dyn Screen>> = None;
 
         loop {
             terminal.draw(|f| {
                 let bounds = Rect::new(2, 1, f.area().width - 4, f.area().height - 2);
 
-                tui.render_login_screen(f, bounds);
+                tui.render(f, bounds);
             })?;
 
             // Handle user input
-            if let event::Event::Key(KeyEvent { code, .. }) = event::read()? {
-                match tui.current_mode {
-                    Mode::EDIT => match tui.login_screen.handle_input(code) {
-                        Cmd::ChangeMode => tui.change_mode(),
-                        Cmd::NavigateTo(screen) => tui.navigate_to(screen),
-                        Cmd::None => {}
-                        _ => {}
-                    },
-                    Mode::NORMAL => {
-                        match code {
-                            KeyCode::Char('q') => break, // Quit the application
-                            _ => {
-                                if tui.login_screen.handle_cmd(code) == Cmd::ChangeMode {
-                                    tui.change_mode();
+            if let event::Event::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press {
+                    match tui.current_mode {
+                        Mode::EDIT => match tui.login_screen.handle_input(key.code) {
+                            Cmd::ChangeMode => tui.change_mode(),
+                            Cmd::NavigateTo(screen) => tui.navigate_to(&screen),
+                            Cmd::None => {}
+                            _ => {}
+                        },
+                        Mode::NORMAL => {
+                            match key.code {
+                                KeyCode::Char('q') => break, // Quit the application
+                                _ => {
+                                    if tui.login_screen.handle_cmd(key.code) == Cmd::ChangeMode {
+                                        tui.change_mode();
+                                    }
                                 }
                             }
                         }
+                        _ => {}
                     }
-                    _ => {}
                 }
             }
         }
@@ -177,13 +176,19 @@ impl Tui {
         }
     }
 
-    fn navigate_to(&mut self, screen: Box<dyn Screen>) {
-        if screen.type_id() == TypeId::of::<LoginScreen>() {
+    fn navigate_to(&mut self, screen: &Box<dyn Screen>) {
+        if let Some(_) = screen.as_any().downcast_ref::<LoginScreen>() {
             self.state = AppState::LoginScreen;
-        } else if screen.type_id() == TypeId::of::<SignupScreen>() {
-            self.state = AppState::SignupScreen;
-        } else if screen.type_id() == TypeId::of::<HomePageScreen>() {
-            self.state = AppState::HomePageScreen;
+            return;
         }
+        if let Some(_) = screen.as_any().downcast_ref::<SignupScreen>() {
+            self.state = AppState::SignupScreen;
+            return;
+        }
+        if let Some(_) = screen.as_any().downcast_ref::<HomePageScreen>() {
+            self.state = AppState::HomePageScreen;
+            return;
+        }
+        panic!("WTF");
     }
 }

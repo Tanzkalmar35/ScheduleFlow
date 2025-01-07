@@ -56,9 +56,6 @@ impl InputWidget {
                         self.cursor_position += 1;
                     }
                 }
-                //KeyCode::Enter => {
-                //    // Handle Enter key if needed (e.g., submit input)
-                //}
                 _ => {}
             }
         }

@@ -27,9 +27,43 @@ impl LoginScreen {
             password: InputWidget::new(String::from("Password"), 'p'),
         }
     }
+
+    fn unfocus_all(&mut self) -> Cmd {
+        self.email.set_focus(false);
+        self.password.set_focus(false);
+        return Cmd::ChangeMode;
+    }
+
+    fn attempt_login(&mut self) -> Cmd {
+        let login_attempt = AuthUtil::attempt_login(
+            None,
+            self.email.input().to_string(),
+            self.password.input().to_string(),
+            false,
+        );
+        if let Ok(()) = login_attempt {
+            return Cmd::NavigateTo(Box::new(HomePageScreen::new()));
+        } else if let Err(e) = login_attempt {
+            // TODO: Handle accordingly
+            panic!("{}", e)
+        }
+        return Cmd::None;
+    }
+
+    fn handle_char(&mut self, key: KeyCode) {
+        if self.email.is_focused() {
+            self.email.handle_input(key);
+        } else if self.password.is_focused() {
+            self.password.handle_input(key);
+        }
+    }
 }
 
 impl Screen for LoginScreen {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
     fn render(&self, f: &mut Frame, bounds: Rect) -> Result<()> {
         let input_height = 3;
         let input_width = bounds.width / 2;
@@ -66,32 +100,15 @@ impl Screen for LoginScreen {
     }
 
     fn handle_input(&mut self, key: KeyCode) -> Cmd {
-        if key == KeyCode::Esc {
-            self.email.set_focus(false);
-            self.password.set_focus(false);
-            return Cmd::ChangeMode;
-        } else if key == KeyCode::Enter {
-            let login_attempt = AuthUtil::attempt_login(
-                None,
-                self.email.input().to_string(),
-                self.password.input().to_string(),
-                true,
-            );
-            if let Ok(()) = login_attempt {
-                return Cmd::NavigateTo(Box::new(HomePageScreen::new()));
-            } else if let Err(e) = login_attempt {
-                panic!("{}", e)
+        match key {
+            KeyCode::Esc => return self.unfocus_all(),
+            KeyCode::Enter => return self.attempt_login(),
+            KeyCode::Char(_) => {
+                self.handle_char(key);
+                return Cmd::None;
             }
-            return Cmd::None;
-        }
-
-        if self.email.is_focused() {
-            self.email.handle_input(key);
-        } else if self.password.is_focused() {
-            self.password.handle_input(key);
-        }
-
-        Cmd::None
+            _ => panic!("Unexpected event occured..."),
+        };
     }
 
     fn handle_cmd(&mut self, key: KeyCode) -> Cmd {

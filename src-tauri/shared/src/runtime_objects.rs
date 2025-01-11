@@ -1,5 +1,6 @@
 use std::sync::{Mutex, OnceLock};
 
+use crate::db::model::client::Client;
 use crate::db::model::user::User;
 use crate::errors::error_messages::ERROR_QUEUE_NOT_INITIALIZED_ERR;
 use crate::errors::error_queue::ErrorQueue;
@@ -8,6 +9,7 @@ use once_cell::sync::OnceCell;
 use pg_driver::PgDriver;
 use tauri::AppHandle;
 
+pub static CURRENT_CLIENT: OnceCell<Mutex<Option<Client>>> = OnceCell::new();
 pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
 pub static ERROR_QUEUE: OnceCell<Mutex<Option<ErrorQueue>>> = OnceCell::new();
 
@@ -38,6 +40,25 @@ pub fn reset_current_user() {
         *user_option = None;
     } else {
         panic!("Current user is not initialized");
+    }
+}
+
+pub fn set_current_client(client: Client) {
+    CURRENT_CLIENT.get_or_init(|| Mutex::new(Some(client)));
+}
+
+pub fn get_current_client() -> &'static Mutex<Option<Client>> {
+    CURRENT_CLIENT
+        .get()
+        .expect("Current user is not initialized")
+}
+
+pub fn reset_current_client() {
+    if let Some(client_mutex) = CURRENT_CLIENT.get() {
+        let mut client_option = client_mutex.lock().unwrap();
+        *client_option = None;
+    } else {
+        panic!("Current client is not initialized");
     }
 }
 

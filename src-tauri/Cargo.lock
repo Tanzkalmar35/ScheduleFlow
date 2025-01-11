@@ -3728,6 +3728,7 @@ name = "shared"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "base64 0.22.1",
  "bcrypt",
  "chrono",
  "dotenv",
@@ -3745,6 +3746,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-shell",
  "uuid",
+ "whoami",
 ]
 
 [[package]]

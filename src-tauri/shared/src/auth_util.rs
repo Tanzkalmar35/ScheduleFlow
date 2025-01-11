@@ -1,31 +1,31 @@
 extern crate bcrypt;
 
-use std::collections::HashSet;
-use std::env;
 use std::fmt::Debug;
 use std::ops::DerefMut;
 use std::sync::MutexGuard;
 
 use crate::db::db_actions::DbActions;
+use crate::db::model::client::Client;
 use crate::db::model::jwt_token::JwtToken;
 use crate::db::model::user::User;
+use crate::db::repository::client_repository::ClientRepository;
 use crate::db::repository::jwt_token_repository::JwtTokenRepository;
 use crate::db::repository::user_repository::UserRepository;
+use crate::db::service::jwt_token_service::JwtTokenService;
 use crate::errors::error_messages::{
-    BCRYPT_DECODING_ERR, BCRYPT_ENCODING_ERR, ENV_VAR_NOT_SET, JWT_COOKIE_ERR,
-    USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
+    BCRYPT_DECODING_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
 };
-use crate::runtime_objects::{driver, get_app_handle, set_app_handle, set_current_user};
+use crate::runtime_objects::{driver, set_app_handle, set_current_user};
 use bcrypt::{hash, verify, DEFAULT_COST};
-use jsonwebtoken::{decode, encode, Algorithm, Header, Validation};
 use pg_driver::PgDriver;
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Emitter};
+use tauri::AppHandle;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
     pub user_uuid: Uuid,
+    pub client_uuid: Uuid,
 }
 
 pub struct AuthUtil;
@@ -75,7 +75,7 @@ impl AuthUtil {
         }
 
         if remember {
-            Self::create_persistent_session(&user, driver)?;
+            Self::create_persistent_session(&user, &client, driver)?;
         }
 
         set_current_user(user);
@@ -119,6 +119,13 @@ impl AuthUtil {
 
         UserRepository::store(driver.deref_mut(), &user).unwrap();
 
+        let client = Client::new(whoami::username());
+
+        if let Err(e) = ClientRepository::store(driver.deref_mut(), &client) {
+            // TODO: Handle error
+            eprintln!("{}", e);
+        }
+
         if remember {
             Self::create_persistent_session(&user, driver)?;
         }
@@ -158,7 +165,7 @@ impl AuthUtil {
     /// # Arguments
     /// * `token` - The token that is supposed to correspond to a valid session.
     pub fn is_valid_session(token: String) -> bool {
-        let token_data = Self::decode_jwt(&token);
+        let token_data = JwtTokenService::decode_jwt(&token);
         let mut token_obj: JwtToken = JwtToken::empty();
         let mut user_tokens: Vec<JwtToken> = vec![];
         let user_uuid;
@@ -203,73 +210,16 @@ impl AuthUtil {
     /// ## If something fails, the user sees it via a toast notification.
     fn create_persistent_session(
         user: &User,
+        client: &Client,
         mut driver: MutexGuard<PgDriver>,
     ) -> Result<(), &'static str> {
-        let token = Self::generate_jwt(user.get_uuid());
-        JwtTokenRepository::store(driver.deref_mut(), &token);
+        let token = JwtTokenService::generate_jwt(user.get_uuid(), client.uuid);
 
-        let res = get_app_handle()
-            .unwrap()
-            .emit("setJwtCookie", &token.token)
-            .map_err(|_| JWT_COOKIE_ERR);
-
-        if let Err(_) = res {
-            JwtTokenRepository::delete_spec_col(
-                driver.deref_mut(),
-                String::from("token"),
-                token.token,
-            );
-            return res;
+        if let Err(e) = JwtTokenRepository::store(driver.deref_mut(), &token) {
+            // TODO: Handle
+            eprintln!("{}", e);
         }
 
         Ok(())
-    }
-
-    /// Generates a new jwt token based on the associated user.
-    ///
-    /// # Arguments
-    /// * `user_uuid` - The uuid of the user associated with the token/session.
-    ///
-    /// # Panics if
-    ///
-    /// * the `SCHEDULEFLOW_JWT_SECRET` environment variable is not set.
-    ///
-    /// * something went wrong in the encoding process of the token.
-    // TODO: Enhance error handling (BCRYPT_ENCODING_ERR)
-    pub fn generate_jwt(user_uuid: Uuid) -> JwtToken {
-        let my_claims = Claims { user_uuid };
-        let key = env::var("SCHEDULEFLOW_JWT_SECRET").expect(ENV_VAR_NOT_SET);
-
-        let encoding_key = jsonwebtoken::EncodingKey::from_secret(key.as_ref());
-        let token = encode(&Header::default(), &my_claims, &encoding_key);
-
-        JwtToken {
-            token: token.expect(BCRYPT_ENCODING_ERR),
-            user_uuid,
-        }
-    }
-
-    /// Decodes an encoded jwt token.
-    ///
-    /// # Arguments
-    /// * `token` - The encoded jwt token.
-    ///
-    /// # Returns an error
-    ///
-    /// * `jsonwebtoken::errors::Error` - If the actual decoding process fails.
-    ///
-    /// # Panics if
-    ///
-    /// * the `SCHEDULEFLOW_JWT_SECRET` environment variable is not set.
-    pub fn decode_jwt(
-        token: &str,
-    ) -> Result<jsonwebtoken::TokenData<Claims>, jsonwebtoken::errors::Error> {
-        let key = env::var("SCHEDULEFLOW_JWT_SECRET").expect(ENV_VAR_NOT_SET);
-        let decoding_key = jsonwebtoken::DecodingKey::from_secret(&key.as_ref());
-
-        let mut validation = Validation::new(Algorithm::HS256);
-        validation.required_spec_claims = HashSet::new();
-
-        decode::<Claims>(token, &decoding_key, &validation)
     }
 }

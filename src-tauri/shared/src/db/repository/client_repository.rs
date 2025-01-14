@@ -1,11 +1,11 @@
 use chrono::{DateTime, Utc};
 
 use crate::{
+    crypto::pki_auth_key::PKIAuthenticationKey,
     db::{
         db_actions::{DbActions, Table},
         model::client::Client,
     },
-    pki_auth_key::PKIAuthenticationKey,
 };
 
 pub struct ClientRepository;

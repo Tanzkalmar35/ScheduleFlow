@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-use crate::pki_auth_key::PKIAuthenticationKey;
+use crate::crypto::pki_auth_key::PKIAuthenticationKey;
 
 pub struct Client {
     uuid: Uuid,

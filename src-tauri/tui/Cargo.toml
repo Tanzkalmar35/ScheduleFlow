@@ -8,6 +8,7 @@ color-eyre = "0.6.3"
 crossterm = "0.28.1"
 dotenv = "0.15.0"
 ratatui = "0.29.0"
+ring = "0.17.8"
 serde = "1.0.217"
 
 shared = { path = "../shared" }

@@ -6,12 +6,8 @@ use std::sync::MutexGuard;
 
 use crate::db::db_actions::DbActions;
 use crate::db::model::client::Client;
-use crate::db::model::jwt_token::JwtToken;
 use crate::db::model::user::User;
-use crate::db::repository::client_repository::ClientRepository;
-use crate::db::repository::jwt_token_repository::JwtTokenRepository;
 use crate::db::repository::user_repository::UserRepository;
-use crate::db::service::jwt_token_service::JwtTokenService;
 use crate::errors::error_messages::{
     BCRYPT_DECODING_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
 };
@@ -74,9 +70,9 @@ impl AuthUtil {
             Err(_) => return Err(BCRYPT_DECODING_ERR),
         }
 
-        if remember {
-            Self::create_persistent_session(&user, &client, driver)?;
-        }
+        //if remember {
+        //    Self::create_persistent_session(&user, &client, driver)?;
+        //}
 
         set_current_user(user);
         Ok(())
@@ -119,16 +115,9 @@ impl AuthUtil {
 
         UserRepository::store(driver.deref_mut(), &user).unwrap();
 
-        let client = Client::new(whoami::username());
-
-        if let Err(e) = ClientRepository::store(driver.deref_mut(), &client) {
-            // TODO: Handle error
-            eprintln!("{}", e);
-        }
-
-        if remember {
-            Self::create_persistent_session(&user, driver)?;
-        }
+        //if remember {
+        //    Self::create_persistent_session(&user, driver)?;
+        //}
 
         set_current_user(user);
         Ok(())
@@ -146,17 +135,18 @@ impl AuthUtil {
     /// ## If something fails, the user sees it via a toast notification.
     /// TODO: Improve error handling
     pub fn logout(token: String) -> Result<(), &'static str> {
-        let res = JwtTokenRepository::delete_spec_col(
-            driver().lock().unwrap().deref_mut(),
-            String::from("token"),
-            token,
-        );
+        todo!();
+        //let res = JwtTokenRepository::delete_spec_col(
+        //    driver().lock().unwrap().deref_mut(),
+        //    String::from("token"),
+        //    token,
+        //);
 
-        if let Ok(()) = res {
-            Ok(())
-        } else {
-            Err("Logout failed unexpectedly")
-        }
+        //if let Ok(()) = res {
+        //    Ok(())
+        //} else {
+        //    Err("Logout failed unexpectedly")
+        //}
     }
 
     /// Checks if the given token corresponds to a valid existing session. If so, the user is free
@@ -165,34 +155,7 @@ impl AuthUtil {
     /// # Arguments
     /// * `token` - The token that is supposed to correspond to a valid session.
     pub fn is_valid_session(token: String) -> bool {
-        let token_data = JwtTokenService::decode_jwt(&token);
-        let mut token_obj: JwtToken = JwtToken::empty();
-        let mut user_tokens: Vec<JwtToken> = vec![];
-        let user_uuid;
-
-        if let Ok(data) = token_data {
-            user_uuid = data.claims.user_uuid;
-            token_obj = JwtToken { token, user_uuid };
-            let user_matches = format!("user_uuid = '{}'", &user_uuid);
-
-            user_tokens = JwtTokenRepository::retrieve(
-                driver().lock().unwrap().deref_mut(),
-                Some(user_matches),
-            );
-        } else {
-            user_uuid = Uuid::default();
-        }
-
-        if user_tokens.contains(&token_obj) {
-            if let Ok(user) =
-                UserRepository::get_by_uuid(driver().lock().unwrap().deref_mut(), user_uuid)
-            {
-                set_current_user(user);
-            }
-            true
-        } else {
-            false
-        }
+        todo!()
     }
 
     /// Creates a local session by generating a jwt token, then storing it once in the database
@@ -213,13 +176,6 @@ impl AuthUtil {
         client: &Client,
         mut driver: MutexGuard<PgDriver>,
     ) -> Result<(), &'static str> {
-        let token = JwtTokenService::generate_jwt(user.get_uuid(), client.uuid);
-
-        if let Err(e) = JwtTokenRepository::store(driver.deref_mut(), &token) {
-            // TODO: Handle
-            eprintln!("{}", e);
-        }
-
         Ok(())
     }
 }

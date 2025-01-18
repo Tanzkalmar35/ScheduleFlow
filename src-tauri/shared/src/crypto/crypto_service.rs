@@ -27,7 +27,7 @@ impl CryptoService {
     ///
     /// If the encryption process fails.
     /// TODO: Add more specific error handling.
-    fn encrypt_private_key(
+    pub fn encrypt_private_key(
         signing_key: &SigningKey,
         passphrase: &str,
     ) -> Result<String, Box<dyn std::error::Error>> {
@@ -166,13 +166,16 @@ mod tests {
     #[test]
     fn test_encryption() -> Result<(), String> {
         let (test_prv_key, _) = PKIAuthenticationKey::new_ed25519_key_pair();
-        let encrypted_prv_key =
-            CryptoService::encrypt_private_key(&test_prv_key, "test_pass")
-                .expect("Encryption failed");
+        let encrypted_prv_key = CryptoService::encrypt_private_key(&test_prv_key, "test_pass")
+            .expect("Encryption failed");
         let dec_prv_key = CryptoService::decrypt_private_key(&encrypted_prv_key, "test_pass")
             .expect("Decryption failed");
 
-        assert_eq!(STANDARD.encode(&test_prv_key.as_ref()), STANDARD.encode(&dec_prv_key.as_ref()));
+        assert_eq!(
+            STANDARD.encode(&test_prv_key.as_ref()),
+            STANDARD.encode(&dec_prv_key.as_ref())
+        );
         Ok(())
     }
 }
+

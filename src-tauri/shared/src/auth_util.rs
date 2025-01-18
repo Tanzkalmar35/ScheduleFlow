@@ -47,7 +47,7 @@ impl AuthUtil {
         app_handle: Option<AppHandle>,
         email: String,
         password: String,
-        remember: bool,
+        _remember: bool,
     ) -> Result<(), &'static str> {
         if let Some(handle) = app_handle {
             set_app_handle(handle);
@@ -101,9 +101,14 @@ impl AuthUtil {
         username: String,
         email: String,
         password: String,
-        remember: bool,
+        _remember: bool,
     ) -> Result<(), &'static str> {
         set_app_handle(app_handle);
+
+        // let (prv_key, pub_key) = PKIAuthenticationKey::new_ed25519_key_pair();
+        // let private_key = CryptoService::encrypt_private_key(&prv_key, &password)
+
+        
 
         let hashed_password = hash(password, DEFAULT_COST).unwrap();
         let user = User::new(username, (&*email).into(), hashed_password);
@@ -134,7 +139,7 @@ impl AuthUtil {
     ///
     /// ## If something fails, the user sees it via a toast notification.
     /// TODO: Improve error handling
-    pub fn logout(token: String) -> Result<(), &'static str> {
+    pub fn logout(_token: String) -> Result<(), &'static str> {
         todo!();
         //let res = JwtTokenRepository::delete_spec_col(
         //    driver().lock().unwrap().deref_mut(),
@@ -154,7 +159,7 @@ impl AuthUtil {
     ///
     /// # Arguments
     /// * `token` - The token that is supposed to correspond to a valid session.
-    pub fn is_valid_session(token: String) -> bool {
+    pub fn is_valid_session(_token: String) -> bool {
         todo!()
     }
 
@@ -172,9 +177,9 @@ impl AuthUtil {
     ///
     /// ## If something fails, the user sees it via a toast notification.
     fn create_persistent_session(
-        user: &User,
-        client: &Client,
-        mut driver: MutexGuard<PgDriver>,
+        _user: &User,
+        _client: &Client,
+        _driver: MutexGuard<PgDriver>,
     ) -> Result<(), &'static str> {
         Ok(())
     }

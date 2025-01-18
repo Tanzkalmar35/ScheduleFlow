@@ -30,6 +30,8 @@ base64 = "0.22.1"
 ed25519-dalek = {version="2.1.1", features=["rand_core"]}
 ring = "0.16.20"
 
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+
 # Own dependencies
 pg_driver = { path = "../pg_driver" }
 simple_query = { path = "../simple_query" }

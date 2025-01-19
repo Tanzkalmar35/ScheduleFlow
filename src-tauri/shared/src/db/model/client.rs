@@ -1,19 +1,18 @@
 use chrono::{DateTime, Utc};
+use ed25519_dalek::VerifyingKey;
 use uuid::Uuid;
-
-use crate::crypto::pki_auth_key::PKIAuthenticationKey;
 
 pub struct Client {
     uuid: Uuid,
     user_uuid: Uuid,
-    pub_key: PKIAuthenticationKey,
+    pub_key: VerifyingKey,
     device_name: String,
     last_used: DateTime<Utc>,
     registered_at: DateTime<Utc>,
 }
 
 impl Client {
-    pub fn new(name: String, user: Uuid, key: PKIAuthenticationKey) -> Self {
+    pub fn new(name: String, user: Uuid, key: VerifyingKey) -> Self {
         Self {
             uuid: Uuid::new_v4(),
             user_uuid: user,
@@ -27,7 +26,7 @@ impl Client {
     pub fn from(
         uuid: Uuid,
         user_uuid: Uuid,
-        pub_key: PKIAuthenticationKey,
+        pub_key: VerifyingKey,
         device_name: String,
         last_used: DateTime<Utc>,
         registered_at: DateTime<Utc>,
@@ -50,7 +49,7 @@ impl Client {
         self.user_uuid
     }
 
-    pub fn get_pub_key(&self) -> &PKIAuthenticationKey {
+    pub fn get_pub_key(&self) -> &VerifyingKey {
         &self.pub_key
     }
 

@@ -1,11 +1,10 @@
+use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{DateTime, Utc};
+use ed25519_dalek::VerifyingKey;
 
-use crate::{
-    crypto::pki_auth_key::PKIAuthenticationKey,
-    db::{
-        db_actions::{DbActions, Table},
-        model::client::Client,
-    },
+use crate::db::{
+    db_actions::{DbActions, Table},
+    model::client::Client,
 };
 
 pub struct ClientRepository;
@@ -32,7 +31,7 @@ impl Table<Client> for ClientRepository {
             "'{}', '{}', '{}', '{}', '{}', '{}'",
             model.get_uuid(),
             model.get_user_uuid(),
-            model.get_pub_key().to_base64(),
+            STANDARD.encode(model.get_pub_key().to_bytes()),
             model.get_device_name(),
             model.get_last_used(),
             model.get_registered_at()
@@ -43,7 +42,7 @@ impl Table<Client> for ClientRepository {
         format!(
             "'{}', '{}', '{}', '{}', '{}'",
             model.get_user_uuid(),
-            model.get_pub_key().to_base64(),
+            STANDARD.encode(model.get_pub_key().to_bytes()),
             model.get_device_name(),
             model.get_last_used(),
             model.get_registered_at()
@@ -71,7 +70,8 @@ impl DbActions<Client, Self> for ClientRepository {
         for row in rows {
             let uuid = row.get("uuid");
             let user_uuid = row.get("user_uuid");
-            let pub_key = PKIAuthenticationKey::from_base64(row.get("public_key")).expect("");
+            let pub_key_str: String = row.get("public_key");
+            let pub_key = VerifyingKey::try_from(&pub_key_str.as_bytes().to_vec()[..32]).unwrap(); // TODO: Improve error handling
             let name = row.get("device_name");
 
             let last_used = DateTime::parse_from_rfc3339(row.get("last_used"))

@@ -16,9 +16,12 @@ impl SecureStorage {
     ///
     /// * If the user_email can not form a valid keyring entry.
     /// * If there is more than one keyring entry for the given user_email.
-    pub fn store_system_key(key: &String, user_email: &String) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn store_system_key(
+        key: &String,
+        entry_id: &String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let service = "ScheduleFlow";
-        let entry = Entry::new(service, user_email)?;
+        let entry = Entry::new(service, entry_id)?;
         let res = entry.set_password(key);
         if let Err(e) = res {
             return Err(e.into());
@@ -40,9 +43,9 @@ impl SecureStorage {
     ///
     /// * If the user_email can not form a valid keyring entry.
     /// * If the entry contains no password.
-    pub fn get_system_key(user_email: &String) -> Result<String, Box<dyn std::error::Error>> {
+    pub fn get_system_key(entry_id: &String) -> Result<String, Box<dyn std::error::Error>> {
         let service = "ScheduleFlow";
-        let entry = Entry::new(service, user_email)?;
+        let entry = Entry::new(service, entry_id)?;
         let res = entry.get_password();
         if let Err(e) = res {
             return Err(e.into());
@@ -97,3 +100,4 @@ mod tests {
         }
     }
 }
+

@@ -37,6 +37,6 @@ pub(crate) fn logout(token: String) -> Result<(), &'static str> {
 }
 
 #[tauri::command]
-pub(crate) fn is_valid_session(token: String) -> bool {
-    AuthUtil::is_valid_session(token)
+pub(crate) fn is_valid_session() -> bool {
+    AuthUtil::is_valid_session(driver().lock().unwrap().deref_mut())
 }

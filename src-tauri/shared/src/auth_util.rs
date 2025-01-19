@@ -2,11 +2,13 @@ extern crate bcrypt;
 
 use std::fmt::Debug;
 use std::ops::DerefMut;
-use std::sync::MutexGuard;
 
+use crate::crypto::crypto_service::CryptoService;
+use crate::crypto::secure_storage::SecureStorage;
 use crate::db::db_actions::DbActions;
 use crate::db::model::client::Client;
 use crate::db::model::user::User;
+use crate::db::repository::client_repository::ClientRepository;
 use crate::db::repository::user_repository::UserRepository;
 use crate::errors::error_messages::{
     BCRYPT_DECODING_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
@@ -101,16 +103,11 @@ impl AuthUtil {
         username: String,
         email: String,
         password: String,
-        _remember: bool,
+        remember: bool,
     ) -> Result<(), &'static str> {
         set_app_handle(app_handle);
 
-        // let (prv_key, pub_key) = PKIAuthenticationKey::new_ed25519_key_pair();
-        // let private_key = CryptoService::encrypt_private_key(&prv_key, &password)
-
-        
-
-        let hashed_password = hash(password, DEFAULT_COST).unwrap();
+        let hashed_password = hash(&password, DEFAULT_COST).unwrap();
         let user = User::new(username, (&*email).into(), hashed_password);
         let mut driver = driver().lock().unwrap();
 
@@ -120,9 +117,9 @@ impl AuthUtil {
 
         UserRepository::store(driver.deref_mut(), &user).unwrap();
 
-        //if remember {
-        //    Self::create_persistent_session(&user, driver)?;
-        //}
+        if remember {
+            Self::create_persistent_session(&user, driver.deref_mut())?;
+        }
 
         set_current_user(user);
         Ok(())
@@ -159,8 +156,27 @@ impl AuthUtil {
     ///
     /// # Arguments
     /// * `token` - The token that is supposed to correspond to a valid session.
-    pub fn is_valid_session(_token: String) -> bool {
-        todo!()
+    pub fn is_valid_session(driver: &mut PgDriver) -> bool {
+        let user_email = SecureStorage::get_system_key(&String::from("user_email")).unwrap();
+        let user = UserRepository::get_by_email(driver, user_email).unwrap();
+        let user_clients =
+            ClientRepository::retrieve(driver, Some(format!("uuid = {}", user.get_uuid())));
+        let prv_key_str = SecureStorage::get_system_key(user.get_email())
+            .unwrap()
+            .as_bytes()
+            .to_vec();
+
+        for client in user_clients {
+            let sign_successful = CryptoService::attempt_sign(
+                &prv_key_str,
+                &client.get_pub_key().as_bytes().to_vec(),
+            );
+            if sign_successful {
+                return true;
+            };
+        }
+
+        false
     }
 
     /// Creates a local session by generating a jwt token, then storing it once in the database
@@ -176,11 +192,23 @@ impl AuthUtil {
     /// The user is prompted to try again.
     ///
     /// ## If something fails, the user sees it via a toast notification.
-    fn create_persistent_session(
-        _user: &User,
-        _client: &Client,
-        _driver: MutexGuard<PgDriver>,
-    ) -> Result<(), &'static str> {
+    fn create_persistent_session(user: &User, driver: &mut PgDriver) -> Result<(), &'static str> {
+        let (prv_key, pub_key) = CryptoService::new_ed25519_key_pair();
+        // TODO: Improve error handling
+        let private_key =
+            CryptoService::encrypt_private_key(&prv_key, &user.get_password()).unwrap();
+
+        // TODO: Improve error handling
+        assert!(SecureStorage::store_system_key(&private_key, &user.get_email()).is_ok());
+        assert!(
+            SecureStorage::store_system_key(&user.get_email(), &String::from("user_email")).is_ok()
+        );
+
+        let client = Client::new(whoami::username(), user.get_uuid(), pub_key);
+
+        // TODO: Improve error handling
+        assert!(ClientRepository::store(driver, &client).is_ok());
+
         Ok(())
     }
 }

@@ -1,7 +1,8 @@
 use std::num::NonZeroU32;
 
 use base64::{engine::general_purpose::STANDARD, Engine};
-use ed25519_dalek::SigningKey;
+use ed25519_dalek::{ed25519::signature::SignerMut, SecretKey, SigningKey, VerifyingKey};
+use rand::{rngs::OsRng, RngCore};
 use ring::{
     aead, pbkdf2,
     rand::{SecureRandom, SystemRandom},
@@ -143,9 +144,6 @@ impl CryptoService {
             )
             .map_err(|_| "Decryption failed")?;
 
-        // Check the length of decrypted_key
-        println!("Decrypted key length: {}", decrypted_key.len()); // Should be 48
-
         // Extract the first 32 bytes for the SigningKey
         if decrypted_key.len() < 32 {
             return Err("Decrypted key must be at least 32 bytes long".into());
@@ -156,16 +154,45 @@ impl CryptoService {
 
         Ok(signing_key)
     }
+
+    pub fn generate_challenge() -> Vec<u8> {
+        let mut rng = OsRng; // Create a secure random number generator
+        let mut challenge = vec![0u8; 16]; // Create a buffer for the challenge (16 bytes)
+        rng.fill_bytes(&mut challenge); // Fill the buffer with random bytes
+        challenge // Return the generated challenge
+    }
+
+    pub fn attempt_sign(prv_key: &Vec<u8>, pub_key: &Vec<u8>) -> bool {
+        let secret_key = SecretKey::try_from(&prv_key[..32]);
+        let mut signing_key = SigningKey::from_bytes(&secret_key.unwrap());
+        let verifying_key = VerifyingKey::try_from(&pub_key[..32]);
+        let challenge = Self::generate_challenge();
+
+        let signature = signing_key.sign(&challenge);
+
+        verifying_key
+            .unwrap()
+            .verify_strict(&challenge, &signature)
+            .is_ok()
+    }
+
+    pub fn new_ed25519_key_pair() -> (SigningKey, VerifyingKey) {
+        let mut csprng = OsRng;
+
+        let signing_key = SigningKey::generate(&mut csprng);
+        let verifying_key = signing_key.verifying_key();
+
+        (signing_key, verifying_key)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::crypto::pki_auth_key::PKIAuthenticationKey;
 
     #[test]
     fn test_encryption() -> Result<(), String> {
-        let (test_prv_key, _) = PKIAuthenticationKey::new_ed25519_key_pair();
+        let (test_prv_key, _) = CryptoService::new_ed25519_key_pair();
         let encrypted_prv_key = CryptoService::encrypt_private_key(&test_prv_key, "test_pass")
             .expect("Encryption failed");
         let dec_prv_key = CryptoService::decrypt_private_key(&encrypted_prv_key, "test_pass")
@@ -177,5 +204,27 @@ mod tests {
         );
         Ok(())
     }
-}
 
+    #[test]
+    fn test_signing() {
+        let (prv_key1, pub_key1) = VerifyingKey::new_ed25519_key_pair();
+        assert!(CryptoService::attempt_sign(
+            prv_key1.to_bytes().to_vec(),
+            pub_key1.to_bytes().to_vec()
+        ));
+
+        let (prv_key2, pub_key2) = VerifyingKey::new_ed25519_key_pair();
+        assert!(CryptoService::attempt_sign(
+            prv_key2.to_bytes().to_vec(),
+            pub_key2.to_bytes().to_vec()
+        ));
+        assert_eq!(
+            CryptoService::attempt_sign(prv_key1.to_bytes().to_vec(), pub_key2.to_bytes().to_vec()),
+            false
+        );
+        assert_eq!(
+            CryptoService::attempt_sign(prv_key2.to_bytes().to_vec(), pub_key1.to_bytes().to_vec()),
+            false
+        );
+    }
+}

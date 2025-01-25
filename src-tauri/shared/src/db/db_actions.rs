@@ -12,25 +12,6 @@ pub trait Table<M> {
 }
 
 /// This module holds the base implementation for the CRUD operations
-///
-/// Example usage:
-/// ```
-/// use crate::db::db_actions::Table;
-///
-/// struct User {
-///     id: i32,
-///     name: String,
-///     email: String,
-/// }
-///
-/// impl Table for User {
-///     // User specific implementations
-/// }
-///
-/// fn main() {
-///    // Now you can access all base- and user specific implementations
-///    User::insert(args);
-/// }
 pub trait DbActions<M, R: Table<M>> {
     /// Inserts a new entry into a given table.
     ///

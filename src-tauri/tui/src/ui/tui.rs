@@ -1,4 +1,4 @@
-use std::{boxed::Box, io};
+use std::{boxed::Box, io, ops::DerefMut};
 
 use color_eyre::Result;
 use crossterm::{
@@ -14,6 +14,7 @@ use ratatui::{
     widgets::Paragraph,
     Frame, Terminal,
 };
+use shared::{auth_util::AuthUtil, runtime_objects::driver};
 
 use crate::constants;
 
@@ -83,6 +84,12 @@ impl Tui {
         let mut terminal = Terminal::new(backend)?;
 
         let mut tui = Tui::new();
+
+        // TODO: Check db conn
+
+        if AuthUtil::is_valid_session(driver().lock().unwrap().deref_mut()) {
+            tui.state = AppState::HomePageScreen;
+        }
 
         loop {
             terminal.draw(|f| {

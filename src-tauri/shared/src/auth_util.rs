@@ -49,7 +49,7 @@ impl AuthUtil {
         app_handle: Option<AppHandle>,
         email: String,
         password: String,
-        _remember: bool,
+        remember: bool,
     ) -> Result<(), &'static str> {
         if let Some(handle) = app_handle {
             set_app_handle(handle);
@@ -72,9 +72,9 @@ impl AuthUtil {
             Err(_) => return Err(BCRYPT_DECODING_ERR),
         }
 
-        //if remember {
-        //    Self::create_persistent_session(&user, &client, driver)?;
-        //}
+        if remember {
+            Self::create_persistent_session(&user, driver.deref_mut())?;
+        }
 
         set_current_user(user);
         Ok(())
@@ -128,6 +128,7 @@ impl AuthUtil {
     /// Logs the current user out and deletes any ongoing sessions.
     ///
     /// # Arguments
+    ///
     /// * `token` - The JwtToken used in the session to destroy.
     ///
     /// # Returns an error
@@ -160,15 +161,16 @@ impl AuthUtil {
         let user_email = SecureStorage::get_system_key(&String::from("user_email")).unwrap();
         let user = UserRepository::get_by_email(driver, user_email).unwrap();
         let user_clients =
-            ClientRepository::retrieve(driver, Some(format!("uuid = {}", user.get_uuid())));
-        let prv_key_str = SecureStorage::get_system_key(user.get_email())
-            .unwrap()
-            .as_bytes()
-            .to_vec();
+            ClientRepository::retrieve(driver, Some(format!("user_uuid = '{}'", user.get_uuid())));
+        let prv_key_str = SecureStorage::get_system_key(user.get_email());
+        let decrypted_key = CryptoService::decrypt_private_key(
+            &prv_key_str.unwrap().as_str(),
+            &user.get_password(),
+        );
 
         for client in user_clients {
             let sign_successful = CryptoService::attempt_sign(
-                &prv_key_str,
+                &decrypted_key.as_ref().unwrap().as_bytes().to_vec(),
                 &client.get_pub_key().as_bytes().to_vec(),
             );
             if sign_successful {
@@ -192,13 +194,12 @@ impl AuthUtil {
     /// The user is prompted to try again.
     ///
     /// ## If something fails, the user sees it via a toast notification.
+    // TODO: Improve error handling
     fn create_persistent_session(user: &User, driver: &mut PgDriver) -> Result<(), &'static str> {
         let (prv_key, pub_key) = CryptoService::new_ed25519_key_pair();
-        // TODO: Improve error handling
         let private_key =
             CryptoService::encrypt_private_key(&prv_key, &user.get_password()).unwrap();
 
-        // TODO: Improve error handling
         assert!(SecureStorage::store_system_key(&private_key, &user.get_email()).is_ok());
         assert!(
             SecureStorage::store_system_key(&user.get_email(), &String::from("user_email")).is_ok()
@@ -206,7 +207,6 @@ impl AuthUtil {
 
         let client = Client::new(whoami::username(), user.get_uuid(), pub_key);
 
-        // TODO: Improve error handling
         assert!(ClientRepository::store(driver, &client).is_ok());
 
         Ok(())

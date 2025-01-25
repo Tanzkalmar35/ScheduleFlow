@@ -1,11 +1,6 @@
 use color_eyre::eyre::Result;
 use crossterm::event::KeyCode;
-use ratatui::{
-    layout::Rect,
-    text::{Span, Text},
-    widgets::{Block, Borders, Paragraph},
-    Frame,
-};
+use ratatui::{layout::Rect, Frame};
 use shared::auth_util::AuthUtil;
 
 use crate::ui::tui::Cmd;
@@ -39,7 +34,7 @@ impl LoginScreen {
             None,
             self.email.input().to_string(),
             self.password.input().to_string(),
-            false,
+            true,
         );
         if let Ok(()) = login_attempt {
             return Cmd::NavigateTo(Box::new(HomePageScreen::new()));

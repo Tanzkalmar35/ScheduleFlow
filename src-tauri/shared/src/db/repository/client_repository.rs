@@ -1,5 +1,5 @@
 use base64::{engine::general_purpose::STANDARD, Engine};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use ed25519_dalek::VerifyingKey;
 
 use crate::db::{
@@ -71,23 +71,18 @@ impl DbActions<Client, Self> for ClientRepository {
             let uuid = row.get("uuid");
             let user_uuid = row.get("user_uuid");
             let pub_key_str: String = row.get("public_key");
-            let pub_key = VerifyingKey::try_from(&pub_key_str.as_bytes().to_vec()[..32]).unwrap(); // TODO: Improve error handling
+            let pub_key = VerifyingKey::try_from(&STANDARD.decode(pub_key_str).unwrap()[..32]).unwrap(); // TODO: Improve error handling
             let name = row.get("device_name");
-
-            let last_used = DateTime::parse_from_rfc3339(row.get("last_used"))
-                .map(|dt| dt.with_timezone(&Utc))
-                .expect("Invalid timestamp");
-            let registered_at = DateTime::parse_from_rfc3339(row.get("registered_at"))
-                .map(|dt| dt.with_timezone(&Utc))
-                .expect("Invalid timestamp");
+            let last_used: NaiveDateTime = row.get("last_used");
+            let registered_at: NaiveDateTime = row.get("registered_at");
 
             res.push(Client::from(
                 uuid,
                 user_uuid,
                 pub_key,
                 name,
-                last_used,
-                registered_at,
+                DateTime::from_naive_utc_and_offset(last_used, Utc),
+                DateTime::from_naive_utc_and_offset(registered_at, Utc),
             ))
         }
 

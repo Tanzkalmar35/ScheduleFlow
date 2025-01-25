@@ -101,7 +101,7 @@ impl CryptoService {
     ///
     /// If the decryption process fails.
     /// TODO: Add more specific error handling.
-    fn decrypt_private_key(
+    pub fn decrypt_private_key(
         encrypted_data: &str,
         passphrase: &str,
     ) -> Result<SigningKey, Box<dyn std::error::Error>> {
@@ -188,6 +188,8 @@ impl CryptoService {
 
 #[cfg(test)]
 mod tests {
+    use crate::crypto::secure_storage::SecureStorage;
+
     use super::*;
 
     #[test]
@@ -206,24 +208,47 @@ mod tests {
     }
 
     #[test]
-    fn test_signing() {
-        let (prv_key1, pub_key1) = VerifyingKey::new_ed25519_key_pair();
+    fn test_encryption_retrieval() {
+        let (prv_key, pub_key) = CryptoService::new_ed25519_key_pair();
+        let enc_prv_key = CryptoService::encrypt_private_key(&prv_key, &String::from("pass"));
+        assert!(SecureStorage::store_system_key(
+            enc_prv_key.as_ref().unwrap(),
+            &String::from("email"),
+        )
+        .is_ok());
+        let key = SecureStorage::get_system_key(&String::from("email")).unwrap();
+        let dec_prv_key = CryptoService::decrypt_private_key(key.as_str(), &String::from("pass"));
         assert!(CryptoService::attempt_sign(
-            prv_key1.to_bytes().to_vec(),
-            pub_key1.to_bytes().to_vec()
+            &dec_prv_key.unwrap().to_bytes().to_vec(),
+            &pub_key.to_bytes().to_vec(),
+        ));
+    }
+
+    #[test]
+    fn test_signing() {
+        let (prv_key1, pub_key1) = CryptoService::new_ed25519_key_pair();
+        assert!(CryptoService::attempt_sign(
+            &prv_key1.to_bytes().to_vec(),
+            &pub_key1.to_bytes().to_vec()
         ));
 
-        let (prv_key2, pub_key2) = VerifyingKey::new_ed25519_key_pair();
+        let (prv_key2, pub_key2) = CryptoService::new_ed25519_key_pair();
         assert!(CryptoService::attempt_sign(
-            prv_key2.to_bytes().to_vec(),
-            pub_key2.to_bytes().to_vec()
+            &prv_key2.to_bytes().to_vec(),
+            &pub_key2.to_bytes().to_vec()
         ));
         assert_eq!(
-            CryptoService::attempt_sign(prv_key1.to_bytes().to_vec(), pub_key2.to_bytes().to_vec()),
+            CryptoService::attempt_sign(
+                &prv_key1.to_bytes().to_vec(),
+                &pub_key2.to_bytes().to_vec()
+            ),
             false
         );
         assert_eq!(
-            CryptoService::attempt_sign(prv_key2.to_bytes().to_vec(), pub_key1.to_bytes().to_vec()),
+            CryptoService::attempt_sign(
+                &prv_key2.to_bytes().to_vec(),
+                &pub_key1.to_bytes().to_vec()
+            ),
             false
         );
     }

@@ -56,6 +56,7 @@ impl InputWidget {
                         self.cursor_position += 1;
                     }
                 }
+                // If this causes pain in the future, sorry me :C
                 _ => {}
             }
         }

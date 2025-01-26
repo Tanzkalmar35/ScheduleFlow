@@ -3,7 +3,7 @@ use crossterm::event::KeyCode;
 use ratatui::{layout::Rect, Frame};
 use shared::auth_util::AuthUtil;
 
-use crate::ui::tui::Cmd;
+use crate::ui::{tui::Cmd, widgets::checkbox::CheckboxWidget};
 
 use super::{
     super::widgets::input_field::InputWidget, home_page_screen::HomePageScreen, screen::Screen,
@@ -13,6 +13,7 @@ use super::{
 pub(crate) struct LoginScreen {
     email: InputWidget,
     password: InputWidget,
+    remember_me: CheckboxWidget,
 }
 
 impl LoginScreen {
@@ -20,6 +21,7 @@ impl LoginScreen {
         Self {
             email: InputWidget::new(String::from("Email"), 'e'),
             password: InputWidget::new(String::from("Password"), 'p'),
+            remember_me: CheckboxWidget::new(String::from("Remember me"), 'r'),
         }
     }
 
@@ -34,7 +36,7 @@ impl LoginScreen {
             None,
             self.email.input().to_string(),
             self.password.input().to_string(),
-            true,
+            self.remember_me.is_checked(),
         );
         if let Ok(()) = login_attempt {
             return Cmd::NavigateTo(Box::new(HomePageScreen::new()));
@@ -50,6 +52,18 @@ impl LoginScreen {
             self.email.handle_input(key);
         } else if self.password.is_focused() {
             self.password.handle_input(key);
+        }
+    }
+
+    fn cycle_input_fields(&mut self) {
+        if self.email.is_focused() {
+            self.email.set_focus(false);
+            self.password.set_focus(true);
+        } else if self.password.is_focused() {
+            self.password.set_focus(false);
+            self.email.set_focus(true);
+        } else {
+            panic!("Can't cycle input fields if not in edit mode.")
         }
     }
 }
@@ -80,6 +94,9 @@ impl Screen for LoginScreen {
         );
         self.password.render(f, password_bounds);
 
+        let checkbox_bounds = Rect::new(start_x, start_y + 4 * input_height, input_width, 1);
+        self.remember_me.render(f, checkbox_bounds);
+
         // Set cursor for the focused input field
         if self.email.is_focused() {
             let cursor_x = email_bounds.x + self.email.cursor_position as u16 + 1; // +1 for the border
@@ -98,11 +115,14 @@ impl Screen for LoginScreen {
         match key {
             KeyCode::Esc => return self.unfocus_all(),
             KeyCode::Enter => return self.attempt_login(),
-            KeyCode::Char(_) => {
+            KeyCode::Tab => {
+                self.cycle_input_fields();
+                return Cmd::None;
+            }
+            _ => {
                 self.handle_char(key);
                 return Cmd::None;
             }
-            _ => panic!("Unexpected event occured..."),
         };
     }
 
@@ -113,6 +133,8 @@ impl Screen for LoginScreen {
         } else if key == KeyCode::Char(self.password.key) {
             self.password.set_focus(true);
             return Cmd::ChangeMode;
+        } else if key == KeyCode::Char(self.remember_me.key) {
+            self.remember_me.toggle();
         }
 
         return Cmd::None;

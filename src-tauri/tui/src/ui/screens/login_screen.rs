@@ -1,12 +1,13 @@
 use color_eyre::eyre::Result;
 use crossterm::event::KeyCode;
-use ratatui::{layout::Rect, Frame};
+use ratatui::{layout::Rect, widgets::Paragraph, Frame};
 use shared::auth_util::AuthUtil;
 
 use crate::ui::{tui::Cmd, widgets::checkbox::CheckboxWidget};
 
 use super::{
     super::widgets::input_field::InputWidget, home_page_screen::HomePageScreen, screen::Screen,
+    signup_screen::SignupScreen,
 };
 
 #[derive(Clone)]
@@ -23,12 +24,6 @@ impl LoginScreen {
             password: InputWidget::new(String::from("Password"), 'p'),
             remember_me: CheckboxWidget::new(String::from("Remember me"), 'r'),
         }
-    }
-
-    fn unfocus_all(&mut self) -> Cmd {
-        self.email.set_focus(false);
-        self.password.set_focus(false);
-        return Cmd::ChangeMode;
     }
 
     fn attempt_login(&mut self) -> Cmd {
@@ -52,18 +47,6 @@ impl LoginScreen {
             self.email.handle_input(key);
         } else if self.password.is_focused() {
             self.password.handle_input(key);
-        }
-    }
-
-    fn cycle_input_fields(&mut self) {
-        if self.email.is_focused() {
-            self.email.set_focus(false);
-            self.password.set_focus(true);
-        } else if self.password.is_focused() {
-            self.password.set_focus(false);
-            self.email.set_focus(true);
-        } else {
-            panic!("Can't cycle input fields if not in edit mode.")
         }
     }
 }
@@ -97,6 +80,11 @@ impl Screen for LoginScreen {
         let checkbox_bounds = Rect::new(start_x, start_y + 4 * input_height, input_width, 1);
         self.remember_me.render(f, checkbox_bounds);
 
+        let signup_info_text_bounds =
+            Rect::new(start_x, start_y + 5 * input_height, input_width, 1);
+        let info = Paragraph::new("Don't have an account? press 's' to create one");
+        f.render_widget(info, signup_info_text_bounds);
+
         // Set cursor for the focused input field
         if self.email.is_focused() {
             let cursor_x = email_bounds.x + self.email.cursor_position as u16 + 1; // +1 for the border
@@ -109,6 +97,24 @@ impl Screen for LoginScreen {
         }
 
         Ok(())
+    }
+
+    fn unfocus_all(&mut self) -> Cmd {
+        self.email.set_focus(false);
+        self.password.set_focus(false);
+        return Cmd::ChangeMode;
+    }
+
+    fn cycle_input_fields(&mut self) {
+        if self.email.is_focused() {
+            self.email.set_focus(false);
+            self.password.set_focus(true);
+        } else if self.password.is_focused() {
+            self.password.set_focus(false);
+            self.email.set_focus(true);
+        } else {
+            panic!("Can't cycle input fields if not in edit mode.")
+        }
     }
 
     fn handle_input(&mut self, key: KeyCode) -> Cmd {
@@ -135,6 +141,8 @@ impl Screen for LoginScreen {
             return Cmd::ChangeMode;
         } else if key == KeyCode::Char(self.remember_me.key) {
             self.remember_me.toggle();
+        } else if key == KeyCode::Char('s') {
+            return Cmd::NavigateTo(Box::new(SignupScreen::new()));
         }
 
         return Cmd::None;

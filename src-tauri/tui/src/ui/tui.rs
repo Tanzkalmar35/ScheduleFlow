@@ -65,11 +65,19 @@ pub(crate) struct Tui {
 impl Tui {
     fn new() -> Self {
         Self {
-            state: AppState::LoginScreen,
+            state: AppState::SignupScreen,
             current_mode: Mode::NORMAL,
             login_screen: LoginScreen::new(),
             signup_screen: SignupScreen::new(),
             home_page_screen: HomePageScreen::new(),
+        }
+    }
+
+    fn get_active_window(&mut self) -> Box<&mut dyn Screen> {
+        match self.state {
+            AppState::SignupScreen => Box::new(&mut self.signup_screen),
+            AppState::LoginScreen => Box::new(&mut self.login_screen),
+            AppState::HomePageScreen => Box::new(&mut self.home_page_screen),
         }
     }
 
@@ -87,14 +95,13 @@ impl Tui {
 
         // TODO: Check db conn
 
-        if AuthUtil::is_valid_session(driver().lock().unwrap().deref_mut()) {
-            tui.state = AppState::HomePageScreen;
-        }
+        //if AuthUtil::is_valid_session(driver().lock().unwrap().deref_mut()) {
+        //    tui.state = AppState::HomePageScreen;
+        //}
 
         loop {
             terminal.draw(|f| {
                 let bounds = Rect::new(2, 1, f.area().width - 4, f.area().height - 2);
-
                 tui.render(f, bounds);
             })?;
 
@@ -102,7 +109,7 @@ impl Tui {
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
                     match tui.current_mode {
-                        Mode::EDIT => match tui.login_screen.handle_input(key.code) {
+                        Mode::EDIT => match tui.get_active_window().handle_input(key.code) {
                             Cmd::ChangeMode => tui.change_mode(),
                             Cmd::NavigateTo(screen) => tui.navigate_to(&screen),
                             Cmd::None => {}
@@ -112,8 +119,10 @@ impl Tui {
                             match key.code {
                                 KeyCode::Char('q') => break, // Quit the application
                                 _ => {
-                                    if tui.login_screen.handle_cmd(key.code) == Cmd::ChangeMode {
-                                        tui.change_mode();
+                                    if let Cmd::NavigateTo(screen) =
+                                        tui.get_active_window().handle_cmd(key.code)
+                                    {
+                                        tui.navigate_to(&screen);
                                     }
                                 }
                             }
@@ -132,15 +141,44 @@ impl Tui {
     fn render(&self, frame: &mut Frame, bounds: Rect) -> Box<dyn Screen + 'static> {
         match self.state {
             AppState::LoginScreen => self.render_login_screen(frame, bounds),
-            AppState::SignupScreen => {
-                self.signup_screen.render(frame, bounds);
-                Box::new(self.signup_screen.clone())
-            }
+            AppState::SignupScreen => self.render_signup_screen(frame, bounds),
             AppState::HomePageScreen => {
                 self.home_page_screen.render(frame, bounds);
                 Box::new(self.home_page_screen.clone())
             }
         }
+    }
+
+    fn render_signup_screen(&self, frame: &mut Frame, bounds: Rect) -> Box<dyn Screen + 'static> {
+        let mode = if self.current_mode == Mode::NORMAL {
+            "Normal"
+        } else {
+            "Edit"
+        };
+
+        // Render ascii banner
+        let ascii: Vec<Line> = constants::BANNER
+            .lines()
+            .map(|line| Line::from(line))
+            .collect();
+        let ascii_art = Paragraph::new(Text::from(ascii)).alignment(Alignment::Center);
+        let ascii_art_bounds = Rect::new(0, 0, bounds.width, constants::BANNER_HEIGHT as u16);
+        frame.render_widget(ascii_art, ascii_art_bounds);
+
+        let info_text_bounds = Rect::new(0, constants::BANNER_HEIGHT as u16 + 2, bounds.width, 1);
+        let info_text = Paragraph::new(Text::from(
+            "Sign up - Press 'h' in normal mode for help, 'q' to quit - Current mode: ".to_owned()
+                + mode,
+        ))
+        .alignment(Alignment::Center);
+
+        frame.render_widget(info_text, info_text_bounds);
+
+        // Render the rest of the login screen (The input fields)
+        self.signup_screen
+            .render(frame, bounds)
+            .expect("Could not render login screen");
+        Box::new(self.signup_screen.clone())
     }
 
     fn render_login_screen(&self, frame: &mut Frame, bounds: Rect) -> Box<dyn Screen + 'static> {

@@ -9,6 +9,8 @@ use crate::ui::tui::Cmd;
 pub(crate) trait Screen {
     fn as_any(&self) -> &dyn Any;
     fn render(&self, f: &mut Frame, bounds: Rect) -> Result<()>;
+    fn unfocus_all(&mut self) -> Cmd;
+    fn cycle_input_fields(&mut self);
     fn handle_input(&mut self, key: KeyCode) -> Cmd;
     fn handle_cmd(&mut self, key: KeyCode) -> Cmd;
 }

@@ -99,13 +99,15 @@ impl AuthUtil {
     ///
     /// ## If something fails, the user sees it via a toast notification.
     pub fn attempt_signup(
-        app_handle: AppHandle,
+        app_handle: Option<AppHandle>,
         username: String,
         email: String,
         password: String,
         remember: bool,
     ) -> Result<(), &'static str> {
-        set_app_handle(app_handle);
+        if let Some(handle) = app_handle {
+            set_app_handle(handle);
+        }
 
         let hashed_password = hash(&password, DEFAULT_COST).unwrap();
         let user = User::new(username, (&*email).into(), hashed_password);

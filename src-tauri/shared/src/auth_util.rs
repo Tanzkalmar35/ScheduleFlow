@@ -15,6 +15,8 @@ use crate::errors::error_messages::{
 };
 use crate::runtime_objects::{driver, set_app_handle, set_current_user};
 use bcrypt::{hash, verify, DEFAULT_COST};
+use customs::benchmark;
+use log::info;
 use pg_driver::PgDriver;
 use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
@@ -45,6 +47,7 @@ impl AuthUtil {
     /// - BCRYPT_DECODING_ERR: If something went wrong while decoding tokens.
     ///
     /// ## If something fails, the user sees it via a toast notification.
+    #[benchmark("Attempting login took")]
     pub fn attempt_login(
         app_handle: Option<AppHandle>,
         email: String,
@@ -159,7 +162,9 @@ impl AuthUtil {
     ///
     /// # Arguments
     /// * `token` - The token that is supposed to correspond to a valid session.
+    #[benchmark("Validating session took")]
     pub fn is_valid_session(driver: &mut PgDriver) -> bool {
+        println!("Checking session validation");
         let user_email = SecureStorage::get_system_key(&String::from("user_email")).unwrap();
         let user = UserRepository::get_by_email(driver, user_email).unwrap();
         let user_clients =
@@ -176,6 +181,7 @@ impl AuthUtil {
                 &client.get_pub_key().as_bytes().to_vec(),
             );
             if sign_successful {
+                set_current_user(user);
                 return true;
             };
         }

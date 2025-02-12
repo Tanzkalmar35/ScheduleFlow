@@ -22,7 +22,7 @@ pub(crate) fn attempt_signup(
     password: String,
     remember: bool,
 ) -> Result<(), &'static str> {
-    AuthUtil::attempt_signup(app_handle, username, email, password, remember)
+    AuthUtil::attempt_signup(Some(app_handle), username, email, password, remember)
 }
 
 #[tauri::command]

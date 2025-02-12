@@ -1,5 +1,5 @@
 [package]
-name = "simple_query"
+name = "customs"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,6 +7,7 @@ edition = "2021"
 syn = {version="1.0", features = ["full"]}
 quote = "1.0.37"
 proc-macro2 = "1.0"
+log = "0.4.25"
 
 [lib]
 proc-macro = true

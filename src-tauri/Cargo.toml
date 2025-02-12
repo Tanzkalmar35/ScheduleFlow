@@ -1,8 +1,8 @@
 [workspace]
 members = [
     "base",
+    "customs", 
     "pg_driver",
-    "simple_query", 
     "shared",
     "tui",
 ]

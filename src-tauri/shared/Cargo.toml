@@ -29,12 +29,12 @@ whoami = "1.5.2"
 base64 = "0.22.1"
 ed25519-dalek = {version="2.1.1", features=["rand_core"]}
 ring = "0.16.20"
-
+log = "0.4.25"
 keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
 
 # Own dependencies
 pg_driver = { path = "../pg_driver" }
-simple_query = { path = "../simple_query" }
+customs = { path = "../customs" }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

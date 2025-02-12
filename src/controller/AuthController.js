@@ -3,13 +3,7 @@ import { createErrorToast, createSuccessToast } from "../Toast.js";
 import { listen } from "@tauri-apps/api/event";
 
 export async function isValidSession() {
-    if (document.cookie === "") {
-        return false;
-    }
-
-    return await invoke("is_valid_session", {
-        token: document.cookie.split("=")[1]
-    });
+    return await invoke("is_valid_session");
 }
 
 export async function submitLoginForm(event) {

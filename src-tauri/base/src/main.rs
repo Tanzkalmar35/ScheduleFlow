@@ -42,6 +42,8 @@ fn main() {
 
 pub fn init() {
     dotenv().ok();
+    env::set_var("RUST_LOG", "info");
+    env_logger::init();
     let error_queue = ErrorQueue::new();
     set_error_queue(error_queue);
 

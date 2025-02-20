@@ -32,8 +32,8 @@ pub(crate) fn user_exists(email: &str) -> bool {
 }
 
 #[tauri::command]
-pub(crate) fn logout(token: String) -> Result<(), &'static str> {
-    AuthUtil::logout(token)
+pub(crate) fn logout() -> Result<(), &'static str> {
+    AuthUtil::logout(driver().lock().unwrap().deref_mut())
 }
 
 #[tauri::command]

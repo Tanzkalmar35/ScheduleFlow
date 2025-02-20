@@ -44,7 +44,6 @@ pub trait DbActions<M, R: Table<M>> {
         let rows = match condition {
             Some(condition) => {
                 let query = format!("SELECT * FROM {} WHERE {}", table, condition);
-                println!("Query: {}", query);
                 driver
                     .exec(&query)
                     // Should not happen!

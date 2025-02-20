@@ -15,8 +15,7 @@ use crate::errors::error_messages::{
 };
 use crate::runtime_objects::{driver, set_app_handle, set_current_user};
 use bcrypt::{hash, verify, DEFAULT_COST};
-use customs::benchmark;
-use log::info;
+use customs::bench_message;
 use pg_driver::PgDriver;
 use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
@@ -47,7 +46,7 @@ impl AuthUtil {
     /// - BCRYPT_DECODING_ERR: If something went wrong while decoding tokens.
     ///
     /// ## If something fails, the user sees it via a toast notification.
-    #[benchmark("Attempting login took")]
+    #[bench_message("Attempting login")]
     pub fn attempt_login(
         app_handle: Option<AppHandle>,
         email: String,
@@ -101,6 +100,7 @@ impl AuthUtil {
     /// The user is prompted to try again.
     ///
     /// ## If something fails, the user sees it via a toast notification.
+    #[bench_message("Attempting signup")]
     pub fn attempt_signup(
         app_handle: Option<AppHandle>,
         username: String,
@@ -142,19 +142,20 @@ impl AuthUtil {
     ///
     /// ## If something fails, the user sees it via a toast notification.
     /// TODO: Improve error handling
-    pub fn logout(_token: String) -> Result<(), &'static str> {
-        todo!();
-        //let res = JwtTokenRepository::delete_spec_col(
-        //    driver().lock().unwrap().deref_mut(),
-        //    String::from("token"),
-        //    token,
-        //);
-
-        //if let Ok(()) = res {
-        //    Ok(())
-        //} else {
-        //    Err("Logout failed unexpectedly")
-        //}
+    #[bench_message("Logging out")]
+    pub fn logout(driver: &mut PgDriver) -> Result<(), &'static str> {
+        let user_email = SecureStorage::get_system_key(&String::from("user_email")).unwrap();
+        let user = UserRepository::get_by_email(driver, user_email).unwrap();
+        let user_clients =
+            ClientRepository::retrieve(driver, Some(format!("user_uuid = '{}'", user.get_uuid())));
+        for client in user_clients {
+            if client.get_device_name() == whoami::devicename() {
+                if let Err(e) = ClientRepository::delete(driver, client.get_uuid()) {
+                    log::error!("{}", e);
+                }
+            }
+        }
+        Ok(())
     }
 
     /// Checks if the given token corresponds to a valid existing session. If so, the user is free
@@ -162,9 +163,8 @@ impl AuthUtil {
     ///
     /// # Arguments
     /// * `token` - The token that is supposed to correspond to a valid session.
-    #[benchmark("Validating session took")]
+    #[bench_message("Validating session")]
     pub fn is_valid_session(driver: &mut PgDriver) -> bool {
-        println!("Checking session validation");
         let user_email = SecureStorage::get_system_key(&String::from("user_email")).unwrap();
         let user = UserRepository::get_by_email(driver, user_email).unwrap();
         let user_clients =
@@ -203,6 +203,7 @@ impl AuthUtil {
     ///
     /// ## If something fails, the user sees it via a toast notification.
     // TODO: Improve error handling
+    #[bench_message("Creating a new persistent session")]
     fn create_persistent_session(user: &User, driver: &mut PgDriver) -> Result<(), &'static str> {
         let (prv_key, pub_key) = CryptoService::new_ed25519_key_pair();
         let private_key =

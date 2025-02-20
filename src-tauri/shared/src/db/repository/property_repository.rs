@@ -1,5 +1,6 @@
 use crate::db::db_actions::{DbActions, Table};
 use crate::db::model::property::Property;
+use customs::bench_message;
 use pg_driver::PgDriver;
 
 pub struct PropertyRepository;
@@ -55,18 +56,22 @@ impl Table<Property> for PropertyRepository {
 }
 
 impl DbActions<Property, Self> for PropertyRepository {
+    #[bench_message("Storing property")]
     fn store(driver: &mut PgDriver, model: &Property) -> anyhow::Result<()> {
         Self::insert(driver, model)
     }
 
+    #[bench_message("Updating property")]
     fn update(driver: &mut PgDriver, model: &Property) -> anyhow::Result<()> {
         Self::alter(driver, &model, model.get_uuid())
     }
 
+    #[bench_message("Deleting property")]
     fn remove(driver: &mut PgDriver, model: &Property) -> anyhow::Result<()> {
         Self::delete(driver, model.get_uuid())
     }
 
+    #[bench_message("Retrieving properties")]
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Property> {
         let mut matches: Vec<Property> = vec![];
 

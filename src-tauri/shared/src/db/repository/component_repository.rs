@@ -1,5 +1,6 @@
 use crate::db::db_actions::{DbActions, Table};
 use crate::db::model::component::{Component, ComponentType};
+use customs::bench_message;
 use pg_driver::PgDriver;
 
 pub struct ComponentRepository;
@@ -37,18 +38,22 @@ impl Table<Component> for ComponentRepository {
 }
 
 impl DbActions<Component, Self> for ComponentRepository {
+    #[bench_message("Storing component")]
     fn store(driver: &mut PgDriver, component: &Component) -> anyhow::Result<()> {
         Self::insert(driver, component)
     }
 
+    #[bench_message("Updating component")]
     fn update(driver: &mut PgDriver, component: &Component) -> anyhow::Result<()> {
         Self::alter(driver, &component, component.uuid)
     }
 
+    #[bench_message("Deleting component")]
     fn remove(driver: &mut PgDriver, component: &Component) -> anyhow::Result<()> {
         Self::delete(driver, component.uuid)
     }
 
+    #[bench_message("Retrieving components")]
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Component> {
         let mut matches: Vec<Component> = vec![];
 

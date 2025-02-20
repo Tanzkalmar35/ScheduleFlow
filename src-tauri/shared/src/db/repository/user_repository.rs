@@ -3,6 +3,7 @@ use crate::db::{
     model::user::User,
 };
 use crate::errors::error_messages::USER_NOT_FOUND_ERR;
+use customs::bench_message;
 use pg_driver::PgDriver;
 use uuid::Uuid;
 
@@ -87,18 +88,22 @@ impl Table<User> for UserRepository {
 }
 
 impl DbActions<User, Self> for UserRepository {
+    #[bench_message("Storing user")]
     fn store(driver: &mut PgDriver, model: &User) -> anyhow::Result<()> {
         Self::insert(driver, model)
     }
 
+    #[bench_message("Updating user")]
     fn update(driver: &mut PgDriver, model: &User) -> anyhow::Result<()> {
         Self::alter(driver, &model, model.get_uuid())
     }
 
+    #[bench_message("Removing user")]
     fn remove(driver: &mut PgDriver, model: &User) -> anyhow::Result<()> {
         Self::delete(driver, model.get_uuid())
     }
 
+    #[bench_message("Retrieving users")]
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<User> {
         let mut res: Vec<User> = vec![];
 

@@ -2,6 +2,7 @@ use crate::db::{
     db_actions::{DbActions, Table},
     model::calendar::Calendar,
 };
+use customs::bench_message;
 use pg_driver::PgDriver;
 
 pub struct CalendarRepository;
@@ -33,6 +34,7 @@ impl Table<Calendar> for CalendarRepository {
 }
 
 impl DbActions<Calendar, Self> for CalendarRepository {
+    #[bench_message("Storing calendar")]
     fn store(driver: &mut PgDriver, calendar: &Calendar) -> anyhow::Result<()> {
         Self::insert(driver, calendar)
     }
@@ -42,10 +44,12 @@ impl DbActions<Calendar, Self> for CalendarRepository {
         unimplemented!("You can't update a calendar db entry, as it does only consist of an uuid.")
     }
 
+    #[bench_message("Deleting calendar")]
     fn remove(driver: &mut PgDriver, calendar: &Calendar) -> anyhow::Result<()> {
         Self::delete(driver, calendar.uuid)
     }
 
+    #[bench_message("Retrieving calendars")]
     fn retrieve(driver: &mut PgDriver, condition: Option<String>) -> Vec<Calendar> {
         let mut res: Vec<Calendar> = vec![];
 

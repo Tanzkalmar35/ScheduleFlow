@@ -18,6 +18,8 @@ anyhow = "1.0.81"
 dotenv = "0.15.0"
 chrono = "0.4.37"
 tauri-plugin-shell = "2"
+env_logger = "0.11.3"
+log = "0.4.25"
 
 # Own dependencies
 pg_driver = { path = "../pg_driver" }

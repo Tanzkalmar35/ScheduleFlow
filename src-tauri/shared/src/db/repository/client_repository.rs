@@ -1,5 +1,6 @@
 use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{DateTime, NaiveDateTime, Utc};
+use customs::bench_message;
 use ed25519_dalek::VerifyingKey;
 
 use crate::db::{
@@ -51,18 +52,22 @@ impl Table<Client> for ClientRepository {
 }
 
 impl DbActions<Client, Self> for ClientRepository {
+    #[bench_message("Storing calendar")]
     fn store(driver: &mut pg_driver::PgDriver, model: &Client) -> anyhow::Result<()> {
         Self::insert(driver, model)
     }
 
+    #[bench_message("Updating calendar")]
     fn update(driver: &mut pg_driver::PgDriver, model: &Client) -> anyhow::Result<()> {
         Self::alter(driver, model, model.get_uuid())
     }
 
+    #[bench_message("Deleting calendar")]
     fn remove(driver: &mut pg_driver::PgDriver, model: &Client) -> anyhow::Result<()> {
         Self::delete(driver, model.get_uuid())
     }
 
+    #[bench_message("Retrieving clients")]
     fn retrieve(driver: &mut pg_driver::PgDriver, condition: Option<String>) -> Vec<Client> {
         let mut res = vec![];
         let rows = Self::read(driver, &Self::get_name(), condition);
@@ -71,7 +76,8 @@ impl DbActions<Client, Self> for ClientRepository {
             let uuid = row.get("uuid");
             let user_uuid = row.get("user_uuid");
             let pub_key_str: String = row.get("public_key");
-            let pub_key = VerifyingKey::try_from(&STANDARD.decode(pub_key_str).unwrap()[..32]).unwrap(); // TODO: Improve error handling
+            let pub_key =
+                VerifyingKey::try_from(&STANDARD.decode(pub_key_str).unwrap()[..32]).unwrap(); // TODO: Improve error handling
             let name = row.get("device_name");
             let last_used: NaiveDateTime = row.get("last_used");
             let registered_at: NaiveDateTime = row.get("registered_at");

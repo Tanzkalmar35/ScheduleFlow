@@ -150,7 +150,7 @@ impl AuthUtil {
             ClientRepository::retrieve(driver, Some(format!("user_uuid = '{}'", user.get_uuid())));
         for client in user_clients {
             if client.get_device_name() == whoami::devicename() {
-                if let Err(e) = ClientRepository::delete(driver, client.get_uuid()) {
+                if let Err(e) = ClientRepository::remove(driver, &client) {
                     log::error!("{}", e);
                 }
             }
@@ -214,7 +214,7 @@ impl AuthUtil {
             SecureStorage::store_system_key(&user.get_email(), &String::from("user_email")).is_ok()
         );
 
-        let client = Client::new(whoami::username(), user.get_uuid(), pub_key);
+        let client = Client::new(whoami::devicename(), user.get_uuid(), pub_key);
 
         assert!(ClientRepository::store(driver, &client).is_ok());
 

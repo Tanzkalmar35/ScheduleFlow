@@ -27,7 +27,6 @@ pub(crate) fn attempt_signup(
 
 #[tauri::command]
 pub(crate) fn user_exists(email: &str) -> bool {
-    println!("Email: {}", email);
     UserRepository::is_existing(driver().lock().unwrap().deref_mut(), email)
 }
 

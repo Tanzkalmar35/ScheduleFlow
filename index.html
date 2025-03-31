@@ -15,7 +15,7 @@
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
     <script type="module" src="/src/Main.js" defer></script>
-    <script type="module" src="/src/calendar/CalendarUtil.js" defer></script>
+    <script type="module" src="/src/calendar/CalendarUtil.ts" defer></script>
 </head>
 
 <body class="poppins-regular">
@@ -107,7 +107,7 @@
 
 <script type="module">
     import {invoke} from "@tauri-apps/api/core";
-    import {createErrorToast, createInfoToast} from "./src/Toast.js";
+    import {createErrorToast, createInfoToast} from "./src/Toast.ts";
     import {invalidateJwtCookie} from "./src/controller/AuthController.js";
 
     document.getElementById("logout-btn").onclick = logout;
@@ -185,6 +185,6 @@
         return users;
     }
 </script>
-<script type="module" src="/src/Toast.js" defer></script>
+<script type="module" src="/src/Toast.ts" defer></script>
 </body>
 </html>

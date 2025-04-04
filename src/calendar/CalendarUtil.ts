@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Calendar } from "./Calendar.js";
 import { IDate } from "../utils/SimpleDate.js";
+import { createErrorToast } from "../Toast.js";
 
 // script.js
 const monthYearElement: any = document.getElementById("month-year");
@@ -13,6 +14,7 @@ const selectCalendarDropdown: any = document.getElementById("select-calendar");
 let currentDate: Date = new Date();
 
 let calendars: Calendar[] = [];
+let currentSelectedCalendar: Calendar;
 
 export async function loadUserCalendarData() {
 	await invoke("get_calendar_of_current_user")
@@ -91,6 +93,7 @@ function validateCalendarAndAppendUserData() {
 	}
 
 	appendUserDataToCalendar(selectedCalendar);
+	currentSelectedCalendar = selectedCalendar;
 }
 
 /**
@@ -125,25 +128,17 @@ function appendUserDataToCalendar(selectedCalendar: Calendar) {
 			iterator = entries.next();
 		}
 
-		//console.log(startDate);
-		//console.log(endDate)
-
 		// Converting plain string dates into Date objects
 		const startDateObj = IDate.parseString(startDate);
 		const endDateObj = IDate.parseString(endDate);
 
-		//console.log(startDate);
-		//console.log(endDate)
-
 		let dateSpan = new Set();
 		let tempDate = startDateObj;
 
-		while (tempDate.compareTo(endDateObj)) {
+		while (tempDate.compareTo(endDateObj) < 0) {
 			dateSpan.add(tempDate);
 			tempDate = tempDate.coypIncreaseOneDay();
 		}
-
-		console.log(dateSpan);
 
 		// Get html elements where the date matches here
 		const calendarDateElements = calendarDatesElement.children;
@@ -153,10 +148,9 @@ function appendUserDataToCalendar(selectedCalendar: Calendar) {
 
 		while (j < amountOfCalendarDateElements) {
 			const element = calendarDateElements[j];
-			const day = parseInt(element.textContent);
+			//const day = parseInt(element.textContent);
 
 			dateSpan.forEach(_date => {
-				console.log("Day " + day + " is inside of a date span!");
 				element.textContent = "This is inside of a date span!";
 				// affectedCalendarDateElements.push(element);
 			})
@@ -164,6 +158,10 @@ function appendUserDataToCalendar(selectedCalendar: Calendar) {
 		}
 		i++;
 	}
+}
+
+export function getCurrentCalendar(): Calendar {
+	return currentSelectedCalendar;
 }
 
 // Render calendar for current date

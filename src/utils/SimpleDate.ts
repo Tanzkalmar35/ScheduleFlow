@@ -104,6 +104,7 @@ export class IDate {
 	compareTo(other: IDate): number {
 		// Compare years
 		if (this.date.getFullYear() < other.date.getFullYear()) {
+			console.log()
 			return -1;
 		} else if (this.date.getFullYear() > other.date.getFullYear()) {
 			return 1;

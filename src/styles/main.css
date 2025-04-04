@@ -15,104 +15,249 @@
 */
 
 * {
-    /*background-color: #121212;*/
+	/*background-color: #121212;*/
 }
 
 /* styles.css */
 .calendar-container {
-    width: 90vw;
-    height: 90vh;
-    margin: 40px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	width: 90vw;
+	height: 90vh;
+	margin: 40px auto;
+	padding: 20px;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .calendar-header {
-    /*background-color: #121212;*/
-    color: #000;
-    padding: 10px;
-    text-align: center;
+	/*background-color: #121212;*/
+	color: #000;
+	padding: 10px;
+	text-align: center;
 }
 
 .day-of-week {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
+	display: flex;
+	justify-content: space-between;
+	padding: 10px;
 }
 
 .day-of-week div {
-    width: calc(100% / 7);
-    height: fit-content;
-    text-align: center;
+	width: calc(100% / 7);
+	height: fit-content;
+	text-align: center;
 }
 
 #calendar-dates {
-    padding: 10px;
+	padding: 10px;
 }
 
 .date {
-    display: inline-block;
-    width: calc(100% / 7);
-    height: 12vh;
-    text-align: center;
-    padding: 10px;
-    border: 1px solid #ddd;
-    box-sizing: border-box;
-    vertical-align: top;
-    /*background-color: #fff;*/
+	display: inline-block;
+	width: calc(100% / 7);
+	height: 12vh;
+	text-align: center;
+	padding: 10px;
+	border: 1px solid #ddd;
+	box-sizing: border-box;
+	vertical-align: top;
+	/*background-color: #fff;*/
 }
 
 .blank {
-    background-color: #f9f9f9;
-    border: none;
-}
-
-/* The Modal (background) */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-}
-
-/* Modal Content/Box */
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
-}
-
-#create-calendar-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	background-color: #f9f9f9;
+	border: none;
 }
 
 /* The Close Button */
 .close-btn {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
 }
 
 .close-btn:hover,
 .close-btn:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
 }
 
 .flex {
-    display: flex;
+	display: flex;
+}
+
+/* Overlay style */
+.modal-overlay {
+	display: none;
+	/* Hidden by default */
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	/* Semi-transparent background */
+	z-index: 999;
+	/* Below the modal */
+}
+
+.modal {
+	display: none;
+	/* Hidden by default */
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 80%;
+	/* Set width to 80% of the screen */
+	height: 80%;
+	/* Set height to 80% of the screen */
+	transform: translate(-50%, -50%);
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	/* Above the overlay */
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px;
+	/* More padding */
+	border-bottom: 2px solid #eee;
+	/* Thicker separator line */
+}
+
+.close-btn {
+	cursor: pointer;
+	font-size: 28px;
+	/* Larger close button */
+}
+
+.modal-body {
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+	/* Padding for body */
+	height: calc(100% - 100px);
+	/* Adjust height for footer */
+	overflow-y: auto;
+	/* Allow scrolling if content is too tall */
+}
+
+.form-section {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	/* Two-column layout */
+	gap: 20px;
+	/* Space between columns */
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+label {
+	font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"] {
+	width: 100%;
+	padding: 12px;
+	/* Increased padding */
+	margin-top: 5px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.email-input-container {
+	display: flex;
+	gap: 10px;
+}
+
+.user-list-container {
+	margin-top: 20px;
+	grid-column: span 2;
+	/* Span across both columns */
+}
+
+.user-list {
+	list-style: none;
+	padding: 0;
+	margin: 10px 0;
+	border-top: 1px solid #eee;
+	padding-top: 10px;
+}
+
+.user-list li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 5px 0;
+}
+
+.user-list button {
+	background: #ff4444;
+	color: white;
+	border: none;
+	padding: 3px 8px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.modal-footer {
+	padding: 20px;
+	/* More padding */
+	display: flex;
+	justify-content: center;
+	/* Center the buttons */
+	border-top: 2px solid #eee;
+	/* Thicker separator line */
+}
+
+.footer-buttons {
+	display: flex;
+	gap: 15px;
+	/* Space between buttons */
+}
+
+button {
+	padding: 12px 24px;
+	/* Increased padding */
+	cursor: pointer;
+	background: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	transition: background 0.3s;
+	/* Smooth transition */
+}
+
+button:hover {
+	background: #0056b3;
+	/* Darker blue on hover */
+}
+
+.cancel-btn {
+	background: #dc3545;
+	/* Red background for cancel button */
+}
+
+.cancel-btn:hover {
+	background: #c82333;
+	/* Darker red on hover */
+}
+
+.save-btn {
+	background: #28a745;
+	/* Green background for save button */
+}
+
+.save-btn:hover {
+	background: #218838;
+	/* Darker green on hover */
 }

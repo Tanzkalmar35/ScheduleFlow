@@ -1,17 +1,21 @@
 use std::sync::{Mutex, OnceLock};
 
+use crate::db::model::calendar::Calendar;
 use crate::db::model::client::Client;
+use crate::db::model::simple::simple_calendar::SimpleCalendar;
 use crate::db::model::user::User;
 use crate::errors::error_messages::ERROR_QUEUE_NOT_INITIALIZED_ERR;
 use crate::errors::error_queue::ErrorQueue;
 use lazy_static::lazy_static;
 use once_cell::sync::OnceCell;
 use pg_driver::PgDriver;
+use tauri::async_runtime::Mutex;
 use tauri::AppHandle;
 
 pub static CURRENT_CLIENT: OnceCell<Mutex<Option<Client>>> = OnceCell::new();
 pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
 pub static ERROR_QUEUE: OnceCell<Mutex<Option<ErrorQueue>>> = OnceCell::new();
+pub static CACHED_CALENDARS: OnceCell<Mutex<Vec<SimpleCalendar>>> = OnceCell::new();
 
 lazy_static! {
     pub static ref APP_HANDLE: Mutex<Option<AppHandle>> = Mutex::new(None);
@@ -99,4 +103,17 @@ pub fn set_app_handle(app_handle: AppHandle) {
 
 pub fn get_app_handle() -> Option<AppHandle> {
     APP_HANDLE.lock().unwrap().clone()
+}
+
+pub fn cache_calendar(calendar: SimpleCalendar) {
+    if CACHED_CALENDARS.get().is_none() {
+        CACHED_CALENDARS.set(Mutex::new(Vec::new())).unwrap();
+    }
+
+    let mut cached_calendars = CACHED_CALENDARS.get().unwrap().lock().unwrap();
+    cached_calendars.push(calendar);
+}
+
+pub fn get_cached_calendars() -> Vec<SimpleCalendar> {
+    CACHED_CALENDARS.get().unwrap()
 }

@@ -47,6 +47,8 @@ impl UserCalendarCombinationRepository {
 
         res
     }
+
+    pub fn get_users_of_calendar(calendar_uuid: Uuid): Vec<User> {}
 }
 
 impl Table<UserCalendarCombination> for UserCalendarCombinationRepository {

@@ -18,6 +18,18 @@ use postgres::Row;
 pub struct UserCalendarCombinationRepository;
 
 impl UserCalendarCombinationRepository {
+    /// Retrieves all calendars the given user has access to.
+    ///
+    /// # Arguments
+    ///
+    /// * `driver` - The database driver.
+    /// * `user` - The user to query.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let calendars_of_user = get_calendars_of_user(driver().lock().unwrap().deref_mut(), user);
+    /// ```
     pub fn get_calendars_of_user(driver: &mut PgDriver, user: &User) -> Vec<Calendar> {
         let mut res: Vec<Calendar> = vec![];
         let stmt = format!(
@@ -48,7 +60,52 @@ impl UserCalendarCombinationRepository {
         res
     }
 
-    pub fn get_users_of_calendar(calendar_uuid: Uuid): Vec<User> {}
+    /// Retrieves all users that have access to the calendar matchig the given uuid.
+    ///
+    /// # Arguments
+    ///
+    /// * `driver` - The database driver.
+    /// * `calendar_uuid` - The uuid of the calendar to query.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let calenar_users = get_users_of_calendar(driver().lock().unwrap().deref_mut(), calendar_uuid);
+    /// ```
+    pub fn get_users_of_calendar(driver: &mut PgDriver, calendar_uuid: Uuid) -> Vec<User> {
+        let mut res: Vec<User> = vec![];
+        let stmt = format!(
+            r#"
+            SELECT u FROM users_calendars uc
+            INNER JOIN users u
+            ON uc.user_uuid = u.uuid
+            WHERE uc.calendar_uuid = '{}'
+            "#,
+            calendar_uuid
+        );
+
+        let query_res = Self::query(driver, stmt);
+        if let Err(e) = query_res {
+            let mut err = DatabaseOperationFailedError::new();
+            err.set_message(format!(
+                "Could not retrieve users of calendar uuid={} because of: {}",
+                calendar_uuid, e
+            ));
+            get_error_queue().enqueue(err);
+            return vec![];
+        }
+
+        for user_row in query_res.unwrap() {
+            res.push(User::from(
+                user_row.get("uuid"),
+                user_row.get("email"),
+                user_row.get("password"),
+                user_row.get("username"),
+            ))
+        }
+
+        res
+    }
 }
 
 impl Table<UserCalendarCombination> for UserCalendarCombinationRepository {

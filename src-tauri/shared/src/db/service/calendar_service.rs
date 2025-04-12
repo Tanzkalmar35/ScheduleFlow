@@ -30,6 +30,7 @@ impl CalendarService {
         for calendar in calendars {
             let simple_calendar = SimpleCalendar::build(driver_binding.deref_mut(), calendar);
             simple_user_calendars.push(simple_calendar);
+            // Caching loaded calendars
             runtime_objects::cache_calendar(simple_calendar)
         }
 

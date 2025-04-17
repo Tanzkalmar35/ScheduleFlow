@@ -1,6 +1,5 @@
-use std::sync::{Mutex, OnceLock};
+use std::sync::{Mutex, MutexGuard, OnceLock};
 
-use crate::db::model::calendar::Calendar;
 use crate::db::model::client::Client;
 use crate::db::model::simple::simple_calendar::SimpleCalendar;
 use crate::db::model::user::User;
@@ -9,7 +8,6 @@ use crate::errors::error_queue::ErrorQueue;
 use lazy_static::lazy_static;
 use once_cell::sync::OnceCell;
 use pg_driver::PgDriver;
-use tauri::async_runtime::Mutex;
 use tauri::AppHandle;
 
 pub static CURRENT_CLIENT: OnceCell<Mutex<Option<Client>>> = OnceCell::new();
@@ -114,6 +112,6 @@ pub fn cache_calendar(calendar: SimpleCalendar) {
     cached_calendars.push(calendar);
 }
 
-pub fn get_cached_calendars() -> Vec<SimpleCalendar> {
-    CACHED_CALENDARS.get().unwrap()
+pub fn get_cached_calendars() -> MutexGuard<'static, Vec<SimpleCalendar>> {
+    CACHED_CALENDARS.get().unwrap().lock().unwrap()
 }

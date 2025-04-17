@@ -165,8 +165,14 @@ impl AuthUtil {
     /// * `token` - The token that is supposed to correspond to a valid session.
     #[bench_message("Validating session")]
     pub fn is_valid_session(driver: &mut PgDriver) -> bool {
-        let user_email = SecureStorage::get_system_key(&String::from("user_email")).unwrap();
-        let user = UserRepository::get_by_email(driver, user_email).unwrap();
+        let user_email_res = SecureStorage::get_system_key(&String::from("user_email"));
+
+        if let Err(e) = user_email_res {
+            println!("{}", e);
+            return false;
+        }
+
+        let user = UserRepository::get_by_email(driver, user_email_res.unwrap()).unwrap();
         let user_clients =
             ClientRepository::retrieve(driver, Some(format!("user_uuid = '{}'", user.get_uuid())));
         let prv_key_str = SecureStorage::get_system_key(user.get_email());

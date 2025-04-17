@@ -2,7 +2,7 @@ use serde::Serialize;
 use sqlx::prelude::Type;
 use uuid::Uuid;
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, Clone)]
 pub struct Property {
     uuid: Uuid,
     key: String,

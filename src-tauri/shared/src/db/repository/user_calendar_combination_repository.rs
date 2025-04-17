@@ -14,6 +14,7 @@ use crate::{
 };
 use pg_driver::PgDriver;
 use postgres::Row;
+use uuid::Uuid;
 
 pub struct UserCalendarCombinationRepository;
 
@@ -76,7 +77,8 @@ impl UserCalendarCombinationRepository {
         let mut res: Vec<User> = vec![];
         let stmt = format!(
             r#"
-            SELECT u FROM users_calendars uc
+            SELECT u.uuid, u.email, u.password, u.username 
+            FROM users_calendars uc
             INNER JOIN users u
             ON uc.user_uuid = u.uuid
             WHERE uc.calendar_uuid = '{}'
@@ -98,9 +100,9 @@ impl UserCalendarCombinationRepository {
         for user_row in query_res.unwrap() {
             res.push(User::from(
                 user_row.get("uuid"),
+                user_row.get("username"),
                 user_row.get("email"),
                 user_row.get("password"),
-                user_row.get("username"),
             ))
         }
 

@@ -1,8 +1,10 @@
+use serde::Serialize;
+
 /// SimpleUser objects represent the same data as 'normal' users, but without any access functions, so
 /// SimpleUser objects can really only be used for holding data.
+#[derive(Serialize, Debug, Clone)]
 pub struct SimpleUser {
     username: String,
-    password: String,
     email: String,
 }
 
@@ -18,14 +20,10 @@ impl SimpleUser {
     /// # Examples
     ///
     /// ```
-    /// let simple_user = SimpleUser::new(user.get_username(), user.password(), user.email());
+    /// let simple_user = SimpleUser::new(user.get_username(), user.email());
     /// ```
-    pub fn new(username: String, password: String, email: String) -> Self {
-        Self {
-            username,
-            password,
-            email,
-        }
+    pub fn new(username: String, email: String) -> Self {
+        Self { username, email }
     }
 
     /// Returns the username of this SimpleUser object.
@@ -40,25 +38,13 @@ impl SimpleUser {
         return &self.username;
     }
 
-    /// Returns the password of this SimpleUser object.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// let simple_user = SimpleUser::new(...);
-    /// println!("Username: {}", simple_user.get_password());
-    /// ```
-    pub fn get_password(&self) -> &String {
-        return &self.password;
-    }
-
     /// Returns the email of this SimpleUser object.
     ///
     /// # Examples
     ///
     /// ```
     /// let simple_user = SimpleUser::new(...);
-    /// println!("Username: {}", simple_user.get_email());
+    /// println!("Email: {}", simple_user.get_email());
     /// ```
     pub fn get_email(&self) -> &String {
         return &self.email;

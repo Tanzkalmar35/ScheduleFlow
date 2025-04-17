@@ -1,4 +1,4 @@
-import { getCurrentCalendar, loadUserCalendarData } from "./calendar/CalendarUtil.ts";
+import { getCurrentCalendar, loadUserCalendarData } from "./models/CalendarUtil.ts";
 import { isValidSession } from "./controller/AuthController.js";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -37,13 +37,17 @@ await init()
 	.catch((e) => console.log("Initialization failed: " + e));
 
 function loadEditCalendarModal(calendar) {
-	const selectedCalendarName = document.querySelector('#select-calendar option:checked').textContent
-	if (selectedCalendarName != "Please select...") {
-		document.getElementById("calendarName").value = selectedCalendarName;
-	} else {
-		return;
-	}
-	document.getElementById("edit-calendar-modal").style.display =
-		"block";
+	const selectedCalendarName = document.querySelector('#select-calendar option:checked').textContent;
+
+	if (selectedCalendarName == "Please select...") return;
+
+	document.getElementById("calendarName").value = selectedCalendarName;
+	document.getElementById("edit-calendar-modal").style.display = "block";
 	document.getElementById("modalOverlay").style.display = "block";
+
+	document.getElementById("userList").appendChild("")
+}
+
+function createNewCalendarUserListElement(user) {
+	let element = document.createElement("li");
 }

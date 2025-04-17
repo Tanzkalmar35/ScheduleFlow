@@ -33,7 +33,7 @@ impl SecureStorage {
     ///
     /// # Arguments
     ///
-    /// * `user_email` - The email of the user to get the system key for.
+    /// * `entry_id` - The email of the user to get the system key for.
     ///
     /// # Returns
     ///
@@ -100,4 +100,3 @@ mod tests {
         }
     }
 }
-

@@ -4,7 +4,6 @@ use crate::db::{
         calendar::Calendar,
         property::{OwnerType, Property},
         simple::simple_component::SimpleComponent,
-        user::User,
     },
     repository::{
         property_repository::PropertyRepository,
@@ -16,7 +15,7 @@ use serde::Serialize;
 
 use super::simple_user::SimpleUser;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct SimpleCalendar {
     name: String,
     components: Vec<SimpleComponent>,
@@ -85,14 +84,13 @@ impl SimpleCalendar {
         let components = SimpleComponent::build_by_calendar(driver, &calendar);
         let properties = PropertyRepository::retrieve(driver, Some(owned_by_calendar));
         let users = UserCalendarCombinationRepository::get_users_of_calendar(driver, calendar.uuid);
-        let simple_users = vec![];
+        let mut simple_users = vec![];
 
         // Convert users to SimpleUsers
         for user in users {
             simple_users.push(SimpleUser::new(
-                user.get_username(),
-                user.get_password(),
-                user.get_email(),
+                user.get_username().to_string(),
+                user.get_email().to_string(),
             ));
         }
 

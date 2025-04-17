@@ -1,3 +1,5 @@
+import { User } from "./User";
+
 /**
  *  The frontend representation of the calendar in simple manner.
  *
@@ -27,6 +29,8 @@ export class Calendar {
 	 */
 	private readonly properties: Map<string, string>;
 
+	private readonly users: User[];
+
 	/**
 	 *   Initializes a new Calendar object.
 	 *
@@ -34,10 +38,11 @@ export class Calendar {
 	 *   @param {Component[]} components belong to this calendar.
 	 *   @param {Map<string, string>} properties describe the calendar's characteristics.
 	 */
-	constructor(name: string, components: Component[], properties: Map<string, string>) {
+	constructor(name: string, components: Component[], properties: Map<string, string>, users: User[]) {
 		this.name = name;
 		this.components = components;
 		this.properties = properties;
+		this.users = users;
 	}
 
 	/**
@@ -65,6 +70,15 @@ export class Calendar {
 	 */
 	getProperties(): Map<string, string> {
 		return this.properties;
+	}
+
+	/**
+	 * Returns a list of users that have access to this calendar.
+	 *
+	 * @returns {User[]} A list of users that have access to this calendar.
+	 */
+	getUsers(): User[] {
+		return this.users;
 	}
 
 	/**
@@ -128,14 +142,20 @@ export class Calendar {
 				l++;
 			}
 
+			let m = 0;
+			let users: User[] = [];
+			while (m < calendar.users.length - 1) {
+				let user = calendar.users[m];
+				users.push(new User(user.username, user.email))
+				m++;
+			}
+
 			result.push(
-				new Calendar(calendar.name, components, calendarPropertyMap),
+				new Calendar(calendar.name, components, calendarPropertyMap, users),
 			);
 
 			i++;
 		}
-
-		console.log(result)
 
 		return result;
 	}

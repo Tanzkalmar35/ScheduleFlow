@@ -14,7 +14,7 @@ use pg_driver::PgDriver;
 use serde::Serialize;
 use uuid::Uuid;
 
-#[derive(Debug, Default, PartialEq, Serialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Clone)]
 pub struct SimpleComponent {
     c_type: ComponentType,
     properties: Vec<Property>,

@@ -1,4 +1,5 @@
 use shared::{
+    current::{driver, get_current_user},
     db::{
         db_actions::DbActions,
         model::{
@@ -12,7 +13,6 @@ use shared::{
         },
         service::calendar_service::CalendarService,
     },
-    runtime_objects::{driver, get_current_user},
 };
 
 use crate::api::auth_api_controller::user_exists;

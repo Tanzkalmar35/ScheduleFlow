@@ -100,18 +100,20 @@
 
 					<div class="form-group">
 						<label for="userEmail">Add User by Email:</label>
-						<div class="email-input-container">
-							<input type="email" id="userEmail" placeholder="Enter email">
-							<button onclick="addUser  ()">Add User</button>
-						</div>
+						<form id="add-users-form">
+							<div class="email-input-container">
+								<input type="email" id="userEmail"
+									placeholder="Enter email">
+								<button id="add-new-user-btn" type="submit">Add
+									user</button>
+							</div>
+						</form>
 					</div>
 				</div>
 
 				<div class="user-list-container">
 					<h3>Users with Access:</h3>
 					<ul class="user-list" id="userList">
-						<li>example@user.com <button
-								onclick="removeUser  (this)">Remove</button></li>
 					</ul>
 				</div>
 			</div>
@@ -126,87 +128,6 @@
 			</div>
 		</div>
 	</div>
-
-	<script type="module">
-		import {invoke} from "@tauri-apps/api/core";
-		import {createErrorToast, createInfoToast} from "./src/Toast.ts";
-		import {invalidateJwtCookie} from "./src/controller/AuthController.js";
-
-		document.getElementById("logout-btn").onclick = logout;
-		const calendarUserList = document.getElementById("calendar-users");
-
-		async function logout() {
-			await invoke("logout", {
-				token: document.cookie.split("=")[1],
-			}).catch((e) => createErrorToast(e));
-
-			invalidateJwtCookie();
-			window.location.reload();
-		}
-
-		document.getElementById("store-new-calendar-btn").onclick = async function (event) {
-			event.preventDefault();
-			const name = document.getElementById("new-calendar-name").value;
-			const usersElements = document.getElementById("calendar-users").children;
-			const users = getEmailsOfCalendarUsers(usersElements);
-
-			await invoke("store_new_calendar", {
-				calendarName: name,
-				usersEmails: users,
-			});
-
-			document.getElementById("create-calendar-modal").style.display = "none";
-
-			await loadUserCalendarData()
-		}
-
-		document.getElementById("add-new-user-btn").onclick = async function (event) {
-			event.preventDefault();
-			const userEmail = document.getElementById("add-new-calendar-user").value;
-
-			if (getEmailsOfCalendarUsers(calendarUserList.children).includes(userEmail)) {
-				return;
-			}
-
-			let userExists = false;
-
-			await invoke("user_exists", {email: userEmail})
-				.then((res) => {
-					userExists = res;
-				})
-				.catch((err) => {
-					createErrorToast(err);
-				});
-
-			if (!userExists) {
-				return;
-			}
-
-			appendUserToList(userEmail);
-		};
-
-		function appendUserToList(email) {
-			const calendarUserCount = calendarUserList.children.length;
-			const newUserElement = document.createElement("div");
-			const htmlParagraphElement = document.createElement("p");
-			htmlParagraphElement.textContent = email;
-			newUserElement.setAttribute("id", "calendar-user-" + calendarUserCount + 1);
-			newUserElement.setAttribute("class", "calendar-user");
-			newUserElement.appendChild(htmlParagraphElement);
-			calendarUserList.appendChild(newUserElement);
-		}
-
-		function getEmailsOfCalendarUsers(calendarUserList) {
-			const users = [];
-			let i = 0;
-			while (i < calendarUserList.length) {
-				const userElement = calendarUserList[i];
-				users.push(userElement.children[0].textContent);
-				i++;
-			}
-			return users;
-		}
-	</script>
 	<script type="module" src="/src/Toast.ts" defer></script>
 </body>
 

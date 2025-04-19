@@ -5,6 +5,7 @@ use std::ops::DerefMut;
 
 use crate::crypto::crypto_service::CryptoService;
 use crate::crypto::secure_storage::SecureStorage;
+use crate::current::{driver, set_app_handle, set_current_user, set_session_type, SessionType};
 use crate::db::db_actions::DbActions;
 use crate::db::model::client::Client;
 use crate::db::model::user::User;
@@ -13,7 +14,6 @@ use crate::db::repository::user_repository::UserRepository;
 use crate::errors::error_messages::{
     BCRYPT_DECODING_ERR, USER_ALREADY_EXISTING_ERR, USER_NOT_FOUND_ERR,
 };
-use crate::runtime_objects::{driver, set_app_handle, set_current_user};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use customs::bench_message;
 use pg_driver::PgDriver;
@@ -74,8 +74,11 @@ impl AuthUtil {
             Err(_) => return Err(BCRYPT_DECODING_ERR),
         }
 
-        if remember {
-            Self::create_persistent_session(&user, driver.deref_mut())?;
+        Self::create_persistent_session(&user, driver.deref_mut())?;
+
+        match remember {
+            true => set_session_type(SessionType::PERSISTENT),
+            false => set_session_type(SessionType::TEMPORARY),
         }
 
         set_current_user(user);
@@ -122,8 +125,11 @@ impl AuthUtil {
 
         UserRepository::store(driver.deref_mut(), &user).unwrap();
 
-        if remember {
-            Self::create_persistent_session(&user, driver.deref_mut())?;
+        Self::create_persistent_session(&user, driver.deref_mut())?;
+
+        match remember {
+            true => set_session_type(SessionType::PERSISTENT),
+            false => set_session_type(SessionType::TEMPORARY),
         }
 
         set_current_user(user);

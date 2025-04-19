@@ -14,7 +14,7 @@ use ratatui::{
     widgets::Paragraph,
     Frame, Terminal,
 };
-use shared::{auth_util::AuthUtil, runtime_objects::driver};
+use shared::{auth_util::AuthUtil, current::driver};
 
 use crate::constants;
 

@@ -12,8 +12,11 @@ use api::{
 };
 use shared::{
     auth_util,
+    current::{
+        driver, get_session_type, set_app_handle as set_shared_app_handle, set_error_queue,
+        SessionType,
+    },
     errors::error_queue::ErrorQueue,
-    runtime_objects::{driver, set_app_handle as set_shared_app_handle, set_error_queue},
 };
 
 use dotenv::dotenv;
@@ -36,6 +39,10 @@ fn main() {
             user_exists,
             store_new_calendar,
         ])
+        .on_window_event(|_, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } => elim_session_if_temp(),
+            _ => {}
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -50,6 +57,12 @@ pub fn init() {
     thread::spawn(move || {
         let driver = driver();
     });
+}
+
+fn elim_session_if_temp() {
+    if let SessionType::TEMPORARY = get_session_type() {
+        auth_util::AuthUtil::logout(driver().lock().unwrap().deref_mut());
+    }
 }
 
 #[tauri::command]

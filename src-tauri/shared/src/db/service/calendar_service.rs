@@ -1,7 +1,7 @@
+use crate::current::{self, driver};
 use crate::db::model::simple::simple_calendar::SimpleCalendar;
 use crate::db::model::user::User;
 use crate::db::repository::user_calendar_combination_repository::UserCalendarCombinationRepository;
-use crate::runtime_objects::{self, driver};
 use std::ops::DerefMut;
 
 pub struct CalendarService;
@@ -31,8 +31,10 @@ impl CalendarService {
             let simple_calendar = SimpleCalendar::build(driver_binding.deref_mut(), calendar);
             simple_user_calendars.push(simple_calendar.clone());
             // Caching loaded calendars
-            runtime_objects::cache_calendar(simple_calendar)
+            current::cache_calendar(simple_calendar)
         }
+
+        println!("{:?}", simple_user_calendars);
 
         simple_user_calendars
     }

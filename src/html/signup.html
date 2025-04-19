@@ -2,68 +2,70 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>This is the user page</title>
+	<meta charset="UTF-8">
+	<title>This is the user page</title>
 
-    <link rel="stylesheet" href="../styles/login.css">
-    <link rel="stylesheet" href="../styles/toast.css">
+	<link rel="stylesheet" href="../styles/login.css">
+	<link rel="stylesheet" href="../styles/toast.css">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+		integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body class="poppins-regular login-body">
 
-    <div class="notifications">
-    </div>
+	<div class="notifications">
+	</div>
 
-    <div class="modal-b-wrapper">
-        <div id="signup-modal" class="modal-b-dark login-modal">
-            <div class="login-modal-header">
-                <h1>Scheduleflow</h1>
-            </div>
-            <div class="login-modal-content-wrapper">
-                <div class="login-modal-content">
-                    <h1 class="login-modal-headline">Welcome!</h1>
-                    <h1 class="login-modal-subheadline">Create an account</h1>
-                    <form id="signup-form" class="login-form">
-                        <label>
-                            <input id="signup-modal-username" class="input__field" type="text" placeholder="Username"
-                                required />
-                        </label>
-                        <label>
-                            <input id="signup-modal-email" class="input__field" type="email" placeholder="Email"
-                                required />
-                        </label>
-                        <label>
-                            <input id="signup-modal-password" class="input__field" type="password"
-                                placeholder="Password" required />
-                        </label>
-                        <label class="flex">
-                            <input id="signup-modal-remember-me" type="checkbox" aria-selected="true" />
-                            <span>Remember me</span>
-                        </label>
-                        <button id="signup-btn" type="submit" class="submit-button">Log in</button>
-                    </form>
-                    <h4 class="login-modal-headline">
-                        Already have an account?
-                        <span>
-                            <a class="text-white" href="login.html">
-                                Log in
-                            </a>
-                        </span>
-                    </h4>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="modal-b-wrapper">
+		<div id="signup-modal" class="modal-b-dark login-modal">
+			<div class="login-modal-header">
+				<h1>Scheduleflow</h1>
+			</div>
+			<div class="login-modal-content-wrapper">
+				<div class="login-modal-content">
+					<h1 class="login-modal-headline">Welcome!</h1>
+					<h1 class="login-modal-subheadline">Create an account</h1>
+					<form id="signup-form" class="login-form">
+						<label>
+							<input id="signup-modal-username" class="input__field"
+								type="text" placeholder="Username" required />
+						</label>
+						<label>
+							<input id="signup-modal-email" class="input__field" type="email"
+								placeholder="Email" required />
+						</label>
+						<label>
+							<input id="signup-modal-password" class="input__field"
+								type="password" placeholder="Password" required />
+						</label>
+						<label class="flex">
+							<input id="signup-modal-remember-me" type="checkbox"
+								aria-selected="true" />
+							<span>Remember me</span>
+						</label>
+						<button id="signup-btn" type="submit" class="submit-button">Log
+							in</button>
+					</form>
+					<h4 class="login-modal-headline">
+						Already have an account?
+						<span>
+							<a class="text-white" href="login.html">
+								Log in
+							</a>
+						</span>
+					</h4>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 <script src="../Signup.js" type="module"></script>
-<script src="../Toast.js" type="module"></script>
+<script src="../Toast.ts" type="module"></script>
 
 </html>

@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Calendar } from "./Calendar.js";
 import { IDate } from "../utils/SimpleDate.js";
-import { createErrorToast } from "../Toast.js";
+import { createErrorToast } from "../Toast.ts";
 
 // script.js
 const monthYearElement: any = document.getElementById("month-year");

@@ -52,17 +52,17 @@ impl Table<Client> for ClientRepository {
 }
 
 impl DbActions<Client, Self> for ClientRepository {
-    #[bench_message("Storing calendar")]
+    #[bench_message("Storing client")]
     fn store(driver: &mut pg_driver::PgDriver, model: &Client) -> anyhow::Result<()> {
         Self::insert(driver, model)
     }
 
-    #[bench_message("Updating calendar")]
+    #[bench_message("Updating client")]
     fn update(driver: &mut pg_driver::PgDriver, model: &Client) -> anyhow::Result<()> {
         Self::alter(driver, model, model.get_uuid())
     }
 
-    #[bench_message("Deleting calendar")]
+    #[bench_message("Deleting client")]
     fn remove(driver: &mut pg_driver::PgDriver, model: &Client) -> anyhow::Result<()> {
         Self::delete(driver, model.get_uuid())
     }

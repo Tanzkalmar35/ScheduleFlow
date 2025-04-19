@@ -29,6 +29,10 @@ export class Calendar {
 	 */
 	private readonly properties: Map<string, string>;
 
+	/**
+	 * A list of users that have access to this calendar.
+	 * @type {User[]}
+	 */
 	private readonly users: User[];
 
 	/**
@@ -37,6 +41,7 @@ export class Calendar {
 	 *   @param name the name of the calendar.
 	 *   @param {Component[]} components belong to this calendar.
 	 *   @param {Map<string, string>} properties describe the calendar's characteristics.
+	 *   @param {User[]} users - a list of users with access to this calendar.
 	 */
 	constructor(name: string, components: Component[], properties: Map<string, string>, users: User[]) {
 		this.name = name;
@@ -144,7 +149,7 @@ export class Calendar {
 
 			let m = 0;
 			let users: User[] = [];
-			while (m < calendar.users.length - 1) {
+			while (m < calendar.users.length) {
 				let user = calendar.users[m];
 				users.push(new User(user.username, user.email))
 				m++;

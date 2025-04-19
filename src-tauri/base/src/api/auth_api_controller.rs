@@ -1,5 +1,5 @@
 use shared::{
-    auth_util::AuthUtil, db::repository::user_repository::UserRepository, runtime_objects::driver,
+    auth_util::AuthUtil, current::driver, db::repository::user_repository::UserRepository,
 };
 use std::ops::{Deref, DerefMut};
 use tauri::AppHandle;

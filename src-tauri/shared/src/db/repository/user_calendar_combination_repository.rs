@@ -1,4 +1,5 @@
 use crate::{
+    current::get_error_queue,
     db::{
         db_actions::{DbActions, Table},
         model::{
@@ -10,7 +11,6 @@ use crate::{
         error_impl::database_operation_failed_error::DatabaseOperationFailedError,
         error_utils::Error,
     },
-    runtime_objects::get_error_queue,
 };
 use pg_driver::PgDriver;
 use postgres::Row;

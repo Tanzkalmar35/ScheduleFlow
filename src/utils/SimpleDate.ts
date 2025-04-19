@@ -88,7 +88,6 @@ export class IDate {
 		if (timeSplit.length !== 3) return false;
 
 		timeSplit.forEach(split => {
-			console.log(Number(split))
 			if (isNaN(Number(split))) return false;
 		})
 

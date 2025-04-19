@@ -14,9 +14,17 @@ pub static CURRENT_CLIENT: OnceCell<Mutex<Option<Client>>> = OnceCell::new();
 pub static CURRENT_USER: OnceCell<Mutex<Option<User>>> = OnceCell::new();
 pub static ERROR_QUEUE: OnceCell<Mutex<Option<ErrorQueue>>> = OnceCell::new();
 pub static CACHED_CALENDARS: OnceCell<Mutex<Vec<SimpleCalendar>>> = OnceCell::new();
+pub static SESSION_TYPE: OnceCell<Mutex<SessionType>> = OnceCell::new();
 
 lazy_static! {
     pub static ref APP_HANDLE: Mutex<Option<AppHandle>> = Mutex::new(None);
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum SessionType {
+    TEMPORARY,
+    PERSISTENT,
+    NONE,
 }
 
 pub fn driver() -> &'static Mutex<PgDriver> {
@@ -114,4 +122,17 @@ pub fn cache_calendar(calendar: SimpleCalendar) {
 
 pub fn get_cached_calendars() -> MutexGuard<'static, Vec<SimpleCalendar>> {
     CACHED_CALENDARS.get().unwrap().lock().unwrap()
+}
+
+pub fn set_session_type(session_type: SessionType) {
+    if SESSION_TYPE.get().is_none() {
+        SESSION_TYPE.set(Mutex::new(session_type)).unwrap();
+    }
+
+    let mut cur_type = SESSION_TYPE.get().unwrap().lock().unwrap();
+    *cur_type = session_type;
+}
+
+pub fn get_session_type() -> SessionType {
+    return *SESSION_TYPE.get().unwrap().lock().unwrap();
 }

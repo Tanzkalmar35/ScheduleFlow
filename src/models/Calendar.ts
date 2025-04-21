@@ -1,3 +1,4 @@
+import { Model, ShadowType } from "./Model";
 import { User } from "./User";
 
 /**
@@ -6,7 +7,7 @@ import { User } from "./User";
  *  This means, that this object is only a data holder,
  *  it does not offer any of the functionality the backend offers.
  */
-export class Calendar {
+export class Calendar implements Model {
 	/**
 	 * The title or alias assigned to a calendar to identify it in the gui.
 	 *
@@ -34,6 +35,12 @@ export class Calendar {
 	 * @type {User[]}
 	 */
 	private readonly users: User[];
+
+	/**
+	 * The shadow type of the calendar used for identification in backend.
+	 * @type {ShadowType} the shadow type used for identification in backend.
+	 */
+	readonly shadowType: ShadowType = ShadowType.Calendar;
 
 	/**
 	 *   Initializes a new Calendar object.
@@ -84,6 +91,15 @@ export class Calendar {
 	 */
 	getUsers(): User[] {
 		return this.users;
+	}
+
+	/**
+	 * Returns the shadow type of the calendar.
+	 *
+	 * @returns {ShadowType} The shadow type of this calendar.
+	 */
+	getShadowType(): ShadowType {
+		return this.shadowType;
 	}
 
 	/**
@@ -166,7 +182,7 @@ export class Calendar {
 	}
 }
 
-class Component {
+class Component implements Model {
 	/**
 	 *   A list of properties describing the component's characteristics.
 	 *
@@ -180,6 +196,13 @@ class Component {
 	 *   @type {ComponentType}
 	 */
 	private readonly type: ComponentType;
+
+	/**
+	 * The shadow type of the calendar used for identification in backend.
+	 *
+	 * @type {ShadowType} the shadow type used for identification in backend.
+	 */
+	readonly shadowType: ShadowType = ShadowType.Component;
 
 	/**
 	 *   Initializes a new Component.
@@ -208,6 +231,15 @@ class Component {
 	 */
 	getType(): ComponentType {
 		return this.type;
+	}
+
+	/**
+	 * Returns the shadow type of the calendar.
+	 *
+	 * @returns {ShadowType} The shadow type of this calendar.
+	 */
+	getShadowType(): ShadowType {
+		return this.shadowType;
 	}
 }
 

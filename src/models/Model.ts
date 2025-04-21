@@ -1,5 +1,7 @@
 export interface Model {
 	readonly shadowType: ShadowType;
+
+	getShadowType(): ShadowType;
 }
 
 export enum ShadowType {

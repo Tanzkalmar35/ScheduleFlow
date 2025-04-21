@@ -4,3 +4,4 @@ pub mod crypto;
 pub mod current;
 pub mod db;
 pub mod errors;
+pub mod validator;
